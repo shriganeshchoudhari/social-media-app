@@ -1,0 +1,23 @@
+### Register User
+POST http://localhost:8080/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "Test123!",
+  "displayName": "Test User"
+}
+
+### Login
+POST http://localhost:8081/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "Password123!"
+}
+
+### Get Feed (replace TOKEN)
+GET http://localhost:8080/api/v1/feed
+Authorization: Bearer YOUR_TOKEN_HERE
