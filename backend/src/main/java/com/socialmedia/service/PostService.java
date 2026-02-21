@@ -15,7 +15,7 @@ import com.socialmedia.repository.FollowRepository;
 import com.socialmedia.repository.LikeRepository;
 import com.socialmedia.repository.PostRepository;
 import com.socialmedia.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
@@ -38,19 +39,6 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final FollowRepository followRepository;
-
-    @Autowired
-    public PostService(PostRepository postRepository,
-                       UserRepository userRepository,
-                       CommentRepository commentRepository,
-                       LikeRepository likeRepository,
-                       FollowRepository followRepository) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
-        this.likeRepository = likeRepository;
-        this.followRepository = followRepository;
-    }
 
     // ─── Helpers ───────────────────────────────────────────────────────────────
 

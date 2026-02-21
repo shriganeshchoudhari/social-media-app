@@ -2,23 +2,17 @@ package com.socialmedia.config;
 
 import com.socialmedia.entity.User;
 import com.socialmedia.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public DataInitializer(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public void run(String... args) {
@@ -39,17 +33,13 @@ public class DataInitializer implements CommandLineRunner {
             user2.setEmail("jane@example.com");
             user2.setPassword(passwordEncoder.encode("Password123!"));
             user2.setDisplayName("Jane Smith");
-            user2.setBio("Designer and content creator");
+            user2.setBio("Designer and creator");
             user2.setIsActive(true);
             user2.setIsPrivate(false);
-            user2.setIsVerified(true);
+            user2.setIsVerified(false);
 
             userRepository.save(user1);
             userRepository.save(user2);
-
-            System.out.println("Demo data initialized successfully!");
-            System.out.println("  Login with: john@example.com / Password123!");
-            System.out.println("  Login with: jane@example.com / Password123!");
         }
     }
 }
