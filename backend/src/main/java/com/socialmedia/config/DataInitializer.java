@@ -3,10 +3,12 @@ package com.socialmedia.config;
 import com.socialmedia.entity.User;
 import com.socialmedia.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -15,9 +17,11 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         if (userRepository.count() == 0) {
-            // Create demo users
+            log.info("Initializing demo users...");
+
+            // Create demo user 1
             User user1 = new User();
             user1.setUsername("john_doe");
             user1.setEmail("john@example.com");
@@ -28,6 +32,7 @@ public class DataInitializer implements CommandLineRunner {
             user1.setIsPrivate(false);
             user1.setIsVerified(false);
 
+            // Create demo user 2
             User user2 = new User();
             user2.setUsername("jane_smith");
             user2.setEmail("jane@example.com");
@@ -38,8 +43,8 @@ public class DataInitializer implements CommandLineRunner {
             user2.setIsPrivate(false);
             user2.setIsVerified(false);
 
-            userRepository.save(user1);
-            userRepository.save(user2);
+            userRepository.saveAll(java.util.List.of(user1, user2));
+            log.info("Demo users created successfully: john@example.com, jane@example.com");
         }
     }
 }
