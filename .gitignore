@@ -25,6 +25,19 @@ frontend/yarn-error.log*
 frontend/pnpm-debug.log*
 frontend/lerna-debug.log*
 
+# e2e
+e2e/node_modules/
+e2e/.env.local
+e2e/.env.development.local
+e2e/.env.test.local
+e2e/.env.production.local
+e2e/npm-debug.log*
+e2e/yarn-debug.log*
+e2e/yarn-error.log*
+e2e/pnpm-debug.log*
+e2e/lerna-debug.log*
+
+
 # IDEs
 .idea/
 .vscode/
