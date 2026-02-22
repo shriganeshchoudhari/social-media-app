@@ -1,4 +1,4 @@
-# Security & Compliance Document
+﻿# Security & Compliance Document
 ## ConnectHub Social Media Platform
 
 **Version:** 1.0  
@@ -108,44 +108,44 @@ This document defines the comprehensive security and compliance framework for Co
 ### 2.1 Security Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│            User Access Layer                    │
-│  - HTTPS/TLS 1.3                               │
-│  - WAF (Web Application Firewall)              │
-│  - DDoS Protection (CloudFront + Shield)       │
-└──────────────────┬──────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────┐
-│        Authentication & Authorization           │
-│  - JWT tokens                                   │
-│  - OAuth 2.0                                    │
-│  - Multi-factor authentication                 │
-│  - Session management                           │
-└──────────────────┬──────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────┐
-│           Application Layer                     │
-│  - Input validation                             │
-│  - Output encoding                              │
-│  - CSRF protection                              │
-│  - Security headers                             │
-└──────────────────┬──────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────┐
-│              Data Layer                         │
-│  - Encryption at rest (AES-256)                │
-│  - Encryption in transit (TLS 1.3)             │
-│  - Database access control                      │
-│  - Data classification                          │
-└──────────────────┬──────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────┐
-│         Infrastructure Layer                    │
-│  - Network segmentation (VPC)                   │
-│  - Security groups                              │
-│  - IAM roles and policies                       │
-│  - Logging and monitoring                       │
-└─────────────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚            User Access Layer                    â”‚
+â”‚  - HTTPS/TLS 1.3                               â”‚
+â”‚  - WAF (Web Application Firewall)              â”‚
+â”‚  - DDoS Protection (CloudFront + Shield)       â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚        Authentication & Authorization           â”‚
+â”‚  - JWT tokens                                   â”‚
+â”‚  - OAuth 2.0                                    â”‚
+â”‚  - Multi-factor authentication                 â”‚
+â”‚  - Session management                           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚           Application Layer                     â”‚
+â”‚  - Input validation                             â”‚
+â”‚  - Output encoding                              â”‚
+â”‚  - CSRF protection                              â”‚
+â”‚  - Security headers                             â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚              Data Layer                         â”‚
+â”‚  - Encryption at rest (AES-256)                â”‚
+â”‚  - Encryption in transit (TLS 1.3)             â”‚
+â”‚  - Database access control                      â”‚
+â”‚  - Data classification                          â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚         Infrastructure Layer                    â”‚
+â”‚  - Network segmentation (VPC)                   â”‚
+â”‚  - Security groups                              â”‚
+â”‚  - IAM roles and policies                       â”‚
+â”‚  - Logging and monitoring                       â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 2.2 Security Controls Matrix
@@ -687,8 +687,8 @@ AWS KMS (Key Management Service):
 
 Key Hierarchy:
 - Master Key (KMS)
-  └─ Data Encryption Keys (DEK)
-      └─ Encrypted data
+  â””â”€ Data Encryption Keys (DEK)
+      â””â”€ Encrypted data
 
 Key Access:
 - Role-based access
@@ -891,9 +891,9 @@ All outbound traffic via NAT Gateway
 **Network Segmentation:**
 ```
 DMZ (Public Subnet)
-    ↓
+    â†“
 Application Tier (Private Subnet)
-    ↓
+    â†“
 Data Tier (Database Subnet)
 
 Each tier in separate subnets
@@ -908,8 +908,8 @@ Network ACLs provide subnet-level filtering
 **ALB Security Group:**
 ```
 Inbound:
-- Port 80 (HTTP): 0.0.0.0/0 → Redirect to HTTPS
-- Port 443 (HTTPS): 0.0.0.0/0 → Accept
+- Port 80 (HTTP): 0.0.0.0/0 â†’ Redirect to HTTPS
+- Port 443 (HTTPS): 0.0.0.0/0 â†’ Accept
 
 Outbound:
 - All traffic to ECS security group
@@ -3066,7 +3066,7 @@ testssl.sh staging.connecthub.com
 
 **Scoring Matrix:**
 ```
-Priority = (Severity × Exploitability × Impact) / Remediation Cost
+Priority = (Severity Ã— Exploitability Ã— Impact) / Remediation Cost
 
 Severity:
 - Critical: 10
@@ -3409,53 +3409,53 @@ Configuration:
 // Security code review guidelines
 
 // 1. Input Validation
-// ✅ GOOD
+// âœ… GOOD
 const username = validator.escape(req.body.username);
 const email = validator.normalizeEmail(req.body.email);
 
-// ❌ BAD
+// âŒ BAD
 const username = req.body.username; // No validation
 
 // 2. SQL Queries
-// ✅ GOOD
+// âœ… GOOD
 const user = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
 
-// ❌ BAD
+// âŒ BAD
 const user = await db.query(`SELECT * FROM users WHERE id = ${userId}`);
 
 // 3. Authentication
-// ✅ GOOD
+// âœ… GOOD
 const hashedPassword = await bcrypt.hash(password, 12);
 
-// ❌ BAD
+// âŒ BAD
 const hashedPassword = crypto.createHash('md5').update(password).digest('hex');
 
 // 4. Authorization
-// ✅ GOOD
+// âœ… GOOD
 if (post.authorId !== req.user.id && req.user.role !== 'admin') {
   return res.status(403).json({ error: 'Forbidden' });
 }
 
-// ❌ BAD
+// âŒ BAD
 if (req.headers['x-admin'] === 'true') {
   // Trusting client-provided header
 }
 
 // 5. Secrets
-// ✅ GOOD
+// âœ… GOOD
 const apiKey = process.env.API_KEY;
 
-// ❌ BAD
+// âŒ BAD
 const apiKey = 'hardcoded-api-key-12345';
 
 // 6. Error Handling
-// ✅ GOOD
+// âœ… GOOD
 catch (error) {
   logger.error('Database error', { error: error.message });
   return res.status(500).json({ error: 'Internal server error' });
 }
 
-// ❌ BAD
+// âŒ BAD
 catch (error) {
   return res.status(500).json({ error: error.stack }); // Exposing stack trace
 }
@@ -3882,7 +3882,7 @@ Requirements:
 - Data processing agreements
 - International transfer safeguards
 
-Status: ✅ Compliant
+Status: âœ… Compliant
 Last Audit: 2026-01-15
 Next Audit: 2026-07-15
 ```
@@ -3897,7 +3897,7 @@ Requirements:
 - Non-discrimination
 - Data security
 
-Status: ✅ Compliant
+Status: âœ… Compliant
 Last Review: 2026-01-15
 Next Review: 2026-07-15
 ```
@@ -4142,9 +4142,9 @@ Action Items:
 [High-level overview of security posture]
 
 ## Key Achievements
-- ✅ ISO 27001 audit completed
-- ✅ Zero critical vulnerabilities
-- ✅ MFA adoption: 95%
+- âœ… ISO 27001 audit completed
+- âœ… Zero critical vulnerabilities
+- âœ… MFA adoption: 95%
 
 ## Security Incidents
 - Total incidents: 3
@@ -4158,8 +4158,8 @@ Action Items:
 - High risks: 2 (mitigation in progress)
 
 ## Compliance Status
-- GDPR: ✅ Compliant
-- CCPA: ✅ Compliant
+- GDPR: âœ… Compliant
+- CCPA: âœ… Compliant
 - SOC 2: In progress (audit Q2)
 
 ## Metrics
@@ -4265,10 +4265,12 @@ Action Items:
 
 **END OF DOCUMENT**
 
-**Status:** ✅ COMPLETE  
+**Status:** âœ… COMPLETE  
 **Classification:** Confidential  
 **Pages:** 100+  
 **Security Controls:** Comprehensive  
 **Compliance:** GDPR, CCPA Ready  
 **Ready for:** Production Security Implementation
+
+
 

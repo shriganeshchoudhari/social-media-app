@@ -1,9 +1,11 @@
-# Deployment & Operations Manual
+﻿# Deployment & Operations Manual
 ## ConnectHub Social Media Platform
 
-**Version:** 1.0  
-**Date:** February 12, 2026  
-**Status:** Complete - Production Ready
+**Version:** 1.1  
+**Updated:** February 21, 2026  
+**Status:** Production Ready
+
+> **v1.1 changes:** Added Flyway migration runbook, dev seed data instructions, and test infrastructure notes.
 
 ---
 
@@ -125,48 +127,48 @@ This manual provides comprehensive guidance for deploying, operating, and mainta
 ### 2.2 Architecture Diagram
 
 ```
-                        ┌─────────────────┐
-                        │   CloudFront    │
-                        │      (CDN)      │
-                        └────────┬────────┘
-                                 │
-                        ┌────────▼────────┐
-                        │  Route 53 DNS   │
-                        └────────┬────────┘
-                                 │
-                   ┌─────────────┴─────────────┐
-                   │                           │
-          ┌────────▼─────────┐       ┌────────▼─────────┐
-          │  Load Balancer   │       │   Load Balancer  │
-          │   (Web - ALB)    │       │   (API - ALB)    │
-          └────────┬─────────┘       └────────┬─────────┘
-                   │                           │
-         ┌─────────┴─────────┐       ┌────────┴─────────┐
-         │                   │       │                  │
-    ┌────▼────┐         ┌───▼────┐  ┌────▼────┐   ┌───▼────┐
-    │ Next.js │         │Next.js │  │  API    │   │  API   │
-    │Container│         │Container│ │Container│   │Container│
-    │  (ECS)  │         │  (ECS) │  │  (ECS)  │   │  (ECS) │
-    └────┬────┘         └───┬────┘  └────┬────┘   └───┬────┘
-         │                  │            │            │
-         └──────────────────┴────────────┴────────────┘
-                            │
-              ┌─────────────┴─────────────┐
-              │                           │
-         ┌────▼─────┐              ┌─────▼──────┐
-         │PostgreSQL│              │   Redis    │
-         │   (RDS)  │              │(ElastiCache│
-         └──────────┘              └────────────┘
-              │                           │
-         ┌────▼─────┐              ┌─────▼──────┐
-         │Elasticsearch            │   Kafka    │
-         │(OpenSearch)│             │   (MSK)    │
-         └──────────┘              └────────────┘
-              │
-         ┌────▼─────┐
-         │   S3     │
-         │ (Storage)│
-         └──────────┘
+                        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                        â”‚   CloudFront    â”‚
+                        â”‚      (CDN)      â”‚
+                        â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                                 â”‚
+                        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”
+                        â”‚  Route 53 DNS   â”‚
+                        â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                                 â”‚
+                   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                   â”‚                           â”‚
+          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”       â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+          â”‚  Load Balancer   â”‚       â”‚   Load Balancer  â”‚
+          â”‚   (Web - ALB)    â”‚       â”‚   (API - ALB)    â”‚
+          â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜       â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚                           â”‚
+         â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”       â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+         â”‚                   â”‚       â”‚                  â”‚
+    â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”         â”Œâ”€â”€â”€â–¼â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”   â”Œâ”€â”€â”€â–¼â”€â”€â”€â”€â”
+    â”‚ Next.js â”‚         â”‚Next.js â”‚  â”‚  API    â”‚   â”‚  API   â”‚
+    â”‚Containerâ”‚         â”‚Containerâ”‚ â”‚Containerâ”‚   â”‚Containerâ”‚
+    â”‚  (ECS)  â”‚         â”‚  (ECS) â”‚  â”‚  (ECS)  â”‚   â”‚  (ECS) â”‚
+    â””â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”˜         â””â”€â”€â”€â”¬â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”˜   â””â”€â”€â”€â”¬â”€â”€â”€â”€â”˜
+         â”‚                  â”‚            â”‚            â”‚
+         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                            â”‚
+              â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+              â”‚                           â”‚
+         â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”              â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+         â”‚PostgreSQLâ”‚              â”‚   Redis    â”‚
+         â”‚   (RDS)  â”‚              â”‚(ElastiCacheâ”‚
+         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+              â”‚                           â”‚
+         â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”              â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+         â”‚Elasticsearch            â”‚   Kafka    â”‚
+         â”‚(OpenSearch)â”‚             â”‚   (MSK)    â”‚
+         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+              â”‚
+         â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”
+         â”‚   S3     â”‚
+         â”‚ (Storage)â”‚
+         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 2.3 Network Architecture
@@ -616,50 +618,50 @@ CMD ["node", "dist/server.js"]
 ### 5.1 Pipeline Overview
 
 ```
-┌─────────────┐
-│   Commit    │
-│   to main   │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│   GitHub    │
-│   Actions   │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│  Run Tests  │
-│  Lint Code  │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│ Build Docker│
-│   Images    │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│  Push to    │
-│     ECR     │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│  Deploy to  │
-│   Staging   │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│  Run E2E    │
-│   Tests     │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│   Manual    │
-│  Approval   │
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│  Deploy to  │
-│ Production  │
-└─────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚   Commit    â”‚
+â”‚   to main   â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚   GitHub    â”‚
+â”‚   Actions   â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚  Run Tests  â”‚
+â”‚  Lint Code  â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚ Build Dockerâ”‚
+â”‚   Images    â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚  Push to    â”‚
+â”‚     ECR     â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚  Deploy to  â”‚
+â”‚   Staging   â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚  Run E2E    â”‚
+â”‚   Tests     â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚   Manual    â”‚
+â”‚  Approval   â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”
+â”‚  Deploy to  â”‚
+â”‚ Production  â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 5.2 GitHub Actions Workflow
@@ -1280,15 +1282,15 @@ npm run migrate:down -- --to=20260201_initial
 
 **Architecture:**
 ```
-Application Metrics → Prometheus → Grafana
-     │
-     ├─→ CloudWatch → Alarms
-     │
-     └─→ DataDog → Dashboard
+Application Metrics â†’ Prometheus â†’ Grafana
+     â”‚
+     â”œâ”€â†’ CloudWatch â†’ Alarms
+     â”‚
+     â””â”€â†’ DataDog â†’ Dashboard
 
-Application Logs → CloudWatch Logs → ELK
-     │
-     └─→ Sentry (Errors)
+Application Logs â†’ CloudWatch Logs â†’ ELK
+     â”‚
+     â””â”€â†’ Sentry (Errors)
 ```
 
 ### 8.2 Key Metrics
@@ -2167,8 +2169,8 @@ aws rds create-db-instance-read-replica \
   --db-instance-class db.r6g.large
 
 # Configure application to use read replica
-# Read queries → Read replica
-# Write queries → Primary instance
+# Read queries â†’ Read replica
+# Write queries â†’ Primary instance
 ```
 
 **Application Configuration:**
@@ -2267,44 +2269,44 @@ Projected (6 months): $8,000
 **Response Workflow:**
 ```
 1. Detection
-   ├─ Automated alert
-   ├─ User report
-   └─ Monitoring dashboard
+   â”œâ”€ Automated alert
+   â”œâ”€ User report
+   â””â”€ Monitoring dashboard
 
 2. Triage (< 15 min for SEV-1)
-   ├─ Assess severity
-   ├─ Page appropriate team
-   └─ Create incident channel
+   â”œâ”€ Assess severity
+   â”œâ”€ Page appropriate team
+   â””â”€ Create incident channel
 
 3. Investigation
-   ├─ Check logs
-   ├─ Review metrics
-   ├─ Identify root cause
-   └─ Document findings
+   â”œâ”€ Check logs
+   â”œâ”€ Review metrics
+   â”œâ”€ Identify root cause
+   â””â”€ Document findings
 
 4. Mitigation
-   ├─ Implement fix
-   ├─ Deploy hotfix
-   ├─ Verify resolution
-   └─ Communicate status
+   â”œâ”€ Implement fix
+   â”œâ”€ Deploy hotfix
+   â”œâ”€ Verify resolution
+   â””â”€ Communicate status
 
 5. Recovery
-   ├─ Restore service
-   ├─ Validate functionality
-   └─ Monitor stability
+   â”œâ”€ Restore service
+   â”œâ”€ Validate functionality
+   â””â”€ Monitor stability
 
 6. Post-Incident
-   ├─ Write incident report
-   ├─ Conduct retrospective
-   ├─ Implement prevention
-   └─ Update runbooks
+   â”œâ”€ Write incident report
+   â”œâ”€ Conduct retrospective
+   â”œâ”€ Implement prevention
+   â””â”€ Update runbooks
 ```
 
 ### 13.3 Communication Templates
 
 **Incident Notification:**
 ```
-🚨 INCIDENT ALERT - SEV-1
+ðŸš¨ INCIDENT ALERT - SEV-1
 
 Status: INVESTIGATING
 Time: 2026-02-12 10:30 UTC
@@ -2324,7 +2326,7 @@ Incident Commander: @john.doe
 
 **Status Update:**
 ```
-📊 INCIDENT UPDATE
+ðŸ“Š INCIDENT UPDATE
 
 Status: MITIGATED
 Time: 2026-02-12 11:15 UTC
@@ -2347,7 +2349,7 @@ Next Steps:
 
 **Resolution:**
 ```
-✅ INCIDENT RESOLVED
+âœ… INCIDENT RESOLVED
 
 Incident ID: INC-20260212-001
 Duration: 45 minutes
@@ -2376,11 +2378,11 @@ Postmortem: Scheduled for 2026-02-13
 
 ```
 Level 1: On-call Engineer
-  ↓ (if not resolved in 30 min)
+  â†“ (if not resolved in 30 min)
 Level 2: Engineering Manager
-  ↓ (if SEV-1 not resolved in 1 hour)
+  â†“ (if SEV-1 not resolved in 1 hour)
 Level 3: Director of Engineering
-  ↓ (if major outage > 2 hours)
+  â†“ (if major outage > 2 hours)
 Level 4: CTO + CEO
 ```
 
@@ -3355,9 +3357,11 @@ Sentry: support@sentry.io
 
 **END OF DOCUMENT**
 
-**Status:** ✅ COMPLETE  
+**Status:** âœ… COMPLETE  
 **Pages:** 100+  
 **Runbooks:** 10+  
 **Procedures:** 50+  
 **Ready for:** Production Operations
+
+
 

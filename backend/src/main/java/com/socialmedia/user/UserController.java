@@ -1,0 +1,56 @@
+package com.socialmedia.user;
+
+import com.socialmedia.post.PostService;
+import com.socialmedia.post.dto.PostResponse;
+import com.socialmedia.user.dto.UpdateProfileRequest;
+import com.socialmedia.user.dto.UserResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+    private final PostService postService;
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getMe(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(UserService.toResponse(currentUser));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<UserResponse> updateMe(
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody UpdateProfileRequest req) {
+        return ResponseEntity.ok(userService.updateProfile(currentUser, req));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResponse>> search(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(userService.search(q, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserResponse> getByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getByUsername(username));
+    }
+
+    @GetMapping("/{username}/posts")
+    public ResponseEntity<Page<PostResponse>> getPostsByUser(
+            @PathVariable String username,
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(postService.getByUsername(username, currentUser, PageRequest.of(page, size)));
+    }
+}

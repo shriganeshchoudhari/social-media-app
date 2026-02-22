@@ -3,114 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
   body {
-    @apply bg-surface-50 text-gray-900 font-sans antialiased;
-  }
-  * {
-    @apply box-border;
-  }
-}
-
-@layer components {
-  /* Buttons */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-150 cursor-pointer select-none;
-  }
-  .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-600 active:bg-primary-700 shadow-sm;
-  }
-  .btn-outline {
-    @apply border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 bg-white;
-  }
-  .btn-ghost {
-    @apply text-gray-600 hover:bg-gray-100 hover:text-gray-900;
-  }
-  .btn-danger {
-    @apply bg-red-500 text-white hover:bg-red-600;
-  }
-  .btn-sm {
-    @apply px-3 py-1.5 text-xs rounded-lg;
-  }
-  .btn-lg {
-    @apply px-6 py-3 text-base;
-  }
-
-  /* Input */
-  .input {
-    @apply w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm
-           bg-white placeholder-gray-400
-           focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
-           transition-all duration-150;
-  }
-  .input-lg {
-    @apply px-4 py-3 text-base;
-  }
-
-  /* Cards */
-  .card {
-    @apply bg-white rounded-2xl shadow-card border border-gray-100/80 p-5;
-  }
-  .card-hover {
-    @apply card hover:shadow-card-hover transition-shadow duration-200;
-  }
-
-  /* Avatar */
-  .avatar {
-    @apply rounded-full object-cover bg-gray-200 flex-shrink-0;
-  }
-  .avatar-sm {
-    @apply avatar w-8 h-8;
-  }
-  .avatar-md {
-    @apply avatar w-10 h-10;
-  }
-  .avatar-lg {
-    @apply avatar w-12 h-12;
-  }
-  .avatar-xl {
-    @apply avatar w-20 h-20;
-  }
-  .avatar-2xl {
-    @apply avatar w-28 h-28;
-  }
-
-  /* Badge */
-  .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
-  }
-  .badge-primary {
-    @apply badge bg-primary-50 text-primary-700;
-  }
-
-  /* Divider */
-  .divider {
-    @apply border-t border-gray-100;
-  }
-
-  /* Layout */
-  .page-container {
-    @apply flex min-h-screen bg-surface-50;
-  }
-  .main-content {
-    @apply flex-1 min-h-screen max-w-2xl mx-auto w-full;
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .border-3 {
-    border-width: 3px;
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }

@@ -1,0 +1,39 @@
+{
+  "name": "connecthub-e2e",
+  "version": "1.0.0",
+  "description": "Playwright E2E tests for ConnectHub social media app",
+  "private": true,
+  "scripts": {
+    "test":                  "playwright test",
+    "test:headed":           "playwright test --headed",
+    "test:ui":               "playwright test --ui",
+    "test:debug":            "playwright test --debug",
+
+    "test:auth":             "playwright test tests/auth.spec.ts",
+    "test:feed":             "playwright test tests/feed.spec.ts",
+    "test:posts":            "playwright test tests/posts.spec.ts",
+    "test:comments":         "playwright test tests/comments.spec.ts",
+    "test:profile":          "playwright test tests/profile.spec.ts",
+    "test:follow":           "playwright test tests/follow.spec.ts",
+    "test:search":           "playwright test tests/search.spec.ts",
+    "test:notifications":    "playwright test tests/notifications.spec.ts",
+    "test:media":            "playwright test tests/media.spec.ts",
+    "test:security":         "playwright test tests/security.spec.ts",
+
+    "test:positive":         "playwright test --grep '✅'",
+    "test:negative":         "playwright test --grep '❌'",
+    "test:api-only":         "playwright test tests/security.spec.ts tests/media.spec.ts",
+    "test:smoke":            "playwright test --grep 'login|register|feed' --workers 1",
+    "test:chromium":         "playwright test --project=chromium",
+    "test:firefox":          "playwright test --project=firefox",
+    "test:mobile":           "playwright test --project=mobile-chrome",
+
+    "report":                "playwright show-report playwright-report",
+    "codegen":               "playwright codegen http://localhost:3000",
+    "install-browsers":      "playwright install --with-deps chromium firefox"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^22.0.0"
+  }
+}

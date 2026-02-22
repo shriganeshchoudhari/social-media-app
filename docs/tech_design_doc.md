@@ -1,4 +1,4 @@
-# Technical Design Document (TDD)
+﻿# Technical Design Document (TDD)
 ## Social Media Clone Application
 
 **Version:** 1.0 | **Date:** February 07, 2026 | **Status:** Active
@@ -12,34 +12,34 @@
 
 **Core Components:**
 ```
-┌──────────────────────────────────────────────────────┐
-│                  Client Layer                         │
-│  Web App (React) │ Mobile Apps │ Third-Party Clients │
-└────────────────────┬─────────────────────────────────┘
-                     │
-┌────────────────────▼─────────────────────────────────┐
-│            API Gateway (Port 8080)                    │
-│  Authentication │ Rate Limiting │ Load Balancing     │
-└────────────────────┬─────────────────────────────────┘
-                     │
-        ┌────────────┴────────────┐
-        │  Service Discovery      │
-        │  (Eureka - Port 8761)   │
-        └────────────┬────────────┘
-                     │
-    ┌────────────────┴──────────────────┐
-    │        Microservices Layer         │
-    ├────────────────────────────────────┤
-    │ Auth(8081) │ User(8082) │ Post(8083)│
-    │ Feed(8084) │ Message(8085) │ etc   │
-    └────────────────┬───────────────────┘
-                     │
-    ┌────────────────┴───────────────────┐
-    │         Data Layer                  │
-    ├─────────────────────────────────────┤
-    │ PostgreSQL │ Redis │ Elasticsearch │
-    │ Kafka │ S3/Cloud Storage            │
-    └─────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                  Client Layer                         â”‚
+â”‚  Web App (React) â”‚ Mobile Apps â”‚ Third-Party Clients â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                     â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚            API Gateway (Port 8080)                    â”‚
+â”‚  Authentication â”‚ Rate Limiting â”‚ Load Balancing     â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                     â”‚
+        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+        â”‚  Service Discovery      â”‚
+        â”‚  (Eureka - Port 8761)   â”‚
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                     â”‚
+    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    â”‚        Microservices Layer         â”‚
+    â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+    â”‚ Auth(8081) â”‚ User(8082) â”‚ Post(8083)â”‚
+    â”‚ Feed(8084) â”‚ Message(8085) â”‚ etc   â”‚
+    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                     â”‚
+    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    â”‚         Data Layer                  â”‚
+    â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+    â”‚ PostgreSQL â”‚ Redis â”‚ Elasticsearch â”‚
+    â”‚ Kafka â”‚ S3/Cloud Storage            â”‚
+    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 1.2 Microservices
@@ -122,14 +122,14 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 ### 2.2 Redis Cache Strategy
 ```
-Format: key → value (TTL)
+Format: key â†’ value (TTL)
 
-user:{id} → UserDTO (5min)
-post:{id} → PostDTO (10min)
-feed:{userId} → List<PostDTO> (15min)
-session:{sessionId} → SessionData (30days)
-trending:hashtags → SortedSet (1hour)
-ratelimit:{userId}:{endpoint} → count (1min)
+user:{id} â†’ UserDTO (5min)
+post:{id} â†’ PostDTO (10min)
+feed:{userId} â†’ List<PostDTO> (15min)
+session:{sessionId} â†’ SessionData (30days)
+trending:hashtags â†’ SortedSet (1hour)
+ratelimit:{userId}:{endpoint} â†’ count (1min)
 ```
 
 ### 2.3 Elasticsearch Indexes
@@ -257,12 +257,12 @@ Anonymous:        10 req/min/IP
 
 ### 4.1 Authentication Flow
 ```
-1. User → POST /auth/login {email, password}
-2. Server → Validate credentials
-3. Server → Generate JWT (access + refresh tokens)
-4. Server → Return tokens
-5. Client → Store tokens (httpOnly cookie)
-6. Client → Include in subsequent requests
+1. User â†’ POST /auth/login {email, password}
+2. Server â†’ Validate credentials
+3. Server â†’ Generate JWT (access + refresh tokens)
+4. Server â†’ Return tokens
+5. Client â†’ Store tokens (httpOnly cookie)
+6. Client â†’ Include in subsequent requests
 ```
 
 **JWT Structure**:
@@ -303,13 +303,13 @@ Anonymous:        10 req/min/IP
 
 **Flow**: Authorization Code with PKCE
 ```
-1. Client → Redirect to OAuth provider
-2. User → Authorize app
-3. Provider → Return auth code
-4. Server → Exchange code for tokens
-5. Server → Fetch user info
-6. Server → Create/link account
-7. Server → Return JWT
+1. Client â†’ Redirect to OAuth provider
+2. User â†’ Authorize app
+3. Provider â†’ Return auth code
+4. Server â†’ Exchange code for tokens
+5. Server â†’ Fetch user info
+6. Server â†’ Create/link account
+7. Server â†’ Return JWT
 ```
 
 ---
@@ -445,10 +445,10 @@ Kubernetes HPA:
 ### 6.3 Event Processing
 ```
 Producer (Post Service) 
-  → Kafka Topic (post-events)
-  → Consumer 1 (Feed Service) - Update feeds
-  → Consumer 2 (Notification Service) - Send notifications
-  → Consumer 3 (Search Service) - Index post
+  â†’ Kafka Topic (post-events)
+  â†’ Consumer 1 (Feed Service) - Update feeds
+  â†’ Consumer 2 (Notification Service) - Send notifications
+  â†’ Consumer 3 (Search Service) - Index post
 ```
 
 ---
@@ -532,30 +532,30 @@ spec:
 
 ```
 1. Code Commit (GitHub)
-   ↓
+   â†“
 2. Trigger Pipeline (GitHub Actions)
-   ↓
+   â†“
 3. Build & Test
    - mvn clean test
    - Code coverage check (>80%)
-   ↓
+   â†“
 4. Build Docker Image
    - docker build -t service:version
-   ↓
+   â†“
 5. Push to Registry
    - docker push to DockerHub/ECR
-   ↓
+   â†“
 6. Deploy to Staging
    - kubectl apply -f staging/
-   ↓
+   â†“
 7. Integration Tests
    - Selenium, API tests
-   ↓
+   â†“
 8. Manual Approval
-   ↓
+   â†“
 9. Deploy to Production
    - kubectl apply -f prod/
-   ↓
+   â†“
 10. Health Checks & Monitoring
 ```
 
@@ -616,10 +616,10 @@ spec:
 
 **Trace Context**:
 ```
-Request arrives → Generate trace ID
-  → Pass to all downstream services
-  → Aggregate in Jaeger
-  → Visualize call graph
+Request arrives â†’ Generate trace ID
+  â†’ Pass to all downstream services
+  â†’ Aggregate in Jaeger
+  â†’ Visualize call graph
 ```
 
 ### 8.4 Alerting
@@ -642,7 +642,7 @@ Request arrives → Generate trace ID
 
 ### 9.1 Backend
 
-**Framework**: Spring Boot 3.2.x
+**Framework**: Spring Boot 4.0.3.x
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -774,3 +774,4 @@ Request arrives → Generate trace ID
 **Document Owner**: Technical Lead  
 **Last Review**: February 07, 2026  
 **Next Review**: March 07, 2026
+

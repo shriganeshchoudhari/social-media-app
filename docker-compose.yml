@@ -1,66 +1,51 @@
-version: '3.8'
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Local development stack for ConnectHub
+#
+# Usage:
+#   docker compose up -d          # start postgres (and optionally pgAdmin)
+#   docker compose down -v        # stop and wipe volumes
+#
+# Then run the backend with:
+#   cd backend
+#   DB_PASSWORD=secret mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+# ─────────────────────────────────────────────────────────────────────────────
 
 services:
-  # PostgreSQL Database
+
   postgres:
-    image: postgres:15-alpine
-    container_name: socialmedia-postgres
+    image: postgres:16-alpine
+    container_name: connecthub-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: socialmedia
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB:       socialmedia
+      POSTGRES_USER:     socialmedia
+      POSTGRES_PASSWORD: secret          # change for real deployments
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - socialmedia-network
+      - ./deploy/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U socialmedia -d socialmedia"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Backend Spring Boot Application
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: socialmedia-backend
+  # Optional pgAdmin UI – comment out if not needed
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: connecthub-pgadmin
+    restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/socialmedia
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      JWT_EXPIRATION: 86400000
+      PGADMIN_DEFAULT_EMAIL:    admin@connecthub.local
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "8080:8080"
+      - "5050:80"
     depends_on:
       postgres:
         condition: service_healthy
-    networks:
-      - socialmedia-network
-    restart: unless-stopped
-
-  # Frontend React Application
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: socialmedia-frontend
-    environment:
-      VITE_API_URL: http://localhost:8080
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    networks:
-      - socialmedia-network
-    restart: unless-stopped
 
 volumes:
   postgres_data:
-
-networks:
-  socialmedia-network:
-    driver: bridge

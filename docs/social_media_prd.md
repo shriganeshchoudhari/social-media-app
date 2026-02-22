@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD)
+﻿# Product Requirements Document (PRD)
 ## Social Media Clone Application
 
 ---
@@ -61,17 +61,17 @@ To create a scalable, secure, and user-friendly social media platform that foste
 ## 3. Product Scope
 
 ### 3.1 In Scope (MVP - Phase 1)
-✅ User authentication and authorization
-✅ User profile management
-✅ Post creation (text, images)
-✅ News feed with basic algorithm
-✅ Social interactions (like, comment, share)
-✅ Follow/unfollow system
-✅ Direct messaging (text)
-✅ Notifications
-✅ Search functionality
-✅ Hashtags
-✅ Privacy settings
+âœ… User authentication and authorization
+âœ… User profile management
+âœ… Post creation (text, images)
+âœ… News feed with basic algorithm
+âœ… Social interactions (like, comment, share)
+âœ… Follow/unfollow system
+âœ… Direct messaging (text)
+âœ… Notifications
+âœ… Search functionality
+âœ… Hashtags
+âœ… Privacy settings
 
 ### 3.2 Future Phases
 
@@ -92,10 +92,10 @@ To create a scalable, secure, and user-friendly social media platform that foste
 - Advanced moderation tools
 
 ### 3.3 Out of Scope
-❌ Native mobile apps (Phase 1)
-❌ Blockchain integration
-❌ Cryptocurrency payments
-❌ VR/AR experiences (Phase 1)
+âŒ Native mobile apps (Phase 1)
+âŒ Blockchain integration
+âŒ Cryptocurrency payments
+âŒ VR/AR experiences (Phase 1)
 
 ---
 
@@ -458,8 +458,8 @@ To create a scalable, secure, and user-friendly social media platform that foste
 ### 6.1 Technology Stack
 
 **Backend:**
-- Java 17+
-- Spring Boot 3.x
+- Java 21+
+- Spring Boot 4.0.3.x
 - Spring Security (JWT + OAuth2)
 - Spring Data JPA
 - Spring Cloud (Microservices)
@@ -1041,3 +1041,4 @@ GET /api/v1/search/hashtags?q={query}
 ---
 
 *This document is confidential and proprietary. Distribution is limited to authorized personnel only.*
+

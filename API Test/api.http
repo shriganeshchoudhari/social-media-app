@@ -1,0 +1,1239 @@
+### ConnectHub — REST Client Test Suite (Complete)
+### Base URL: http://localhost:9090/api/v1
+###
+### Usage:
+###   VS Code  → install "REST Client" (humao.rest-client) → click "Send Request"
+###   IntelliJ → open as HTTP file → click the green ▶ button
+###
+### Quick start:
+###   1. Start docker compose (Postgres)
+###   2. Run backend:  mvn spring-boot:run -Dspring-boot.run.profiles=postgres,dev
+###   3. Run §2.9 (login alice), copy the token into @token
+###   4. Run §2.11 (login bob),  copy the token into @bobToken
+###   5. Execute requests top-to-bottom
+###
+### Seed users (DataSeeder — spring.profiles.active=postgres,dev):
+###   alice / Password1!    bob / Password1!    carol / Password1!
+###   dave  / Password1!    eve / Password1!
+
+@baseUrl   = http://localhost:9090/api/v1
+@token     = PASTE_ALICE_JWT_HERE
+@bobToken  = PASTE_BOB_JWT_HERE
+@carolToken= PASTE_CAROL_JWT_HERE
+
+# ═══════════════════════════════════════════════════════════════
+# 1. HEALTH
+# ═══════════════════════════════════════════════════════════════
+
+### 1.1 Health check (public endpoint)
+GET {{baseUrl}}/health
+Accept: application/json
+
+
+# ═══════════════════════════════════════════════════════════════
+# 2. AUTH
+# ═══════════════════════════════════════════════════════════════
+
+### 2.1 Register — Alice ✅ (expect 201)
+# @name registerAlice
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "email": "alice@example.com",
+  "password": "Password1!",
+  "displayName": "Alice Wonder"
+}
+
+###
+
+### 2.2 Register — Bob ✅
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "bob",
+  "email": "bob@example.com",
+  "password": "Password1!",
+  "displayName": "Bob Builder"
+}
+
+###
+
+### 2.3 Register — Carol ✅
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "carol",
+  "email": "carol@example.com",
+  "password": "Password1!",
+  "displayName": "Carol Danvers"
+}
+
+###
+
+### 2.4 Register ❌ — short password (expect 400)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "baduser",
+  "email": "bad@example.com",
+  "password": "abc",
+  "displayName": "Bad User"
+}
+
+###
+
+### 2.5 Register ❌ — invalid email format (expect 400)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "bademail",
+  "email": "not-an-email",
+  "password": "Password1!",
+  "displayName": "Bad Email"
+}
+
+###
+
+### 2.6 Register ❌ — blank username (expect 400)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "",
+  "email": "blank@example.com",
+  "password": "Password1!",
+  "displayName": "Blank User"
+}
+
+###
+
+### 2.7 Register ❌ — duplicate username (expect 409)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "email": "alice2@example.com",
+  "password": "Password1!",
+  "displayName": "Alice Again"
+}
+
+###
+
+### 2.8 Register ❌ — duplicate email (expect 409)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "alice999",
+  "email": "alice@example.com",
+  "password": "Password1!",
+  "displayName": "Alice III"
+}
+
+###
+
+### 2.9 Login by username ✅ — COPY returned token into @token above
+# @name loginAlice
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "alice",
+  "password": "Password1!"
+}
+
+###
+
+### 2.10 Login by email ✅
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "alice@demo.com",
+  "password": "Password1!"
+}
+
+###
+
+### 2.11 Login — Bob ✅ — COPY token into @bobToken
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "bob",
+  "password": "Password1!"
+}
+
+###
+
+### 2.12 Login — Carol ✅ — COPY token into @carolToken
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "carol",
+  "password": "Password1!"
+}
+
+###
+
+### 2.13 Login ❌ — wrong password (expect 401)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "alice",
+  "password": "WrongPassword!"
+}
+
+###
+
+### 2.14 Login ❌ — non-existent user (expect 401)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "nobody_xyz_99999",
+  "password": "Password1!"
+}
+
+###
+
+### 2.15 Login ❌ — blank credentials (expect 400)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "",
+  "password": ""
+}
+
+
+# ═══════════════════════════════════════════════════════════════
+# 3. USERS
+# ═══════════════════════════════════════════════════════════════
+
+### 3.1 Get own profile ✅
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+
+###
+
+### 3.2 Get own profile — as Bob ✅
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{bobToken}}
+
+###
+
+### 3.3 Get own profile ❌ — no token (expect 401)
+GET {{baseUrl}}/users/me
+
+###
+
+### 3.4 Get own profile ❌ — invalid token (expect 401)
+GET {{baseUrl}}/users/me
+Authorization: Bearer this.is.not.a.valid.jwt
+
+###
+
+### 3.5 Update profile — all fields ✅
+PUT {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "displayName": "Alice In Wonderland",
+  "bio": "Curiouser and curiouser!",
+  "avatarUrl": "https://example.com/avatars/alice.png"
+}
+
+###
+
+### 3.6 Update profile — bio only (partial) ✅
+PUT {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "bio": "Just updated my bio."
+}
+
+###
+
+### 3.7 Update profile — displayName only (partial) ✅
+PUT {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "displayName": "Alice W."
+}
+
+###
+
+### 3.8 Update profile — avatarUrl only ✅
+PUT {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "avatarUrl": "https://example.com/avatars/new-alice.jpg"
+}
+
+###
+
+### 3.9 Update profile ❌ — bio over 200 characters (expect 400)
+PUT {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "bio": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+
+###
+
+### 3.10 Update profile ❌ — no token (expect 401)
+PUT {{baseUrl}}/users/me
+Content-Type: application/json
+
+{
+  "bio": "Unauthorized update."
+}
+
+###
+
+### 3.11 Get user by username — alice ✅
+GET {{baseUrl}}/users/alice
+Authorization: Bearer {{token}}
+
+###
+
+### 3.12 Get user by username — bob ✅
+GET {{baseUrl}}/users/bob
+Authorization: Bearer {{token}}
+
+###
+
+### 3.13 Get user by username — carol ✅
+GET {{baseUrl}}/users/carol
+Authorization: Bearer {{token}}
+
+###
+
+### 3.14 Get user ❌ — not found (expect 404)
+GET {{baseUrl}}/users/nobody_xyz_99999
+Authorization: Bearer {{token}}
+
+###
+
+### 3.15 Search users — "ali" ✅
+GET {{baseUrl}}/users/search?q=ali&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.16 Search users — "bob" ✅
+GET {{baseUrl}}/users/search?q=bob&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.17 Search users — "carol" ✅
+GET {{baseUrl}}/users/search?q=carol&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.18 Search users — no results ✅
+GET {{baseUrl}}/users/search?q=zzznobodyzzzxxx&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.19 Search users ❌ — no auth (expect 401)
+GET {{baseUrl}}/users/search?q=alice
+
+###
+
+### 3.20 Get posts by user — alice ✅
+GET {{baseUrl}}/users/alice/posts?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.21 Get posts by user — page 2 ✅
+GET {{baseUrl}}/users/alice/posts?page=1&size=5
+Authorization: Bearer {{token}}
+
+###
+
+### 3.22 Get followers of bob ✅
+GET {{baseUrl}}/users/bob/followers?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.23 Get followers ❌ — user not found (expect 404)
+GET {{baseUrl}}/users/nobody_xyz_99999/followers?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.24 Get following list of alice ✅
+GET {{baseUrl}}/users/alice/following?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 3.25 Check is-following — alice → bob (should be true in seed) ✅
+GET {{baseUrl}}/users/bob/is-following
+Authorization: Bearer {{token}}
+
+###
+
+### 3.26 Check is-following — alice → carol (follows in seed) ✅
+GET {{baseUrl}}/users/carol/is-following
+Authorization: Bearer {{token}}
+
+###
+
+### 3.27 Check is-following ❌ — no auth (expect 401)
+GET {{baseUrl}}/users/bob/is-following
+
+
+# ═══════════════════════════════════════════════════════════════
+# 4. POSTS
+# ═══════════════════════════════════════════════════════════════
+
+### 4.1 Create post — public ✅
+# @name createPublicPost
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Hello world! First post. #hello #e2e",
+  "privacy": "PUBLIC"
+}
+
+###
+
+### 4.2 Create post — with image URL ✅
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Check out this photo! #photography",
+  "imageUrl": "https://picsum.photos/800/600",
+  "privacy": "PUBLIC"
+}
+
+###
+
+### 4.3 Create post — followers only ✅
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "For my followers only.",
+  "privacy": "FOLLOWERS_ONLY"
+}
+
+###
+
+### 4.4 Create post — private ✅
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "My private thought.",
+  "privacy": "PRIVATE"
+}
+
+###
+
+### 4.5 Create post — as Bob ✅
+POST {{baseUrl}}/posts
+Authorization: Bearer {{bobToken}}
+Content-Type: application/json
+
+{
+  "content": "Bob's post for feed testing. #bob",
+  "privacy": "PUBLIC"
+}
+
+###
+
+### 4.6 Create post ❌ — empty content (expect 400)
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "",
+  "privacy": "PUBLIC"
+}
+
+###
+
+### 4.7 Create post ❌ — content over 2000 characters (expect 400)
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "privacy": "PUBLIC"
+}
+
+###
+
+### 4.8 Create post ❌ — no auth (expect 401)
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "content": "Should fail.",
+  "privacy": "PUBLIC"
+}
+
+###
+
+### 4.9 Get post by ID — ID 1 ✅
+# Replace 1 with a real post ID from §4.1 response
+GET {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+
+###
+
+### 4.10 Get post ❌ — not found (expect 404)
+GET {{baseUrl}}/posts/99999999
+Authorization: Bearer {{token}}
+
+###
+
+### 4.11 Get post ❌ — no auth (expect 401)
+GET {{baseUrl}}/posts/1
+
+###
+
+### 4.12 Get home feed — page 0 ✅
+GET {{baseUrl}}/posts/feed?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 4.13 Get home feed — page 1 ✅
+GET {{baseUrl}}/posts/feed?page=1&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 4.14 Get home feed — small page size ✅
+GET {{baseUrl}}/posts/feed?page=0&size=5
+Authorization: Bearer {{token}}
+
+###
+
+### 4.15 Get home feed ❌ — no auth (expect 401)
+GET {{baseUrl}}/posts/feed?page=0&size=10
+
+###
+
+### 4.16 Delete post — own post ✅ (replace 1 with real ID)
+DELETE {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+
+###
+
+### 4.17 Delete post ❌ — not found (expect 404)
+DELETE {{baseUrl}}/posts/99999999
+Authorization: Bearer {{token}}
+
+###
+
+### 4.18 Delete post ❌ — another user's post (expect 403)
+# Replace 5 with one of Bob's post IDs; authenticate as Alice
+DELETE {{baseUrl}}/posts/5
+Authorization: Bearer {{token}}
+
+###
+
+### 4.19 Delete post ❌ — no auth (expect 401)
+DELETE {{baseUrl}}/posts/1
+
+
+# ═══════════════════════════════════════════════════════════════
+# 5. LIKES
+# ═══════════════════════════════════════════════════════════════
+
+### 5.1 Like a post ✅ (replace 2 with a valid public post ID)
+POST {{baseUrl}}/posts/2/like
+Authorization: Bearer {{token}}
+
+###
+
+### 5.2 Like same post again ❌ — already liked (expect 409)
+POST {{baseUrl}}/posts/2/like
+Authorization: Bearer {{token}}
+
+###
+
+### 5.3 Unlike a post ✅
+DELETE {{baseUrl}}/posts/2/like
+Authorization: Bearer {{token}}
+
+###
+
+### 5.4 Unlike post not yet liked ❌ — (expect 409)
+DELETE {{baseUrl}}/posts/2/like
+Authorization: Bearer {{token}}
+
+###
+
+### 5.5 Like a non-existent post ❌ — (expect 404)
+POST {{baseUrl}}/posts/99999999/like
+Authorization: Bearer {{token}}
+
+###
+
+### 5.6 Like post ❌ — no auth (expect 401)
+POST {{baseUrl}}/posts/2/like
+
+###
+
+### 5.7 Unlike post ❌ — no auth (expect 401)
+DELETE {{baseUrl}}/posts/2/like
+
+
+# ═══════════════════════════════════════════════════════════════
+# 6. COMMENTS
+# ═══════════════════════════════════════════════════════════════
+
+### 6.1 Add comment to post 2 ✅
+# @name createComment
+POST {{baseUrl}}/posts/2/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Great post! Really enjoyed reading this."
+}
+
+###
+
+### 6.2 Add second comment ✅
+POST {{baseUrl}}/posts/2/comments
+Authorization: Bearer {{bobToken}}
+Content-Type: application/json
+
+{
+  "content": "I totally agree with this!"
+}
+
+###
+
+### 6.3 Add comment ❌ — empty content (expect 400)
+POST {{baseUrl}}/posts/2/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": ""
+}
+
+###
+
+### 6.4 Add comment ❌ — whitespace only (expect 400)
+POST {{baseUrl}}/posts/2/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "   "
+}
+
+###
+
+### 6.5 Add comment ❌ — content over 1000 characters (expect 400)
+POST {{baseUrl}}/posts/2/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+
+###
+
+### 6.6 Add comment to non-existent post ❌ — (expect 404)
+POST {{baseUrl}}/posts/99999999/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "This should 404."
+}
+
+###
+
+### 6.7 Add comment ❌ — no auth (expect 401)
+POST {{baseUrl}}/posts/2/comments
+Content-Type: application/json
+
+{
+  "content": "Unauthorized comment."
+}
+
+###
+
+### 6.8 List comments on post 2 — page 0 ✅
+GET {{baseUrl}}/posts/2/comments?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 6.9 List comments — page 1, size 5 ✅
+GET {{baseUrl}}/posts/2/comments?page=1&size=5
+Authorization: Bearer {{token}}
+
+###
+
+### 6.10 List comments on non-existent post ❌ — (expect 404)
+GET {{baseUrl}}/posts/99999999/comments?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 6.11 List comments ❌ — no auth (expect 401)
+GET {{baseUrl}}/posts/2/comments
+
+###
+
+### 6.12 Delete own comment ✅ (replace 2/1 with real postId/commentId)
+DELETE {{baseUrl}}/posts/2/comments/1
+Authorization: Bearer {{token}}
+
+###
+
+### 6.13 Delete comment ❌ — not found (expect 404)
+DELETE {{baseUrl}}/posts/2/comments/99999999
+Authorization: Bearer {{token}}
+
+###
+
+### 6.14 Delete another user's comment ❌ — (expect 403)
+# Authenticate as alice, try to delete a comment created by bob
+DELETE {{baseUrl}}/posts/2/comments/5
+Authorization: Bearer {{token}}
+
+###
+
+### 6.15 Delete comment ❌ — no auth (expect 401)
+DELETE {{baseUrl}}/posts/2/comments/1
+
+
+# ═══════════════════════════════════════════════════════════════
+# 7. FOLLOW
+# ═══════════════════════════════════════════════════════════════
+
+### 7.1 Alice follows Carol ✅
+POST {{baseUrl}}/users/carol/follow
+Authorization: Bearer {{token}}
+
+###
+
+### 7.2 Alice follows Carol again ❌ — already following (expect 409)
+POST {{baseUrl}}/users/carol/follow
+Authorization: Bearer {{token}}
+
+###
+
+### 7.3 Alice tries to follow herself ❌ — (expect 403)
+POST {{baseUrl}}/users/alice/follow
+Authorization: Bearer {{token}}
+
+###
+
+### 7.4 Follow non-existent user ❌ — (expect 404)
+POST {{baseUrl}}/users/nobody_xyz_99999/follow
+Authorization: Bearer {{token}}
+
+###
+
+### 7.5 Follow ❌ — no auth (expect 401)
+POST {{baseUrl}}/users/bob/follow
+
+###
+
+### 7.6 Check is-following — alice → carol (true after §7.1) ✅
+GET {{baseUrl}}/users/carol/is-following
+Authorization: Bearer {{token}}
+
+###
+
+### 7.7 Check is-following — alice → dave (depends on seed) ✅
+GET {{baseUrl}}/users/dave/is-following
+Authorization: Bearer {{token}}
+
+###
+
+### 7.8 Get Carol's followers list ✅
+GET {{baseUrl}}/users/carol/followers?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 7.9 Get Alice's following list ✅
+GET {{baseUrl}}/users/alice/following?page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 7.10 Bob follows Alice back ✅
+POST {{baseUrl}}/users/alice/follow
+Authorization: Bearer {{bobToken}}
+
+###
+
+### 7.11 Feed after follows — includes carol's posts ✅
+GET {{baseUrl}}/posts/feed?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+
+### 7.12 Alice unfollows Carol ✅
+DELETE {{baseUrl}}/users/carol/follow
+Authorization: Bearer {{token}}
+
+###
+
+### 7.13 Unfollow Carol again ❌ — not following (expect 409)
+DELETE {{baseUrl}}/users/carol/follow
+Authorization: Bearer {{token}}
+
+###
+
+### 7.14 Unfollow ❌ — no auth (expect 401)
+DELETE {{baseUrl}}/users/bob/follow
+
+###
+
+### 7.15 Unfollow non-existent user ❌ — (expect 404)
+DELETE {{baseUrl}}/users/nobody_xyz_99999/follow
+Authorization: Bearer {{token}}
+
+
+# ═══════════════════════════════════════════════════════════════
+# 8. NOTIFICATIONS
+# ═══════════════════════════════════════════════════════════════
+
+### 8.1 List notifications — page 0, size 20 ✅
+GET {{baseUrl}}/notifications?page=0&size=20
+Authorization: Bearer {{token}}
+
+###
+
+### 8.2 List notifications — page 1 ✅
+GET {{baseUrl}}/notifications?page=1&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 8.3 List notifications — as Bob ✅
+GET {{baseUrl}}/notifications?page=0&size=20
+Authorization: Bearer {{bobToken}}
+
+###
+
+### 8.4 List notifications ❌ — no auth (expect 401)
+GET {{baseUrl}}/notifications
+
+###
+
+### 8.5 Get unread notification count ✅
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{token}}
+
+###
+
+### 8.6 Get unread count — as Bob ✅
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{bobToken}}
+
+###
+
+### 8.7 Get unread count ❌ — no auth (expect 401)
+GET {{baseUrl}}/notifications/unread-count
+
+###
+
+### 8.8 Mark ALL notifications as read ✅
+PATCH {{baseUrl}}/notifications/read-all
+Authorization: Bearer {{token}}
+
+###
+
+### 8.9 Unread count after mark-all-read — expect 0 ✅
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{token}}
+
+###
+
+### 8.10 Mark all read ❌ — no auth (expect 401)
+PATCH {{baseUrl}}/notifications/read-all
+
+###
+
+### 8.11 Mark single notification as read ✅
+# Replace 1 with a real notification ID from §8.1 response
+PATCH {{baseUrl}}/notifications/1/read
+Authorization: Bearer {{token}}
+
+###
+
+### 8.12 Mark notification as read — already read ✅ (idempotent)
+PATCH {{baseUrl}}/notifications/1/read
+Authorization: Bearer {{token}}
+
+###
+
+### 8.13 Mark notification as read ❌ — not found (expect 404)
+PATCH {{baseUrl}}/notifications/99999999/read
+Authorization: Bearer {{token}}
+
+###
+
+### 8.14 Mark notification ❌ — no auth (expect 401)
+PATCH {{baseUrl}}/notifications/1/read
+
+###
+
+### 8.15 Trigger a LIKE notification — Alice likes Bob's post ✅
+# 1. Bob creates a post (run §4.5 or use an existing Bob post ID)
+# 2. Alice likes it — bob should receive a notification
+POST {{baseUrl}}/posts/3/like
+Authorization: Bearer {{token}}
+
+###
+
+### 8.16 Trigger a FOLLOW notification — Carol follows Dave ✅
+POST {{baseUrl}}/users/dave/follow
+Authorization: Bearer {{carolToken}}
+
+###
+
+### 8.17 Verify no self-notification — Alice likes her own post (count stays same)
+# Get unread count before
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{token}}
+
+# (then run §5.1 with Alice's own post ID, then check count again)
+
+
+# ═══════════════════════════════════════════════════════════════
+# 9. SEARCH
+# ═══════════════════════════════════════════════════════════════
+
+### 9.1 Search users — "ali" ✅
+GET {{baseUrl}}/search/users?q=ali&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.2 Search users — "bob" ✅
+GET {{baseUrl}}/search/users?q=bob&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.3 Search users — display name "Builder" ✅
+GET {{baseUrl}}/search/users?q=Builder&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.4 Search users — no results ✅
+GET {{baseUrl}}/search/users?q=zzznobodyzzzxxx&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.5 Search users ❌ — no auth (expect 401)
+GET {{baseUrl}}/search/users?q=alice
+
+###
+
+### 9.6 Search posts — by content keyword ✅
+GET {{baseUrl}}/search/posts?q=hello&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.7 Search posts — "standing desk" ✅
+GET {{baseUrl}}/search/posts?q=standing+desk&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.8 Search posts — case-insensitive "COFFEE" ✅
+GET {{baseUrl}}/search/posts?q=COFFEE&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.9 Search posts — no results ✅
+GET {{baseUrl}}/search/posts?q=zzznomatchzzz&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.10 Search posts — pagination page 1 ✅
+GET {{baseUrl}}/search/posts?q=post&page=1&size=5
+Authorization: Bearer {{token}}
+
+###
+
+### 9.11 Search posts ❌ — no auth (expect 401)
+GET {{baseUrl}}/search/posts?q=hello
+
+###
+
+### 9.12 Search hashtags — "intro" (without #) ✅
+GET {{baseUrl}}/search/hashtags?q=intro&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.13 Search hashtags — "books" ✅
+GET {{baseUrl}}/search/hashtags?q=books&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.14 Search hashtags — with # prefix (URL-encoded) ✅
+GET {{baseUrl}}/search/hashtags?q=%23coffee&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.15 Search hashtags — no results ✅
+GET {{baseUrl}}/search/hashtags?q=zzznohashtagzzz&page=0&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 9.16 Search hashtags ❌ — no auth (expect 401)
+GET {{baseUrl}}/search/hashtags?q=intro
+
+
+# ═══════════════════════════════════════════════════════════════
+# 10. MEDIA UPLOAD
+# ═══════════════════════════════════════════════════════════════
+# NOTE: VS Code REST Client supports binary files via  < ./filename.ext
+#       Replace paths below with real files on your local machine.
+
+### 10.1 Upload JPEG ✅
+POST {{baseUrl}}/media/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="photo.jpg"
+Content-Type: image/jpeg
+
+< ./sample.jpg
+------Boundary--
+
+###
+
+### 10.2 Upload PNG ✅
+POST {{baseUrl}}/media/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="avatar.png"
+Content-Type: image/png
+
+< ./sample.png
+------Boundary--
+
+###
+
+### 10.3 Upload GIF ✅
+POST {{baseUrl}}/media/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="anim.gif"
+Content-Type: image/gif
+
+< ./sample.gif
+------Boundary--
+
+###
+
+### 10.4 Upload WEBP ✅
+POST {{baseUrl}}/media/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="image.webp"
+Content-Type: image/webp
+
+< ./sample.webp
+------Boundary--
+
+###
+
+### 10.5 Upload ❌ — PDF (unsupported type, expect 400)
+POST {{baseUrl}}/media/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="doc.pdf"
+Content-Type: application/pdf
+
+< ./sample.pdf
+------Boundary--
+
+###
+
+### 10.6 Upload ❌ — plain text (unsupported, expect 400)
+POST {{baseUrl}}/media/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="notes.txt"
+Content-Type: text/plain
+
+< ./sample.txt
+------Boundary--
+
+###
+
+### 10.7 Upload ❌ — no auth (expect 401)
+POST {{baseUrl}}/media/upload
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="photo.jpg"
+Content-Type: image/jpeg
+
+< ./sample.jpg
+------Boundary--
+
+###
+
+### 10.8 Serve uploaded file ✅ — replace UUID with value from §10.1 response
+GET {{baseUrl}}/media/files/replace-with-real-filename.jpg
+Accept: image/jpeg
+
+###
+
+### 10.9 Serve file ❌ — not found (expect 404)
+GET {{baseUrl}}/media/files/does_not_exist_xyz.jpg
+
+###
+
+### 10.10 Serve file ❌ — path traversal attempt (expect 400 or 404)
+GET {{baseUrl}}/media/files/..%2F..%2Fetc%2Fpasswd
+
+###
+
+### 10.11 Create post with uploaded image URL ✅
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Post with an uploaded image! #media",
+  "imageUrl": "/api/v1/media/files/replace-with-real-filename.jpg",
+  "privacy": "PUBLIC"
+}
+
+
+# ═══════════════════════════════════════════════════════════════
+# 11. SECURITY & HEADERS
+# ═══════════════════════════════════════════════════════════════
+
+### 11.1 Protected endpoint — no token (expect 401)
+GET {{baseUrl}}/users/me
+
+###
+
+### 11.2 Protected endpoint — invalid token (expect 401)
+GET {{baseUrl}}/users/me
+Authorization: Bearer not.a.valid.jwt.token
+
+###
+
+### 11.3 Protected endpoint — tampered signature (expect 401)
+GET {{baseUrl}}/posts/feed
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSJ9.invalidsignature
+
+###
+
+### 11.4 Protected endpoint — expired token structure (expect 401)
+GET {{baseUrl}}/notifications
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbGljZSIsImlhdCI6MTAwMDAwMDAwMCwiZXhwIjoxMDAwMDg2NDAwfQ.fake_sig
+
+###
+
+### 11.5 X-Content-Type-Options header check ✅
+# Verify "nosniff" in response headers
+GET {{baseUrl}}/users/alice
+Authorization: Bearer {{token}}
+
+###
+
+### 11.6 X-RateLimit headers check ✅
+# Verify X-RateLimit-Limit and X-RateLimit-Remaining are present
+GET {{baseUrl}}/posts/feed?page=0&size=1
+Authorization: Bearer {{token}}
+
+###
+
+### 11.7 SQL injection in search — should return 200 (not 500)
+GET {{baseUrl}}/search/users?q=%27+OR+%271%27%3D%271
+Authorization: Bearer {{token}}
+
+###
+
+### 11.8 XSS payload in post content — stored safely, not executed
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "<script>alert('xss')</script> #security",
+  "privacy": "PRIVATE"
+}
+
+###
+
+### 11.9 No stack trace in 404 error body — verify clean error response
+GET {{baseUrl}}/posts/99999999
+Authorization: Bearer {{token}}
+
+###
+
+### 11.10 Self-follow prevention ❌ — (expect 403)
+POST {{baseUrl}}/users/alice/follow
+Authorization: Bearer {{token}}

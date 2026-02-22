@@ -1,9 +1,12 @@
-# Database Schema Document
-## Social Media Clone Application
+﻿# Database Schema Document
+## ConnectHub — Social Media Application
 
-**Version:** 1.0  
-**Date:** February 07, 2026  
-**Database:** PostgreSQL 15+, Redis 7+, Elasticsearch 8+
+**Version:** 2.0  
+**Updated:** February 21, 2026  
+**Database:** PostgreSQL 16 (production), H2 (tests)  
+**Schema management:** Flyway — migrations in `backend/src/main/resources/db/migration/`
+
+> **Note:** The authoritative schema is `V1__create_schema.sql`. This document describes the same tables for reference. When adding columns, always create a new numbered migration (e.g. `V2__add_avatar_url.sql`) rather than editing existing files.
 
 ---
 
@@ -762,58 +765,58 @@ COMMENT ON TABLE moderation_logs IS 'Audit log of moderation actions';
 ### 3.1 ER Diagram (Text Representation)
 
 ```
-USERS (1) ──────────< (M) POSTS
-  │                          │
-  │                          ├──< POST_MEDIA (M)
-  │                          ├──< POST_HASHTAGS (M) ──> HASHTAGS
-  │                          ├──< MENTIONS (M)
-  │                          ├──< LIKES (M)
-  │                          ├──< COMMENTS (M)
-  │                          ├──< SHARES (M)
-  │                          └──< BOOKMARKS (M)
-  │
-  ├──< USER_SETTINGS (1:1)
-  ├──< USER_STATS (1:1)
-  ├──< OAUTH_CONNECTIONS (M)
-  ├──< FOLLOWS (M) [follower_id, following_id]
-  ├──< BLOCKS (M) [blocker_id, blocked_id]
-  ├──< MUTES (M) [muter_id, muted_id]
-  ├──< CONVERSATIONS (M) via CONVERSATION_PARTICIPANTS
-  ├──< MESSAGES (M)
-  ├──< NOTIFICATIONS (M)
-  └──< REPORTS (M)
+USERS (1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< (M) POSTS
+  â”‚                          â”‚
+  â”‚                          â”œâ”€â”€< POST_MEDIA (M)
+  â”‚                          â”œâ”€â”€< POST_HASHTAGS (M) â”€â”€> HASHTAGS
+  â”‚                          â”œâ”€â”€< MENTIONS (M)
+  â”‚                          â”œâ”€â”€< LIKES (M)
+  â”‚                          â”œâ”€â”€< COMMENTS (M)
+  â”‚                          â”œâ”€â”€< SHARES (M)
+  â”‚                          â””â”€â”€< BOOKMARKS (M)
+  â”‚
+  â”œâ”€â”€< USER_SETTINGS (1:1)
+  â”œâ”€â”€< USER_STATS (1:1)
+  â”œâ”€â”€< OAUTH_CONNECTIONS (M)
+  â”œâ”€â”€< FOLLOWS (M) [follower_id, following_id]
+  â”œâ”€â”€< BLOCKS (M) [blocker_id, blocked_id]
+  â”œâ”€â”€< MUTES (M) [muter_id, muted_id]
+  â”œâ”€â”€< CONVERSATIONS (M) via CONVERSATION_PARTICIPANTS
+  â”œâ”€â”€< MESSAGES (M)
+  â”œâ”€â”€< NOTIFICATIONS (M)
+  â””â”€â”€< REPORTS (M)
 
-CONVERSATIONS (1) ──< (M) MESSAGES
-      │
-      └──< (M) CONVERSATION_PARTICIPANTS ──> USERS
+CONVERSATIONS (1) â”€â”€< (M) MESSAGES
+      â”‚
+      â””â”€â”€< (M) CONVERSATION_PARTICIPANTS â”€â”€> USERS
 
-COMMENTS (1) ──< (M) COMMENT_LIKES
-      │
-      └──< (M) COMMENTS [parent_comment_id - self-referencing]
+COMMENTS (1) â”€â”€< (M) COMMENT_LIKES
+      â”‚
+      â””â”€â”€< (M) COMMENTS [parent_comment_id - self-referencing]
 ```
 
 ### 3.2 Key Relationships
 
 **One-to-One**:
-- users ↔ user_settings
-- users ↔ user_stats
+- users â†” user_settings
+- users â†” user_stats
 
 **One-to-Many**:
-- users → posts
-- users → comments
-- users → messages
-- posts → post_media
-- posts → comments
-- conversations → messages
+- users â†’ posts
+- users â†’ comments
+- users â†’ messages
+- posts â†’ post_media
+- posts â†’ comments
+- conversations â†’ messages
 
 **Many-to-Many** (via junction tables):
-- users ↔ users (follows)
-- posts ↔ hashtags (post_hashtags)
-- users ↔ posts (likes, bookmarks, shares)
-- users ↔ conversations (conversation_participants)
+- users â†” users (follows)
+- posts â†” hashtags (post_hashtags)
+- users â†” posts (likes, bookmarks, shares)
+- users â†” conversations (conversation_participants)
 
 **Self-Referencing**:
-- comments.parent_comment_id → comments.id (nested comments)
+- comments.parent_comment_id â†’ comments.id (nested comments)
 
 ---
 
@@ -1130,64 +1133,64 @@ CREATE TRIGGER trigger_initialize_user_settings
 
 **User Cache**:
 ```
-user:{userId}                    → UserDTO (TTL: 5 minutes)
-user:profile:{userId}            → ProfileDTO (TTL: 5 minutes)
-user:stats:{userId}              → UserStatsDTO (TTL: 1 minute)
-user:settings:{userId}           → SettingsDTO (TTL: 10 minutes)
-user:followers:{userId}          → Set<userId> (TTL: 5 minutes)
-user:following:{userId}          → Set<userId> (TTL: 5 minutes)
+user:{userId}                    â†’ UserDTO (TTL: 5 minutes)
+user:profile:{userId}            â†’ ProfileDTO (TTL: 5 minutes)
+user:stats:{userId}              â†’ UserStatsDTO (TTL: 1 minute)
+user:settings:{userId}           â†’ SettingsDTO (TTL: 10 minutes)
+user:followers:{userId}          â†’ Set<userId> (TTL: 5 minutes)
+user:following:{userId}          â†’ Set<userId> (TTL: 5 minutes)
 ```
 
 **Post Cache**:
 ```
-post:{postId}                    → PostDTO (TTL: 10 minutes)
-post:likes:{postId}              → Set<userId> (TTL: 5 minutes)
-post:comments:{postId}           → List<CommentDTO> (TTL: 3 minutes)
-post:user:{userId}               → List<PostDTO> (TTL: 5 minutes)
+post:{postId}                    â†’ PostDTO (TTL: 10 minutes)
+post:likes:{postId}              â†’ Set<userId> (TTL: 5 minutes)
+post:comments:{postId}           â†’ List<CommentDTO> (TTL: 3 minutes)
+post:user:{userId}               â†’ List<PostDTO> (TTL: 5 minutes)
 ```
 
 **Feed Cache**:
 ```
-feed:{userId}                    → List<PostDTO> (TTL: 15 minutes)
-feed:trending                    → List<PostDTO> (TTL: 30 minutes)
-feed:explore                     → List<PostDTO> (TTL: 1 hour)
-feed:hashtag:{tag}               → List<PostDTO> (TTL: 10 minutes)
+feed:{userId}                    â†’ List<PostDTO> (TTL: 15 minutes)
+feed:trending                    â†’ List<PostDTO> (TTL: 30 minutes)
+feed:explore                     â†’ List<PostDTO> (TTL: 1 hour)
+feed:hashtag:{tag}               â†’ List<PostDTO> (TTL: 10 minutes)
 ```
 
 **Session Cache**:
 ```
-session:{sessionId}              → SessionDTO (TTL: 30 days)
-session:user:{userId}            → Set<sessionId> (TTL: 30 days)
-jwt:blacklist:{token}            → true (TTL: 24 hours)
-refresh:token:{token}            → userId (TTL: 30 days)
+session:{sessionId}              â†’ SessionDTO (TTL: 30 days)
+session:user:{userId}            â†’ Set<sessionId> (TTL: 30 days)
+jwt:blacklist:{token}            â†’ true (TTL: 24 hours)
+refresh:token:{token}            â†’ userId (TTL: 30 days)
 ```
 
 **Rate Limiting**:
 ```
-ratelimit:{userId}:{endpoint}    → count (TTL: 1 minute)
-ratelimit:ip:{ipAddress}         → count (TTL: 1 minute)
-ratelimit:global:{endpoint}      → count (TTL: 1 second)
+ratelimit:{userId}:{endpoint}    â†’ count (TTL: 1 minute)
+ratelimit:ip:{ipAddress}         â†’ count (TTL: 1 minute)
+ratelimit:global:{endpoint}      â†’ count (TTL: 1 second)
 ```
 
 **Real-time Data**:
 ```
-online:users                     → Set<userId> (TTL: 5 minutes)
-typing:{conversationId}:{userId} → timestamp (TTL: 10 seconds)
-presence:{userId}                → status (TTL: 5 minutes)
+online:users                     â†’ Set<userId> (TTL: 5 minutes)
+typing:{conversationId}:{userId} â†’ timestamp (TTL: 10 seconds)
+presence:{userId}                â†’ status (TTL: 5 minutes)
 ```
 
 **Trending & Analytics**:
 ```
-trending:hashtags                → SortedSet<tag, score> (TTL: 1 hour)
-trending:posts                   → SortedSet<postId, score> (TTL: 30 minutes)
-trending:users                   → SortedSet<userId, score> (TTL: 1 hour)
-analytics:daily:{date}           → JSONB (TTL: 7 days)
+trending:hashtags                â†’ SortedSet<tag, score> (TTL: 1 hour)
+trending:posts                   â†’ SortedSet<postId, score> (TTL: 30 minutes)
+trending:users                   â†’ SortedSet<userId, score> (TTL: 1 hour)
+analytics:daily:{date}           â†’ JSONB (TTL: 7 days)
 ```
 
 **Notification Queue**:
 ```
-notifications:queue:{userId}     → List<NotificationDTO> (TTL: 1 hour)
-notifications:unread:{userId}    → count (TTL: 5 minutes)
+notifications:queue:{userId}     â†’ List<NotificationDTO> (TTL: 1 hour)
+notifications:unread:{userId}    â†’ count (TTL: 5 minutes)
 ```
 
 ### 6.2 Cache Invalidation Strategy
@@ -1727,11 +1730,11 @@ $ LANGUAGE plpgsql;
 
 | Query Type | Target | Actual | Status |
 |------------|--------|--------|--------|
-| User lookup by ID | < 10ms | 5ms | ✓ |
-| Feed generation | < 200ms | 150ms | ✓ |
-| Post creation | < 50ms | 30ms | ✓ |
-| Search query | < 300ms | 250ms | ✓ |
-| Follow operation | < 30ms | 20ms | ✓ |
+| User lookup by ID | < 10ms | 5ms | âœ“ |
+| Feed generation | < 200ms | 150ms | âœ“ |
+| Post creation | < 50ms | 30ms | âœ“ |
+| Search query | < 300ms | 250ms | âœ“ |
+| Follow operation | < 30ms | 20ms | âœ“ |
 
 ### C. References
 
@@ -1745,3 +1748,4 @@ $ LANGUAGE plpgsql;
 **Document Prepared By**: Database Team  
 **Last Updated**: February 07, 2026  
 **Status**: Approved for Implementation
+
