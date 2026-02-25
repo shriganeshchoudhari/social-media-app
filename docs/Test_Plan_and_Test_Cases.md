@@ -1,4 +1,4 @@
-﻿# Test Plan & Test Cases
+# Test Plan & Test Cases
 ## ConnectHub Social Media Platform
 
 **Version:** 1.0  
@@ -69,11 +69,11 @@ This document defines the comprehensive test plan and test cases for ConnectHub 
 
 ```
 Unit Testing (70%)
-    â†“
+    ↓
 Integration Testing (20%)
-    â†“
+    ↓
 System Testing (8%)
-    â†“
+    ↓
 User Acceptance Testing (2%)
 ```
 
@@ -135,21 +135,21 @@ User Acceptance Testing (2%)
 **Continuous Testing:**
 ```
 Code Commit
-    â†“
+    ↓
 Run Unit Tests (5 min)
-    â†“
+    ↓
 Run Integration Tests (15 min)
-    â†“
+    ↓
 Run API Tests (10 min)
-    â†“
+    ↓
 Deploy to Staging
-    â†“
+    ↓
 Run E2E Tests (30 min)
-    â†“
+    ↓
 Run Performance Tests (1 hour)
-    â†“
+    ↓
 Manual Exploratory Testing
-    â†“
+    ↓
 Deploy to Production
 ```
 
@@ -371,19 +371,19 @@ Deploy to Production
 **CI/CD Pipeline:**
 ```
 GitHub Actions
-    â†“
+    ↓
 Build & Unit Tests
-    â†“
+    ↓
 Integration Tests
-    â†“
+    ↓
 Deploy to Staging
-    â†“
+    ↓
 E2E Tests
-    â†“
+    ↓
 Performance Tests
-    â†“
+    ↓
 Security Scan
-    â†“
+    ↓
 Deploy to Production
 ```
 
@@ -415,9 +415,9 @@ Deploy to Production
 - Samsung Internet
 
 **Screen Resolutions:**
-- Desktop: 1920Ã—1080, 1366Ã—768, 2560Ã—1440
-- Tablet: 768Ã—1024, 1024Ã—768
-- Mobile: 375Ã—667, 414Ã—896, 360Ã—640
+- Desktop: 1920×1080, 1366×768, 2560×1440
+- Tablet: 768×1024, 1024×768
+- Mobile: 375×667, 414×896, 360×640
 
 **Devices:**
 - iPhone 13, iPhone SE
@@ -699,7 +699,7 @@ it('should sanitize malicious HTML', () => {
 it('should generate URL-safe slug', () => {
   expect(SlugGenerator.generate('Hello World!')).toBe('hello-world');
   expect(SlugGenerator.generate('Test Post 123')).toBe('test-post-123');
-  expect(SlugGenerator.generate('CafÃ© RÃ©sumÃ©')).toBe('cafe-resume');
+  expect(SlugGenerator.generate('Café Résumé')).toBe('cafe-resume');
 });
 ```
 
@@ -1459,12 +1459,12 @@ Test Steps:
 8. Verify redirect to login
 
 Expected Results:
-âœ“ Form validates input
-âœ“ Success message displays
-âœ“ Email received within 1 minute
-âœ“ Verification link works
-âœ“ Redirected to login page
-âœ“ Can login with new credentials
+✓ Form validates input
+✓ Success message displays
+✓ Email received within 1 minute
+✓ Verification link works
+✓ Redirected to login page
+✓ Can login with new credentials
 ```
 
 **TC-UI-002: Registration - Field Validation**
@@ -1480,10 +1480,10 @@ Test Steps:
 8. Verify password strength error
 
 Expected Results:
-âœ“ Required field errors shown
-âœ“ Email format validated
-âœ“ Password strength indicator shown
-âœ“ Submit button disabled until valid
+✓ Required field errors shown
+✓ Email format validated
+✓ Password strength indicator shown
+✓ Submit button disabled until valid
 ```
 
 ### 10.2 Login & Logout
@@ -1497,10 +1497,10 @@ Test Steps:
 4. Verify redirect to home feed
 
 Expected Results:
-âœ“ Login successful
-âœ“ Redirected to /feed
-âœ“ User menu shows logged-in state
-âœ“ Avatar displayed in header
+✓ Login successful
+✓ Redirected to /feed
+✓ User menu shows logged-in state
+✓ Avatar displayed in header
 ```
 
 **TC-UI-004: Failed Login - Wrong Password**
@@ -1512,9 +1512,9 @@ Test Steps:
 4. Click "Login"
 
 Expected Results:
-âœ“ Error message: "Invalid email or password"
-âœ“ Input fields cleared
-âœ“ Not redirected
+✓ Error message: "Invalid email or password"
+✓ Input fields cleared
+✓ Not redirected
 ```
 
 **TC-UI-005: Logout**
@@ -1525,9 +1525,9 @@ Test Steps:
 3. Click "Logout"
 
 Expected Results:
-âœ“ Session cleared
-âœ“ Redirected to homepage
-âœ“ Cannot access protected routes
+✓ Session cleared
+✓ Redirected to homepage
+✓ Cannot access protected routes
 ```
 
 ### 10.3 Create Post
@@ -1541,12 +1541,12 @@ Test Steps:
 4. Click "Post" button
 
 Expected Results:
-âœ“ Post composer opens
-âœ“ Character count updates (remaining: 4978/5000)
-âœ“ Post button enabled
-âœ“ Post appears immediately in feed (optimistic UI)
-âœ“ "Posting..." indicator shown briefly
-âœ“ Post confirmed after API success
+✓ Post composer opens
+✓ Character count updates (remaining: 4978/5000)
+✓ Post button enabled
+✓ Post appears immediately in feed (optimistic UI)
+✓ "Posting..." indicator shown briefly
+✓ Post confirmed after API success
 ```
 
 **TC-UI-007: Create Post with Image**
@@ -1560,12 +1560,12 @@ Test Steps:
 6. Click "Post"
 
 Expected Results:
-âœ“ File picker opens
-âœ“ Image previews correctly
-âœ“ Can remove image before posting
-âœ“ Upload progress shown
-âœ“ Post created with image
-âœ“ Image displays in feed
+✓ File picker opens
+✓ Image previews correctly
+✓ Can remove image before posting
+✓ Upload progress shown
+✓ Post created with image
+✓ Image displays in feed
 ```
 
 **TC-UI-008: Post Character Limit**
@@ -1575,9 +1575,9 @@ Test Steps:
 2. Type 5001 characters
 
 Expected Results:
-âœ“ Character count shows: -1/5000 (red)
-âœ“ Post button disabled
-âœ“ Error message: "Post exceeds character limit"
+✓ Character count shows: -1/5000 (red)
+✓ Post button disabled
+✓ Error message: "Post exceeds character limit"
 ```
 
 ### 10.4 Social Interactions
@@ -1590,11 +1590,11 @@ Test Steps:
 3. Click heart icon
 
 Expected Results:
-âœ“ Heart icon fills with color
-âœ“ Like count increases by 1
-âœ“ Animation plays (heartbeat)
-âœ“ Unlike on second click
-âœ“ Like count decreases
+✓ Heart icon fills with color
+✓ Like count increases by 1
+✓ Animation plays (heartbeat)
+✓ Unlike on second click
+✓ Like count decreases
 ```
 
 **TC-UI-010: Comment on Post**
@@ -1606,11 +1606,11 @@ Test Steps:
 4. Press Enter or click "Comment"
 
 Expected Results:
-âœ“ Comment input focused
-âœ“ Comment posted immediately
-âœ“ Comment appears in thread
-âœ“ Comment count increases
-âœ“ Post author gets notification
+✓ Comment input focused
+✓ Comment posted immediately
+✓ Comment appears in thread
+✓ Comment count increases
+✓ Post author gets notification
 ```
 
 **TC-UI-011: Follow User**
@@ -1620,10 +1620,10 @@ Test Steps:
 2. Click "Follow" button
 
 Expected Results:
-âœ“ Button changes to "Following"
-âœ“ Follower count increases
-âœ“ User gets notification
-âœ“ User's posts appear in feed
+✓ Button changes to "Following"
+✓ Follower count increases
+✓ User gets notification
+✓ User's posts appear in feed
 ```
 
 ### 10.5 Feed & Discovery
@@ -1636,11 +1636,11 @@ Test Steps:
 3. Observe loading behavior
 
 Expected Results:
-âœ“ Initial 20 posts loaded
-âœ“ Loading spinner shows near bottom
-âœ“ Next 20 posts load automatically
-âœ“ Smooth scrolling (no jank)
-âœ“ "No more posts" shown when end reached
+✓ Initial 20 posts loaded
+✓ Loading spinner shows near bottom
+✓ Next 20 posts load automatically
+✓ Smooth scrolling (no jank)
+✓ "No more posts" shown when end reached
 ```
 
 **TC-UI-013: Pull to Refresh**
@@ -1651,10 +1651,10 @@ Test Steps (Mobile):
 3. Release
 
 Expected Results:
-âœ“ Refresh spinner shown
-âœ“ Feed updates with new posts
-âœ“ Scroll position maintained for existing posts
-âœ“ New posts badge shown
+✓ Refresh spinner shown
+✓ Feed updates with new posts
+✓ Scroll position maintained for existing posts
+✓ New posts badge shown
 ```
 
 ### 10.6 Search
@@ -1668,10 +1668,10 @@ Test Steps:
 4. Click a result
 
 Expected Results:
-âœ“ Search activates after 2 characters
-âœ“ Autocomplete shows matching users
-âœ“ Results update in real-time
-âœ“ Clicking result navigates to profile
+✓ Search activates after 2 characters
+✓ Autocomplete shows matching users
+✓ Results update in real-time
+✓ Clicking result navigates to profile
 ```
 
 **TC-UI-015: Search Posts**
@@ -1683,10 +1683,10 @@ Test Steps:
 4. Switch to "Posts" tab
 
 Expected Results:
-âœ“ Search results load
-âœ“ Posts containing "javascript" shown
-âœ“ Keywords highlighted
-âœ“ Can filter by date/type
+✓ Search results load
+✓ Posts containing "javascript" shown
+✓ Keywords highlighted
+✓ Can filter by date/type
 ```
 
 ### 10.7 Messages
@@ -1702,11 +1702,11 @@ Test Steps:
 6. Click Send
 
 Expected Results:
-âœ“ Conversation created
-âœ“ Message appears immediately
-âœ“ "Delivered" status shown
-âœ“ Recipient receives in real-time
-âœ“ Read receipt when read
+✓ Conversation created
+✓ Message appears immediately
+✓ "Delivered" status shown
+✓ Recipient receives in real-time
+✓ Read receipt when read
 ```
 
 **TC-UI-017: Real-time Message Delivery**
@@ -1717,10 +1717,10 @@ Test Steps:
 3. Observe User A's screen
 
 Expected Results:
-âœ“ Message appears immediately (no refresh)
-âœ“ Notification sound plays (if enabled)
-âœ“ Conversation marked unread
-âœ“ Message content correct
+✓ Message appears immediately (no refresh)
+✓ Notification sound plays (if enabled)
+✓ Conversation marked unread
+✓ Message content correct
 ```
 
 ### 10.8 Notifications
@@ -1732,11 +1732,11 @@ Test Steps:
 2. View notification panel
 
 Expected Results:
-âœ“ Unread count badge shown
-âœ“ Notifications list displayed
-âœ“ Grouped by type
-âœ“ Clicking notification navigates to content
-âœ“ Mark as read on view
+✓ Unread count badge shown
+✓ Notifications list displayed
+✓ Grouped by type
+✓ Clicking notification navigates to content
+✓ Mark as read on view
 ```
 
 **TC-UI-019: Push Notification**
@@ -1747,10 +1747,10 @@ Test Steps:
 3. Observe device notification
 
 Expected Results:
-âœ“ Push notification received
-âœ“ Notification shows: "[User] liked your post"
-âœ“ Clicking opens app to post
-âœ“ Respects Do Not Disturb settings
+✓ Push notification received
+✓ Notification shows: "[User] liked your post"
+✓ Clicking opens app to post
+✓ Respects Do Not Disturb settings
 ```
 
 ### 10.9 Profile Management
@@ -1766,12 +1766,12 @@ Test Steps:
 6. Click "Save Changes"
 
 Expected Results:
-âœ“ Edit modal opens
-âœ“ Current data pre-filled
-âœ“ Image upload preview shown
-âœ“ Changes saved successfully
-âœ“ Profile updated immediately
-âœ“ Success toast shown
+✓ Edit modal opens
+✓ Current data pre-filled
+✓ Image upload preview shown
+✓ Changes saved successfully
+✓ Profile updated immediately
+✓ Success toast shown
 ```
 
 ---
@@ -1795,24 +1795,24 @@ Scenarios:
 4. 10% searching
 
 Success Criteria:
-âœ“ Response time p95 < 500ms
-âœ“ Response time p99 < 1000ms
-âœ“ Error rate < 1%
-âœ“ Throughput > 1000 req/sec
+✓ Response time p95 < 500ms
+✓ Response time p99 < 1000ms
+✓ Error rate < 1%
+✓ Throughput > 1000 req/sec
 ```
 
 **TC-PERF-002: Spike Test**
 ```
 Test Configuration:
-- VUs: 0 â†’ 5000 (instant spike)
+- VUs: 0 → 5000 (instant spike)
 - Duration: 5 minutes
 - Recovery period: 2 minutes
 
 Success Criteria:
-âœ“ System remains available
-âœ“ No crashes or timeouts
-âœ“ Recovery time < 30 seconds
-âœ“ Error rate < 5% during spike
+✓ System remains available
+✓ No crashes or timeouts
+✓ Recovery time < 30 seconds
+✓ Error rate < 5% during spike
 ```
 
 **TC-PERF-003: Stress Test**
@@ -1842,9 +1842,9 @@ ORDER BY created_at DESC
 LIMIT 20;
 
 Success Criteria:
-âœ“ Execution time < 50ms
-âœ“ Uses index scan (not seq scan)
-âœ“ Consistent performance with 1M+ posts
+✓ Execution time < 50ms
+✓ Uses index scan (not seq scan)
+✓ Consistent performance with 1M+ posts
 ```
 
 **TC-PERF-005: Write Performance**
@@ -1857,10 +1857,10 @@ Scenario:
 - Duration: 5 minutes
 
 Success Criteria:
-âœ“ Write latency p95 < 200ms
-âœ“ No deadlocks
-âœ“ No transaction failures
-âœ“ Index updates performant
+✓ Write latency p95 < 200ms
+✓ No deadlocks
+✓ No transaction failures
+✓ Index updates performant
 ```
 
 ### 11.3 API Performance
@@ -1876,9 +1876,9 @@ Endpoints to Test:
 Load: 100 concurrent requests
 
 Success Criteria:
-âœ“ All endpoints meet target
-âœ“ No timeouts
-âœ“ Consistent performance
+✓ All endpoints meet target
+✓ No timeouts
+✓ Consistent performance
 ```
 
 **TC-PERF-007: Caching Effectiveness**
@@ -1891,9 +1891,9 @@ Scenarios:
 3. Trending posts (expect > 95% hit rate)
 
 Success Criteria:
-âœ“ Cache hit rates meet targets
-âœ“ Cache response time < 10ms
-âœ“ Memory usage stable
+✓ Cache hit rates meet targets
+✓ Cache response time < 10ms
+✓ Memory usage stable
 ```
 
 ### 11.4 Frontend Performance
@@ -1907,11 +1907,11 @@ Pages to Test:
 - Post detail
 
 Metrics (Lighthouse):
-âœ“ First Contentful Paint < 1.8s
-âœ“ Largest Contentful Paint < 2.5s
-âœ“ Time to Interactive < 3.8s
-âœ“ Cumulative Layout Shift < 0.1
-âœ“ Overall Score > 90
+✓ First Contentful Paint < 1.8s
+✓ Largest Contentful Paint < 2.5s
+✓ Time to Interactive < 3.8s
+✓ Cumulative Layout Shift < 0.1
+✓ Overall Score > 90
 ```
 
 **TC-PERF-009: Bundle Size**
@@ -1919,11 +1919,11 @@ Metrics (Lighthouse):
 Test: JavaScript Bundle Analysis
 
 Targets:
-âœ“ Initial bundle < 200KB (gzipped)
-âœ“ Vendor bundle < 150KB (gzipped)
-âœ“ Code splitting implemented
-âœ“ Lazy loading for routes
-âœ“ Tree shaking effective
+✓ Initial bundle < 200KB (gzipped)
+✓ Vendor bundle < 150KB (gzipped)
+✓ Code splitting implemented
+✓ Lazy loading for routes
+✓ Tree shaking effective
 ```
 
 **TC-PERF-010: Image Optimization**
@@ -1931,11 +1931,11 @@ Targets:
 Test: Image Loading Performance
 
 Requirements:
-âœ“ WebP format used
-âœ“ Responsive images (srcset)
-âœ“ Lazy loading below fold
-âœ“ Image compression quality: 80%
-âœ“ Average image size < 100KB
+✓ WebP format used
+✓ Responsive images (srcset)
+✓ Lazy loading below fold
+✓ Image compression quality: 80%
+✓ Average image size < 100KB
 ```
 
 ### 11.5 Real-time Performance
@@ -1948,10 +1948,10 @@ Test Configuration:
 - Duration: 30 minutes
 
 Success Criteria:
-âœ“ All connections stable
-âœ“ Message delivery latency < 100ms
-âœ“ No dropped messages
-âœ“ Memory usage linear with connections
+✓ All connections stable
+✓ Message delivery latency < 100ms
+✓ No dropped messages
+✓ Memory usage linear with connections
 ```
 
 **TC-PERF-012: Notification Delivery Performance**
@@ -1964,10 +1964,10 @@ Scenario:
 - Duration: 5 minutes
 
 Success Criteria:
-âœ“ Delivery time p95 < 1 second
-âœ“ All notifications delivered
-âœ“ No FCM errors
-âœ“ Queue processing stable
+✓ Delivery time p95 < 1 second
+✓ All notifications delivered
+✓ No FCM errors
+✓ Queue processing stable
 ```
 
 ---
@@ -1986,11 +1986,11 @@ Attack Vectors:
 3. Username: admin'--
 
 Expected Behavior:
-âœ“ Login fails gracefully
-âœ“ No error messages leak DB info
-âœ“ All inputs sanitized
-âœ“ Parameterized queries used
-âœ“ No unauthorized access
+✓ Login fails gracefully
+✓ No error messages leak DB info
+✓ All inputs sanitized
+✓ Parameterized queries used
+✓ No unauthorized access
 ```
 
 **TC-SEC-002: XSS Prevention**
@@ -2003,10 +2003,10 @@ Attack Vectors:
 3. javascript:alert('XSS')
 
 Expected Behavior:
-âœ“ Scripts not executed
-âœ“ HTML entities escaped
-âœ“ Content Security Policy enforced
-âœ“ DOM sanitization applied
+✓ Scripts not executed
+✓ HTML entities escaped
+✓ Content Security Policy enforced
+✓ DOM sanitization applied
 ```
 
 **TC-SEC-003: CSRF Protection**
@@ -2019,10 +2019,10 @@ Attack:
 - Without CSRF token
 
 Expected Behavior:
-âœ“ Request rejected (403)
-âœ“ CSRF token required
-âœ“ Token validated
-âœ“ SameSite cookie attribute set
+✓ Request rejected (403)
+✓ CSRF token required
+✓ Token validated
+✓ SameSite cookie attribute set
 ```
 
 **TC-SEC-004: Password Security**
@@ -2030,11 +2030,11 @@ Expected Behavior:
 Test: Password Storage & Handling
 
 Verifications:
-âœ“ Passwords hashed with bcrypt (cost 12)
-âœ“ Never stored in plaintext
-âœ“ Not logged in server logs
-âœ“ Not returned in API responses
-âœ“ Secure password reset flow
+✓ Passwords hashed with bcrypt (cost 12)
+✓ Never stored in plaintext
+✓ Not logged in server logs
+✓ Not returned in API responses
+✓ Secure password reset flow
 ```
 
 **TC-SEC-005: JWT Token Security**
@@ -2048,10 +2048,10 @@ Attack Vectors:
 4. Missing token
 
 Expected Behavior:
-âœ“ All invalid tokens rejected
-âœ“ Proper 401 responses
-âœ“ Token expiry enforced (24h)
-âœ“ Refresh token rotation
+✓ All invalid tokens rejected
+✓ Proper 401 responses
+✓ Token expiry enforced (24h)
+✓ Refresh token rotation
 ```
 
 ### 12.2 Authorization Security
@@ -2066,9 +2066,9 @@ Steps:
 3. Send DELETE /api/posts/{userA-post-id} as User B
 
 Expected Behavior:
-âœ“ Request rejected (403 Forbidden)
-âœ“ Post not deleted
-âœ“ Ownership verified
+✓ Request rejected (403 Forbidden)
+✓ Post not deleted
+✓ Ownership verified
 ```
 
 **TC-SEC-007: Insecure Direct Object Reference**
@@ -2081,9 +2081,9 @@ Attack:
 3. Attempt to access User B's private data
 
 Expected Behavior:
-âœ“ Request rejected (403)
-âœ“ Privacy settings enforced
-âœ“ No data leakage
+✓ Request rejected (403)
+✓ Privacy settings enforced
+✓ No data leakage
 ```
 
 **TC-SEC-008: API Rate Limiting**
@@ -2095,10 +2095,10 @@ Attack:
 - Same IP address
 
 Expected Behavior:
-âœ“ Rate limit triggered (429)
-âœ“ After 5 failed attempts, account locked temp
-âœ“ IP blocked for 1 hour
-âœ“ CAPTCHA required after limit
+✓ Rate limit triggered (429)
+✓ After 5 failed attempts, account locked temp
+✓ IP blocked for 1 hour
+✓ CAPTCHA required after limit
 ```
 
 ### 12.3 Data Security
@@ -2114,11 +2114,11 @@ Attack Vectors:
 4. File > size limit (10MB)
 
 Expected Behavior:
-âœ“ File type validated (magic numbers)
-âœ“ Extension whitelist enforced
-âœ“ Files sanitized
-âœ“ Virus scan performed
-âœ“ Size limits enforced
+✓ File type validated (magic numbers)
+✓ Extension whitelist enforced
+✓ Files sanitized
+✓ Virus scan performed
+✓ Size limits enforced
 ```
 
 **TC-SEC-010: Sensitive Data Exposure**
@@ -2126,11 +2126,11 @@ Expected Behavior:
 Test: API Response Data Leakage
 
 Checks:
-âœ“ No password hashes in responses
-âœ“ No email addresses (unless owned)
-âœ“ No internal IDs exposed
-âœ“ No stack traces in errors
-âœ“ HTTPS enforced (no HTTP)
+✓ No password hashes in responses
+✓ No email addresses (unless owned)
+✓ No internal IDs exposed
+✓ No stack traces in errors
+✓ HTTPS enforced (no HTTP)
 ```
 
 **TC-SEC-011: Database Encryption**
@@ -2138,10 +2138,10 @@ Checks:
 Test: Data at Rest Encryption
 
 Verifications:
-âœ“ Database encrypted (AWS RDS encryption)
-âœ“ Sensitive fields hashed (passwords)
-âœ“ Backups encrypted
-âœ“ SSL/TLS for DB connections
+✓ Database encrypted (AWS RDS encryption)
+✓ Sensitive fields hashed (passwords)
+✓ Backups encrypted
+✓ SSL/TLS for DB connections
 ```
 
 ### 12.4 Infrastructure Security
@@ -2155,10 +2155,10 @@ Steps:
 2. Attempt API call over HTTP
 
 Expected Behavior:
-âœ“ Redirect to HTTPS (301)
-âœ“ HSTS header present
-âœ“ HTTP requests rejected at API
-âœ“ Secure cookies only
+✓ Redirect to HTTPS (301)
+✓ HSTS header present
+✓ HTTP requests rejected at API
+✓ Secure cookies only
 ```
 
 **TC-SEC-013: Security Headers**
@@ -2166,12 +2166,12 @@ Expected Behavior:
 Test: HTTP Security Headers
 
 Required Headers:
-âœ“ X-Content-Type-Options: nosniff
-âœ“ X-Frame-Options: DENY
-âœ“ X-XSS-Protection: 1; mode=block
-âœ“ Strict-Transport-Security: max-age=31536000
-âœ“ Content-Security-Policy: (defined)
-âœ“ Referrer-Policy: no-referrer
+✓ X-Content-Type-Options: nosniff
+✓ X-Frame-Options: DENY
+✓ X-XSS-Protection: 1; mode=block
+✓ Strict-Transport-Security: max-age=31536000
+✓ Content-Security-Policy: (defined)
+✓ Referrer-Policy: no-referrer
 ```
 
 **TC-SEC-014: Dependency Vulnerabilities**
@@ -2179,10 +2179,10 @@ Required Headers:
 Test: npm audit / Snyk Scan
 
 Verifications:
-âœ“ No critical vulnerabilities
-âœ“ No high vulnerabilities
-âœ“ Dependencies up to date
-âœ“ Automated scanning in CI/CD
+✓ No critical vulnerabilities
+✓ No high vulnerabilities
+✓ Dependencies up to date
+✓ Automated scanning in CI/CD
 ```
 
 ### 12.5 Privacy & Compliance
@@ -2197,10 +2197,10 @@ Steps:
 3. User downloads file
 
 Verifications:
-âœ“ All user data included
-âœ“ JSON format (machine-readable)
-âœ“ Download link expires (7 days)
-âœ“ File encrypted (password-protected)
+✓ All user data included
+✓ JSON format (machine-readable)
+✓ Download link expires (7 days)
+✓ File encrypted (password-protected)
 ```
 
 **TC-SEC-016: Right to be Forgotten**
@@ -2213,10 +2213,10 @@ Steps:
 3. Verify data removal
 
 Verifications:
-âœ“ Personal data deleted within 30 days
-âœ“ Posts deleted or anonymized
-âœ“ Cannot login after deletion
-âœ“ Data not in backups after retention period
+✓ Personal data deleted within 30 days
+✓ Posts deleted or anonymized
+✓ Cannot login after deletion
+✓ Data not in backups after retention period
 ```
 
 ---
@@ -2236,11 +2236,11 @@ Steps:
 4. Press Enter to activate
 
 Success Criteria:
-âœ“ All interactive elements reachable
-âœ“ Tab order logical
-âœ“ Focus indicator visible (2px outline)
-âœ“ No keyboard traps
-âœ“ Skip links present
+✓ All interactive elements reachable
+✓ Tab order logical
+✓ Focus indicator visible (2px outline)
+✓ No keyboard traps
+✓ Skip links present
 ```
 
 **TC-A11Y-002: Keyboard Shortcuts**
@@ -2254,9 +2254,9 @@ Shortcuts:
 - Esc : Close modal
 
 Success Criteria:
-âœ“ All shortcuts functional
-âœ“ No conflicts with browser shortcuts
-âœ“ Help accessible (? key)
+✓ All shortcuts functional
+✓ No conflicts with browser shortcuts
+✓ Help accessible (? key)
 ```
 
 ### 13.2 Screen Reader Support
@@ -2272,12 +2272,12 @@ Steps:
 4. Read feed
 
 Success Criteria:
-âœ“ All content announced
-âœ“ Headings structured (H1-H6)
-âœ“ Landmarks present (nav, main, aside)
-âœ“ ARIA labels on icons
-âœ“ Form labels associated
-âœ“ Dynamic content announced (aria-live)
+✓ All content announced
+✓ Headings structured (H1-H6)
+✓ Landmarks present (nav, main, aside)
+✓ ARIA labels on icons
+✓ Form labels associated
+✓ Dynamic content announced (aria-live)
 ```
 
 **TC-A11Y-004: Image Alt Text**
@@ -2285,11 +2285,11 @@ Success Criteria:
 Test: Alternative Text
 
 Checks:
-âœ“ All images have alt attribute
-âœ“ Decorative images: alt=""
-âœ“ Informative images: descriptive alt
-âœ“ Avatar images: alt="[Name]'s avatar"
-âœ“ User-uploaded images: alt from caption or AI
+✓ All images have alt attribute
+✓ Decorative images: alt=""
+✓ Informative images: descriptive alt
+✓ Avatar images: alt="[Name]'s avatar"
+✓ User-uploaded images: alt from caption or AI
 ```
 
 ### 13.3 Visual Accessibility
@@ -2299,10 +2299,10 @@ Checks:
 Test: WCAG Contrast Ratios
 
 Requirements:
-âœ“ Normal text: 4.5:1 minimum
-âœ“ Large text (18pt+): 3:1 minimum
-âœ“ UI components: 3:1 minimum
-âœ“ Pass in both light/dark mode
+✓ Normal text: 4.5:1 minimum
+✓ Large text (18pt+): 3:1 minimum
+✓ UI components: 3:1 minimum
+✓ Pass in both light/dark mode
 
 Tool: axe DevTools, Lighthouse
 ```
@@ -2317,10 +2317,10 @@ Steps:
 3. Verify usability
 
 Success Criteria:
-âœ“ No horizontal scrolling
-âœ“ All text readable
-âœ“ No overlapping content
-âœ“ Functionality intact
+✓ No horizontal scrolling
+✓ All text readable
+✓ No overlapping content
+✓ Functionality intact
 ```
 
 **TC-A11Y-007: Color Blindness**
@@ -2333,10 +2333,10 @@ Scenarios:
 3. Tritanopia (blue-yellow)
 
 Success Criteria:
-âœ“ Information not conveyed by color alone
-âœ“ Icons + labels used
-âœ“ Patterns/textures for differentiation
-âœ“ Simulate with tool (Stark)
+✓ Information not conveyed by color alone
+✓ Icons + labels used
+✓ Patterns/textures for differentiation
+✓ Simulate with tool (Stark)
 ```
 
 ### 13.4 Form Accessibility
@@ -2346,12 +2346,12 @@ Success Criteria:
 Test: Form Accessibility
 
 Checks:
-âœ“ All inputs have <label>
-âœ“ Labels associated (for/id)
-âœ“ Required fields indicated (*)
-âœ“ Error messages clear
-âœ“ Error messages announced (aria-describedby)
-âœ“ Error icons + text (not color only)
+✓ All inputs have <label>
+✓ Labels associated (for/id)
+✓ Required fields indicated (*)
+✓ Error messages clear
+✓ Error messages announced (aria-describedby)
+✓ Error icons + text (not color only)
 ```
 
 **TC-A11Y-009: Focus Management**
@@ -2364,10 +2364,10 @@ Steps:
 3. Close modal
 
 Success Criteria:
-âœ“ Focus moved to modal on open
-âœ“ Focus trapped within modal
-âœ“ Esc closes modal
-âœ“ Focus returned to trigger on close
+✓ Focus moved to modal on open
+✓ Focus trapped within modal
+✓ Esc closes modal
+✓ Focus returned to trigger on close
 ```
 
 ### 13.5 WCAG Compliance
@@ -2384,10 +2384,10 @@ Pages to Test:
 - Settings
 
 Success Criteria:
-âœ“ 0 critical violations
-âœ“ 0 serious violations
-âœ“ < 5 moderate violations
-âœ“ WCAG 2.1 Level AA compliant
+✓ 0 critical violations
+✓ 0 serious violations
+✓ < 5 moderate violations
+✓ WCAG 2.1 Level AA compliant
 ```
 
 ---
@@ -2399,22 +2399,22 @@ Success Criteria:
 **TC-MOB-001: Mobile Layout**
 ```
 Test Devices:
-- iPhone SE (375Ã—667)
-- iPhone 13 (390Ã—844)
-- Samsung Galaxy S21 (360Ã—800)
-- iPad Pro (1024Ã—1366)
+- iPhone SE (375×667)
+- iPhone 13 (390×844)
+- Samsung Galaxy S21 (360×800)
+- iPad Pro (1024×1366)
 
 Success Criteria:
-âœ“ Content fits screen (no horizontal scroll)
-âœ“ Text readable (min 16px)
-âœ“ Touch targets â‰¥ 44px
-âœ“ Images responsive
-âœ“ Navigation accessible
+✓ Content fits screen (no horizontal scroll)
+✓ Text readable (min 16px)
+✓ Touch targets ≥ 44px
+✓ Images responsive
+✓ Navigation accessible
 ```
 
 **TC-MOB-002: Orientation Change**
 ```
-Test: Portrait â†” Landscape
+Test: Portrait ↔ Landscape
 
 Steps:
 1. Open app in portrait
@@ -2423,10 +2423,10 @@ Steps:
 4. Rotate back to portrait
 
 Success Criteria:
-âœ“ Layout adapts smoothly
-âœ“ No content loss
-âœ“ State maintained
-âœ“ No visual glitches
+✓ Layout adapts smoothly
+✓ No content loss
+✓ State maintained
+✓ No visual glitches
 ```
 
 ### 14.2 Touch Interactions
@@ -2442,10 +2442,10 @@ Gestures to Test:
 - Pinch (zoom images)
 
 Success Criteria:
-âœ“ All gestures responsive
-âœ“ Visual feedback on touch
-âœ“ No accidental triggers
-âœ“ 44px minimum touch target
+✓ All gestures responsive
+✓ Visual feedback on touch
+✓ No accidental triggers
+✓ 44px minimum touch target
 ```
 
 **TC-MOB-004: Scroll Performance**
@@ -2458,10 +2458,10 @@ Scenarios:
 - Long form scroll
 
 Success Criteria:
-âœ“ 60fps scrolling
-âœ“ No jank
-âœ“ Momentum scrolling
-âœ“ Scroll position preserved
+✓ 60fps scrolling
+✓ No jank
+✓ Momentum scrolling
+✓ Scroll position preserved
 ```
 
 ### 14.3 Mobile-Specific Features
@@ -2477,11 +2477,11 @@ Steps:
 4. Confirm upload
 
 Success Criteria:
-âœ“ Camera permission requested
-âœ“ Camera opens
-âœ“ Photo captured
-âœ“ Preview shown
-âœ“ Upload successful
+✓ Camera permission requested
+✓ Camera opens
+✓ Photo captured
+✓ Preview shown
+✓ Upload successful
 ```
 
 **TC-MOB-006: Offline Behavior**
@@ -2495,11 +2495,11 @@ Steps:
 4. Re-enable network
 
 Success Criteria:
-âœ“ Offline indicator shown
-âœ“ Cached content accessible
-âœ“ Actions queued
-âœ“ Sync on reconnection
-âœ“ Conflicts handled
+✓ Offline indicator shown
+✓ Cached content accessible
+✓ Actions queued
+✓ Sync on reconnection
+✓ Conflicts handled
 ```
 
 **TC-MOB-007: Push Notifications (Mobile)**
@@ -2512,10 +2512,10 @@ Steps:
 3. Tap notification
 
 Success Criteria:
-âœ“ Permission prompt shown
-âœ“ Notification received
-âœ“ Sound/vibration (if enabled)
-âœ“ Deep link to content works
+✓ Permission prompt shown
+✓ Notification received
+✓ Sound/vibration (if enabled)
+✓ Deep link to content works
 ```
 
 ### 14.4 Performance on Mobile
@@ -2530,10 +2530,10 @@ Throttling:
 - Latency: 150ms
 
 Success Criteria:
-âœ“ Page load < 5s
-âœ“ Images lazy load
-âœ“ Progressive enhancement
-âœ“ Offline cache utilized
+✓ Page load < 5s
+✓ Images lazy load
+✓ Progressive enhancement
+✓ Offline cache utilized
 ```
 
 **TC-MOB-009: Mobile Battery Usage**
@@ -2547,9 +2547,9 @@ Scenario:
 - Messaging
 
 Success Criteria:
-âœ“ Battery drain < 5%
-âœ“ No excessive CPU usage
-âœ“ Background activity minimal
+✓ Battery drain < 5%
+✓ No excessive CPU usage
+✓ Background activity minimal
 ```
 
 ### 14.5 Cross-Browser Mobile
@@ -2563,10 +2563,10 @@ Browsers to Test:
 - Firefox Mobile
 
 Features to Verify:
-âœ“ All features functional
-âœ“ Layout consistent
-âœ“ Gestures work
-âœ“ Performance acceptable
+✓ All features functional
+✓ Layout consistent
+✓ Gestures work
+✓ Performance acceptable
 ```
 
 ---
@@ -2677,9 +2677,9 @@ Test:
 - OAuth providers (Google, GitHub)
 
 Verify:
-âœ“ All integrations functional
-âœ“ Error handling works
-âœ“ Fallbacks in place
+✓ All integrations functional
+✓ Error handling works
+✓ Fallbacks in place
 ```
 
 **TS-REG-010: Database Operations**
@@ -2692,10 +2692,10 @@ Test:
 - Transactions (COMMIT/ROLLBACK)
 
 Verify:
-âœ“ All CRUD operations work
-âœ“ Constraints enforced
-âœ“ Indexes used
-âœ“ Triggers fire correctly
+✓ All CRUD operations work
+✓ Constraints enforced
+✓ Indexes used
+✓ Triggers fire correctly
 ```
 
 ---
@@ -2876,8 +2876,8 @@ afterAll(async () => {
 ### 17.3 Defect Lifecycle
 
 ```
-New â†’ Assigned â†’ In Progress â†’ Fixed â†’ Ready for Test â†’ Verified â†’ Closed
-                                    â†“
+New → Assigned → In Progress → Fixed → Ready for Test → Verified → Closed
+                                    ↓
                                 Reopened (if still failing)
 ```
 
@@ -2981,7 +2981,7 @@ Skipped: 5 (0.4%)
 
 Execution Time: 35 minutes
 
-Trend: â†‘ (improvement from yesterday)
+Trend: ↑ (improvement from yesterday)
 ```
 
 **Sprint Summary:**
@@ -3152,7 +3152,7 @@ Week 20:
 - UAT (User Acceptance Testing)
 - Production readiness testing
 - Final sign-off
-- Launch ðŸš€
+- Launch 🚀
 ```
 
 ### 19.2 Daily Testing Activities
@@ -3178,16 +3178,16 @@ Week 20:
 ### 19.3 Testing Milestones
 
 ```
-âœ“ Week 2: CI/CD pipeline operational
-âœ“ Week 4: Unit test coverage > 80%
-âœ“ Week 6: Integration tests complete
-âœ“ Week 8: First load test passed
-âœ“ Week 10: E2E test suite complete
-âœ“ Week 12: Accessibility compliance verified
-âœ“ Week 14: Security audit passed
-âœ“ Week 16: Performance benchmarks met
-âœ“ Week 18: UAT started
-âœ“ Week 20: Production ready
+✓ Week 2: CI/CD pipeline operational
+✓ Week 4: Unit test coverage > 80%
+✓ Week 6: Integration tests complete
+✓ Week 8: First load test passed
+✓ Week 10: E2E test suite complete
+✓ Week 12: Accessibility compliance verified
+✓ Week 14: Security audit passed
+✓ Week 16: Performance benchmarks met
+✓ Week 18: UAT started
+✓ Week 20: Production ready
 ```
 
 ---
@@ -3334,11 +3334,9 @@ Week 20:
 
 **END OF DOCUMENT**
 
-**Status:** âœ… COMPLETE  
+**Status:** ✅ COMPLETE  
 **Total Test Cases:** 300+  
 **Coverage:** Unit, Integration, API, UI, Performance, Security, Accessibility  
 **Test Strategy:** Comprehensive and production-ready  
 **Ready for:** Test execution and quality assurance
-
-
 

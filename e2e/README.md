@@ -60,7 +60,7 @@ cd frontend
 npm install
 npm run dev
 ```
-Frontend: `http://localhost:3000`
+Frontend: `http://localhost:3001`
 
 ### Install Playwright browsers (first time only)
 ```bash

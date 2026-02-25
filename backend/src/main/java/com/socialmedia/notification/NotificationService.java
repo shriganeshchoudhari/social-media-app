@@ -3,6 +3,7 @@ package com.socialmedia.notification;
 import com.socialmedia.exception.ResourceNotFoundException;
 import com.socialmedia.notification.dto.NotificationResponse;
 import com.socialmedia.user.User;
+import com.socialmedia.websocket.WebSocketNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -17,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class NotificationService {
 
-    private final NotificationRepository notificationRepository;
+    private final NotificationRepository           notificationRepository;
+    private final WebSocketNotificationService      webSocketNotificationService;
 
     // ── Async event listener ──────────────────────────────────
 
@@ -43,6 +45,10 @@ public class NotificationService {
         notificationRepository.save(notification);
         log.debug("Notification saved: type={} recipient={}", event.getType(),
                 event.getRecipient().getUsername());
+
+        // Push real-time update if user is connected via WebSocket
+        NotificationResponse dto = toResponse(notification);
+        webSocketNotificationService.sendToUser(event.getRecipient().getUsername(), dto);
     }
 
     // ── Query methods ─────────────────────────────────────────

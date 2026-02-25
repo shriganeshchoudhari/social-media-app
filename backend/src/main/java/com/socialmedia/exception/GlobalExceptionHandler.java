@@ -1,5 +1,7 @@
 package com.socialmedia.exception;
 
+import com.socialmedia.ai.AiRateLimitException;
+import com.socialmedia.ai.AiUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -44,6 +48,27 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ApiError(422, "Validation Error", message));
+    }
+
+    @ExceptionHandler(AiRateLimitException.class)
+    public ResponseEntity<Map<String, Object>> handleAiRateLimit(AiRateLimitException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status",    "error");
+        body.put("code",      "RATE_LIMIT");
+        body.put("message",   "AI rate limit reached");
+        body.put("remaining", ex.getRemaining());
+        body.put("resetAt",   ex.getResetAt().toString());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(body);
+    }
+
+    @ExceptionHandler(AiUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleAiUnavailable(AiUnavailableException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status",    "error");
+        body.put("code",      "AI_UNAVAILABLE");
+        body.put("message",   "AI assistant is starting up — try again in a moment");
+        body.put("retryable", true);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
     }
 
     @ExceptionHandler(Exception.class)

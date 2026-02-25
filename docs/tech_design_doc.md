@@ -1,67 +1,57 @@
-﻿# Technical Design Document (TDD)
+# Technical Design Document (TDD)
 ## Social Media Clone Application
 
-**Version:** 1.0 | **Date:** February 07, 2026 | **Status:** Active
+**Version:** 1.3 | **Date:** February 25, 2026 | **Status:** Active
 
 ---
 
 ## 1. SYSTEM ARCHITECTURE
 
 ### 1.1 Architecture Overview
-**Pattern:** Microservices Architecture with Event-Driven Communication
+**Pattern:** Monolith-first, evolving toward service extraction
 
 **Core Components:**
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                  Client Layer                         â”‚
-â”‚  Web App (React) â”‚ Mobile Apps â”‚ Third-Party Clients â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                     â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚            API Gateway (Port 8080)                    â”‚
-â”‚  Authentication â”‚ Rate Limiting â”‚ Load Balancing     â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                     â”‚
-        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-        â”‚  Service Discovery      â”‚
-        â”‚  (Eureka - Port 8761)   â”‚
-        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                     â”‚
-    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-    â”‚        Microservices Layer         â”‚
-    â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-    â”‚ Auth(8081) â”‚ User(8082) â”‚ Post(8083)â”‚
-    â”‚ Feed(8084) â”‚ Message(8085) â”‚ etc   â”‚
-    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                     â”‚
-    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-    â”‚         Data Layer                  â”‚
-    â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-    â”‚ PostgreSQL â”‚ Redis â”‚ Elasticsearch â”‚
-    â”‚ Kafka â”‚ S3/Cloud Storage            â”‚
-    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
++------------------------------------------------------+
+|                  Client Layer                         |
+|  Web App (React) | Mobile Apps | Third-Party Clients |
++--------------------+---------------------------------+
+                     |
++--------------------v---------------------------------+
+|            Spring Boot Backend (Port 9090)            |
+|  Authentication | Rate Limiting | REST API            |
++--------------------+---------------------------------+
+                     |
+    +----------------+-------------------+
+    |         Data Layer                  |
+    +-------------------------------------+
+    | PostgreSQL | Redis (future)          |
+    | Flyway Migrations | H2 (test)        |
+    +-------------------------------------+
+                     |
+    +----------------+-------------------+
+    |         AI Layer (Spark)            |
+    +-------------------------------------+
+    | Ollama (local LLM, llama3.2:3b)    |
+    | Port 11434 — free, no API key       |
+    +-------------------------------------+
 ```
 
-### 1.2 Microservices
+### 1.2 Service Overview
 
 | Service | Port | Database | Responsibility |
 |---------|------|----------|----------------|
-| **Auth Service** | 8081 | PostgreSQL | Authentication, JWT, OAuth2 |
-| **User Service** | 8082 | PostgreSQL + Redis | Profiles, follows, settings |
-| **Post Service** | 8083 | PostgreSQL + Redis | Posts, media, hashtags |
-| **Feed Service** | 8084 | Redis + Kafka | News feed, trending |
-| **Interaction Service** | 8085 | PostgreSQL | Likes, comments, shares |
-| **Messaging Service** | 8086 | PostgreSQL + WebSocket | Chat, DMs |
-| **Notification Service** | 8087 | PostgreSQL + Firebase | Notifications |
-| **Search Service** | 8088 | Elasticsearch | Search, discovery |
-| **Media Service** | 8089 | S3 + PostgreSQL | Upload, processing |
-| **Admin Service** | 8090 | PostgreSQL | Moderation, analytics |
+| **Spring Boot Backend** | 9090 | PostgreSQL + H2 | Auth, Users, Posts, Feed, Comments, Likes, Follow, Notifications, Search, Media, Messaging, Bookmarks, AI |
+| **React Frontend** | 3001 | — | SPA client |
+| **PostgreSQL** | 5432 | — | Primary datastore |
+| **pgAdmin** | 5050 | — | DB admin UI |
+| **Ollama** | 11434 | — | Local LLM (Spark AI) |
 
 ---
 
 ## 2. DATABASE DESIGN
 
-### 2.1 PostgreSQL Schema
+### 2.1 PostgreSQL Schema (Flyway-managed)
 
 #### Core Tables:
 
@@ -71,16 +61,14 @@ CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(30) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    display_name VARCHAR(100),
-    bio TEXT,
-    profile_picture_url VARCHAR(500),
-    cover_photo_url VARCHAR(500),
-    is_verified BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_private BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    password VARCHAR(255) NOT NULL,
+    display_name VARCHAR(60),
+    bio VARCHAR(200),
+    avatar_url VARCHAR(500),
+    followers_count INT DEFAULT 0,
+    following_count INT DEFAULT 0,
+    posts_count INT DEFAULT 0,
+    created_at TIMESTAMP NOT NULL
 );
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_email ON users(email);
@@ -90,16 +78,16 @@ CREATE INDEX idx_users_email ON users(email);
 ```sql
 CREATE TABLE posts (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    content TEXT NOT NULL CHECK (LENGTH(content) <= 5000),
-    privacy_level VARCHAR(20) DEFAULT 'public',
+    author_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    content VARCHAR(2000) NOT NULL,
+    image_url VARCHAR(500),
+    privacy VARCHAR(20) DEFAULT 'PUBLIC',
     likes_count INT DEFAULT 0,
     comments_count INT DEFAULT 0,
-    shares_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
 );
-CREATE INDEX idx_posts_user_id ON posts(user_id);
+CREATE INDEX idx_posts_author_id ON posts(author_id);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
 ```
 
@@ -109,47 +97,20 @@ CREATE TABLE follows (
     id BIGSERIAL PRIMARY KEY,
     follower_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     following_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    status VARCHAR(20) DEFAULT 'accepted',
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP NOT NULL,
     UNIQUE(follower_id, following_id),
     CHECK (follower_id != following_id)
 );
-CREATE INDEX idx_follows_follower ON follows(follower_id);
-CREATE INDEX idx_follows_following ON follows(following_id);
 ```
 
-**likes, comments, messages** (see full schema in Database Document)
+**post_likes, comments, notifications** — see `docs/database_schema_doc.md`
 
-### 2.2 Redis Cache Strategy
+### 2.2 Redis Cache Strategy (Phase 9)
 ```
-Format: key â†’ value (TTL)
-
-user:{id} â†’ UserDTO (5min)
-post:{id} â†’ PostDTO (10min)
-feed:{userId} â†’ List<PostDTO> (15min)
-session:{sessionId} â†’ SessionData (30days)
-trending:hashtags â†’ SortedSet (1hour)
-ratelimit:{userId}:{endpoint} â†’ count (1min)
-```
-
-### 2.3 Elasticsearch Indexes
-```json
-{
-  "users": {
-    "id": "long",
-    "username": "keyword",
-    "display_name": "text",
-    "bio": "text",
-    "follower_count": "integer"
-  },
-  "posts": {
-    "id": "long",
-    "content": "text",
-    "hashtags": "keyword[]",
-    "engagement_score": "float",
-    "created_at": "date"
-  }
-}
+user:{id}            -> UserDTO           (5 min)
+post:{id}            -> PostDTO           (10 min)
+feed:{userId}        -> List<PostDTO>     (15 min)
+ratelimit:{userId}   -> count             (1 min)
 ```
 
 ---
@@ -158,7 +119,7 @@ ratelimit:{userId}:{endpoint} â†’ count (1min)
 
 ### 3.1 RESTful API Standards
 
-**Base URL**: `https://api.connecthub.com/api/v1`
+**Base URL**: `http://localhost:9090/api/v1`
 
 **Authentication**: JWT Bearer Token
 ```
@@ -175,81 +136,104 @@ Authorization: Bearer <token>
 }
 ```
 
-### 3.2 Key Endpoints
+### 3.2 Implemented Endpoints
 
-**Authentication** (`/auth`)
+**Authentication** (`/api/v1/auth`)
 ```
-POST   /auth/register          - User registration
-POST   /auth/login             - User login
-POST   /auth/logout            - User logout
-POST   /auth/refresh-token     - Refresh JWT
-POST   /auth/forgot-password   - Password reset request
-POST   /auth/reset-password    - Password reset
+POST   /auth/register          - User registration (201)
+POST   /auth/login             - User login, returns JWT (200)
 ```
 
-**Users** (`/users`)
+**Users** (`/api/v1/users`)
 ```
-GET    /users/{id}             - Get user profile
-PUT    /users/{id}             - Update profile
-GET    /users/{id}/followers   - Get followers
-GET    /users/{id}/following   - Get following
-POST   /users/{id}/follow      - Follow user
-DELETE /users/{id}/unfollow    - Unfollow user
-```
-
-**Posts** (`/posts`)
-```
-GET    /posts                  - Get feed posts
-POST   /posts                  - Create post
-GET    /posts/{id}             - Get post
-PUT    /posts/{id}             - Update post
-DELETE /posts/{id}             - Delete post
-POST   /posts/{id}/like        - Like post
-DELETE /posts/{id}/unlike      - Unlike post
-GET    /posts/{id}/comments    - Get comments
-POST   /posts/{id}/comments    - Add comment
+GET    /users/me               - Own profile
+PUT    /users/me               - Update profile
+GET    /users/{username}       - Get user profile
+GET    /users/{username}/posts - User's posts
+GET    /users/{username}/followers  - Followers list
+GET    /users/{username}/following  - Following list
+GET    /users/{username}/is-following - Follow status
+GET    /users/search?q=        - Search users
+POST   /users/{username}/follow     - Follow user
+DELETE /users/{username}/follow     - Unfollow user
 ```
 
-**Feed** (`/feed`)
+**Posts** (`/api/v1/posts`)
 ```
-GET    /feed                   - Personalized feed
-GET    /feed/trending          - Trending posts
-GET    /feed/explore           - Explore page
+GET    /posts/feed                  - Home feed (paginated)
+POST   /posts                       - Create post
+GET    /posts/{id}                  - Get post
+PUT    /posts/{id}                  - Edit post (author only; sets updated_at)
+DELETE /posts/{id}                  - Delete post (own only)
+POST   /posts/{id}/like             - Like post
+DELETE /posts/{id}/like             - Unlike post
+GET    /posts/{id}/comments         - Get comments
+POST   /posts/{id}/comments         - Add comment
+DELETE /posts/{id}/comments/{cid}   - Delete comment (own only)
+POST   /posts/{id}/bookmark         - Toggle bookmark (saves or removes)
 ```
 
-**Messages** (`/messages`)
+**Bookmarks** (`/api/v1/users`)
 ```
-GET    /conversations          - Get all conversations
-POST   /conversations          - Create conversation
-GET    /conversations/{id}/messages - Get messages
-POST   /conversations/{id}/messages - Send message
+GET    /users/me/bookmarks           - Saved posts for current user (paginated)
 ```
 
-**Search** (`/search`)
+**Messaging** (`/api/v1/messages`)
+```
+GET    /messages/conversations                         - All conversations for current user
+POST   /messages                                       - Send message (creates conversation if needed)
+GET    /messages/conversations/{id}/messages            - Message history (paginated, newest-first)
+PUT    /messages/conversations/{id}/read               - Mark conversation as read
+```
+
+**Search** (`/api/v1/search`)
 ```
 GET    /search/users?q=        - Search users
-GET    /search/posts?q=        - Search posts
+GET    /search/posts?q=        - Search post content
 GET    /search/hashtags?q=     - Search hashtags
 ```
 
-### 3.3 WebSocket Endpoints
-
-**Base**: `wss://ws.connecthub.com`
-
+**Notifications** (`/api/v1/notifications`)
 ```
-/ws/connect                     - Connect
-/topic/chat/{conversationId}    - Subscribe to chat
-/app/send-message               - Send message
-/app/typing                     - Typing indicator
+GET    /notifications          - List notifications (paginated)
+GET    /notifications/unread-count - Unread count
+PATCH  /notifications/read-all - Mark all read
+PATCH  /notifications/{id}/read - Mark one read
 ```
 
-### 3.4 Rate Limits
+**Media** (`/api/v1/media`)
 ```
-General Read:    200 req/min/user
-General Write:    20 req/min/user
-Search:           30 req/min/user
-Anonymous:        10 req/min/IP
+POST   /media/upload           - Upload image/video (multipart)
+GET    /media/files/{filename} - Serve uploaded file (public)
 ```
+
+**AI Assistant** (`/api/v1/ai`)
+```
+POST   /ai/chat                - Streaming chat (NDJSON, auth required)
+GET    /ai/health              - Ollama health check
+```
+
+### 3.3 Rate Limits
+```
+Global:    100 req/min per IP  (RateLimitFilter)
+AI chat:    60 req/hour per user (AiRateLimiter)
+```
+
+### 3.4 WebSocket / Real-time (STOMP over SockJS)
+
+**Connection URL**: `ws://localhost:9090/ws`  
+**Auth**: JWT passed as STOMP connect header (`Authorization: Bearer <token>`)  
+**Library**: `@stomp/stompjs` + `sockjs-client`
+
+```
+SUBSCRIBE  /topic/chat/{conversationId}      - Incoming messages for a conversation
+SUBSCRIBE  /user/queue/notifications          - Personal real-time notifications
+SEND       /app/send-message                 - Broadcast a new message to a conversation
+SEND       /app/typing                       - Emit typing indicator
+```
+
+**Typing indicator topic**: `/topic/typing/{conversationId}`  
+Messages sent to `/app/send-message` are broadcast to `/topic/chat/{conversationId}` so all participants receive them in real time.
 
 ---
 
@@ -257,83 +241,60 @@ Anonymous:        10 req/min/IP
 
 ### 4.1 Authentication Flow
 ```
-1. User â†’ POST /auth/login {email, password}
-2. Server â†’ Validate credentials
-3. Server â†’ Generate JWT (access + refresh tokens)
-4. Server â†’ Return tokens
-5. Client â†’ Store tokens (httpOnly cookie)
-6. Client â†’ Include in subsequent requests
+1. User -> POST /auth/login {usernameOrEmail, password}
+2. Server -> Validate credentials (BCrypt)
+3. Server -> Generate JWT (access token, 7-day expiry)
+4. Server -> Return {token, user}
+5. Client -> Store token (localStorage)
+6. Client -> Authorization: Bearer <token>
 ```
 
-**JWT Structure**:
+**JWT Claims**:
 ```json
 {
-  "sub": "user_id",
-  "username": "john_doe",
-  "roles": ["USER"],
+  "sub": "alice",
   "iat": 1706400000,
-  "exp": 1706486400
+  "exp": 1707004800
 }
 ```
 
 ### 4.2 Security Measures
 
 **Data Protection**:
-- HTTPS/TLS 1.3 only
-- bcrypt password hashing (cost: 12)
-- AES-256 encryption at rest
-- End-to-end encryption for messages
+- BCrypt password hashing (strength 10)
+- JWT with HS384 signing
 
 **API Security**:
-- JWT token validation
-- Role-based access control (RBAC)
-- Input validation & sanitization
-- SQL injection prevention (PreparedStatements)
-- XSS protection (Content Security Policy)
-- CSRF tokens for state-changing operations
+- JWT validation on every request (JwtAuthFilter)
+- Input validation (Jakarta Validation)
+- SQL injection prevention (JPA/Hibernate)
+- XSS protection (Content Security Policy headers)
+- CORS configured for frontend origin
+- Rate limiting (RateLimitFilter — 100 req/min/IP)
 
-**Rate Limiting**:
-- Token bucket algorithm
-- Per-user and per-IP limits
-- Distributed rate limiting (Redis)
+**Security Headers**:
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: SAMEORIGIN`
+- `Strict-Transport-Security` (HTTPS)
 
-### 4.3 OAuth2 Integration
-
-**Supported Providers**: Google, GitHub, Facebook
-
-**Flow**: Authorization Code with PKCE
-```
-1. Client â†’ Redirect to OAuth provider
-2. User â†’ Authorize app
-3. Provider â†’ Return auth code
-4. Server â†’ Exchange code for tokens
-5. Server â†’ Fetch user info
-6. Server â†’ Create/link account
-7. Server â†’ Return JWT
-```
+### 4.3 Prompt Injection Prevention (AI)
+- User-supplied content sanitised before injection into Ollama system prompt
+- `---` delimiters replaced to prevent context escape
+- HTML escaped (`<` -> `&lt;`)
+- Null bytes stripped
 
 ---
 
 ## 5. PERFORMANCE & SCALABILITY
 
 ### 5.1 Caching Strategy
-
-**Layer 1 - Application Cache (Redis)**
-- User profiles: 5 min TTL
-- Feed data: 15 min TTL
-- Post data: 10 min TTL
-- Trending: 1 hour TTL
-
-**Layer 2 - CDN Cache**
-- Static assets: 1 year
-- User media: 1 month
-- Profile images: 1 week
+Current: no cache (Phase 1)
+Phase 9: Redis cache for feed, profiles, trending
 
 **Cache Invalidation**:
 ```
 - On update: Delete specific cache keys
 - On post creation: Invalidate author's profile, followers' feeds
-- On user update: Invalidate user cache
 - Lazy invalidation for low-priority data
 ```
 
@@ -341,402 +302,194 @@ Anonymous:        10 req/min/IP
 
 **Indexing Strategy**:
 ```sql
--- Frequently queried columns
-CREATE INDEX idx_posts_user_created ON posts(user_id, created_at DESC);
-CREATE INDEX idx_follows_composite ON follows(follower_id, following_id);
-
--- Full-text search
-CREATE INDEX idx_posts_content_gin ON posts USING GIN(to_tsvector('english', content));
+-- Applied via Flyway V1__create_schema.sql
+CREATE INDEX idx_posts_author_id ON posts(author_id);
+CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
+CREATE INDEX idx_follows_follower ON follows(follower_id);
+CREATE INDEX idx_follows_following ON follows(following_id);
 ```
 
-**Connection Pooling**:
+**Connection Pooling** (HikariCP defaults):
 ```yaml
 spring:
   datasource:
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
+      maximum-pool-size: 10
+      minimum-idle: 2
       connection-timeout: 30000
-      idle-timeout: 600000
 ```
 
-**Query Optimization**:
-- Use JPA projections for partial data
-- Implement pagination (default: 20 items/page)
-- Avoid N+1 queries (@EntityGraph)
-- Use database views for complex queries
+### 5.3 Performance Targets
 
-### 5.3 Horizontal Scaling
-
-**Stateless Services**:
-- All services are stateless
-- Session data in Redis
-- Load balancing via API Gateway
-
-**Auto-Scaling**:
-```yaml
-Kubernetes HPA:
-  minReplicas: 2
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 70
-  targetMemoryUtilizationPercentage: 80
-```
-
-**Database Scaling**:
-- Read replicas for read-heavy operations
-- Sharding strategy (by user_id % 4)
-- Connection pooling
-
-### 5.4 Performance Targets
-
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| API Response Time (P95) | < 200ms | Prometheus |
-| Page Load Time | < 2s | Browser metrics |
-| Feed Load Time | < 1s | Custom timing |
-| Search Response | < 300ms | Elasticsearch |
-| WebSocket Latency | < 100ms | Custom metrics |
-| Database Query (P95) | < 50ms | Slow query log |
+| Metric | Target |
+|--------|--------|
+| API Response Time (P95) | < 200ms |
+| Feed Load Time | < 1s |
+| AI First Token | < 3s (CPU) |
+| Database Query (P95) | < 50ms |
 
 ---
 
-## 6. MESSAGE QUEUE (KAFKA)
+## 6. AI ASSISTANT (SPARK)
 
-### 6.1 Topics
+### 6.1 Architecture
 
-| Topic | Partitions | Replication | Purpose |
-|-------|------------|-------------|---------|
-| user-events | 4 | 3 | User actions |
-| post-events | 4 | 3 | Post actions |
-| notification-events | 4 | 3 | Notifications |
-| message-events | 4 | 3 | Chat messages |
-
-### 6.2 Event Schema
-
-**PostCreatedEvent**:
-```json
-{
-  "eventId": "uuid",
-  "eventType": "POST_CREATED",
-  "timestamp": "ISO8601",
-  "data": {
-    "postId": 123,
-    "userId": 456,
-    "content": "Hello",
-    "hashtags": ["tech"],
-    "mentions": [789]
-  }
-}
+```
+Frontend (React)
+  -> POST /api/v1/ai/chat (NDJSON stream)
+  -> AiController.java
+  -> AiService.java (rate-limit + context)
+  -> OllamaClient.java
+  -> Ollama HTTP API (localhost:11434)
+  -> llama3.2:3b model
 ```
 
-**UserFollowedEvent**:
-```json
-{
-  "eventId": "uuid",
-  "eventType": "USER_FOLLOWED",
-  "timestamp": "ISO8601",
-  "data": {
-    "followerId": 123,
-    "followingId": 456
-  }
-}
+### 6.2 Ollama Integration
+
+**Model**: llama3.2:3b (default, ~2 GB)
+**API**: POST http://ollama:11434/api/chat
+**Protocol**: NDJSON streaming
+**Cost**: Free — runs on local hardware
+
+**Stream Format**:
+```
+Token: {"delta":"<text>"}
+End:   {"done":true}
+Error: {"error":"rate_limit"|"ai_unavailable","message":"..."}
 ```
 
-### 6.3 Event Processing
-```
-Producer (Post Service) 
-  â†’ Kafka Topic (post-events)
-  â†’ Consumer 1 (Feed Service) - Update feeds
-  â†’ Consumer 2 (Notification Service) - Send notifications
-  â†’ Consumer 3 (Search Service) - Index post
-```
+### 6.3 Context Modes
+
+| Mode | Description |
+|------|-------------|
+| `general` | Injects user profile (name, bio, followers) |
+| `feed_summary` | Injects latest 20 public feed posts |
+| `post_improve` | Instructions for draft improvement |
+
+### 6.4 Rate Limiting
+- 60 requests per user per hour (in-memory sliding window)
+- Purpose: protect local Ollama from overload (not cost-based)
 
 ---
 
 ## 7. DEPLOYMENT ARCHITECTURE
 
-### 7.1 Container Strategy
+### 7.1 Docker Compose Stack
 
-**Docker Images**:
-```dockerfile
-# Base image for all services
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
-COPY target/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-**Docker Compose (Development)**:
 ```yaml
-version: '3.8'
 services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: social_media
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-  
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-  
-  auth-service:
-    build: ./auth-service
-    ports:
-      - "8081:8081"
-    depends_on:
-      - postgres
-      - redis
+  postgres:     image: postgres:16-alpine, port 5432
+  pgadmin:      image: dpage/pgadmin4, port 5050
+  ollama:       image: ollama/ollama:latest, port 11434
+  ollama-init:  pulls llama3.2:3b on first run
+  backend:      builds ./backend/Dockerfile, port 9090
+  frontend:     builds ./frontend/Dockerfile, port 3001
 ```
 
-### 7.2 Kubernetes Deployment
+### 7.2 Dockerfiles
 
-**Service Deployment**:
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: user-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: user-service
-  template:
-    metadata:
-      labels:
-        app: user-service
-    spec:
-      containers:
-      - name: user-service
-        image: connecthub/user-service:latest
-        ports:
-        - containerPort: 8082
-        env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: "prod"
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
+**Backend** (multi-stage):
+```dockerfile
+FROM maven:3.9-eclipse-temurin-21 AS builder
+# ... build ...
+FROM eclipse-temurin:21-jre-alpine
+# Non-root user, health check on /actuator/health
 ```
 
-### 7.3 CI/CD Pipeline
+**Frontend**:
+```dockerfile
+FROM node:20-alpine
+# Vite dev server with --host 0.0.0.0
+```
+
+### 7.3 CI/CD Pipeline (Phase 9)
 
 ```
 1. Code Commit (GitHub)
-   â†“
-2. Trigger Pipeline (GitHub Actions)
-   â†“
-3. Build & Test
-   - mvn clean test
-   - Code coverage check (>80%)
-   â†“
-4. Build Docker Image
-   - docker build -t service:version
-   â†“
-5. Push to Registry
-   - docker push to DockerHub/ECR
-   â†“
-6. Deploy to Staging
-   - kubectl apply -f staging/
-   â†“
-7. Integration Tests
-   - Selenium, API tests
-   â†“
-8. Manual Approval
-   â†“
-9. Deploy to Production
-   - kubectl apply -f prod/
-   â†“
-10. Health Checks & Monitoring
+2. GitHub Actions triggered
+3. mvn clean test (unit + integration)
+4. docker build
+5. Push to DockerHub/GHCR
+6. Deploy to staging
+7. Playwright E2E tests
+8. Deploy to production
 ```
 
 ---
 
 ## 8. MONITORING & OBSERVABILITY
 
-### 8.1 Metrics (Prometheus + Grafana)
+### 8.1 Health Checks
+- `GET /api/v1/health` — backend health (public)
+- `GET /api/v1/ai/health` — Ollama reachability
+- `/actuator/health` — Spring Boot actuator (Docker health check)
 
-**Application Metrics**:
+### 8.2 Logging
+```
+Format: structured console (logback-spring.xml)
+Levels: ERROR, WARN, INFO, DEBUG
+AI errors: logged with user context, no message content
+```
+
+### 8.3 Future: Prometheus + Grafana (Phase 9)
 ```
 - Request count by endpoint
 - Response time (P50, P95, P99)
-- Error rate by service
-- Active connections
+- AI response latency
 - Cache hit/miss ratio
-- Database connection pool usage
+- Active users
 ```
-
-**Business Metrics**:
-```
-- User registrations/hour
-- Posts created/hour
-- Messages sent/hour
-- Active users (real-time)
-```
-
-**Infrastructure Metrics**:
-```
-- CPU usage per pod
-- Memory usage per pod
-- Network I/O
-- Disk usage
-```
-
-### 8.2 Logging (ELK Stack)
-
-**Log Format** (JSON):
-```json
-{
-  "timestamp": "2026-02-07T10:30:00Z",
-  "level": "INFO",
-  "service": "user-service",
-  "traceId": "abc123",
-  "userId": "456",
-  "message": "User profile updated",
-  "duration": 45
-}
-```
-
-**Log Levels**:
-- ERROR: System failures, exceptions
-- WARN: Degraded performance, retries
-- INFO: Business events, API calls
-- DEBUG: Detailed debugging (dev only)
-
-### 8.3 Distributed Tracing (Jaeger)
-
-**Trace Context**:
-```
-Request arrives â†’ Generate trace ID
-  â†’ Pass to all downstream services
-  â†’ Aggregate in Jaeger
-  â†’ Visualize call graph
-```
-
-### 8.4 Alerting
-
-**Critical Alerts** (PagerDuty):
-- Service down > 2 minutes
-- Error rate > 5%
-- Response time > 1s (P95)
-- Database connection failures
-
-**Warning Alerts** (Slack):
-- CPU > 80%
-- Memory > 85%
-- Disk > 90%
-- Cache hit rate < 70%
 
 ---
 
-## 9. TECHNOLOGY STACK DETAILS
+## 9. TECHNOLOGY STACK
 
 ### 9.1 Backend
 
-**Framework**: Spring Boot 4.0.3.x
-```xml
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.2</version>
-</parent>
-```
-
-**Key Dependencies**:
-```xml
-<!-- Web & REST -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
-
-<!-- Security -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt</artifactId>
-    <version>0.12.3</version>
-</dependency>
-
-<!-- Database -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-</dependency>
-
-<!-- Redis -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
-</dependency>
-
-<!-- Kafka -->
-<dependency>
-    <groupId>org.springframework.kafka</groupId>
-    <artifactId>spring-kafka</artifactId>
-</dependency>
-
-<!-- WebSocket -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-websocket</artifactId>
-</dependency>
-
-<!-- Cloud -->
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-gateway</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-</dependency>
-```
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Framework | Spring Boot | 4.0.3 |
+| Language | Java | 21 |
+| Build | Maven | 3.9 |
+| Security | Spring Security | 7.0.3 |
+| JWT | jjwt | 0.12.6 |
+| Database ORM | Spring Data JPA / Hibernate | 7.x |
+| Migrations | Flyway | — |
+| Validation | Jakarta Validation | — |
+| Async | Spring @Async | — |
+| HTTP Client | Java 21 HttpClient (Ollama) | built-in |
 
 ### 9.2 Frontend
 
-**Framework**: React 18.x
-```json
-{
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "redux": "^5.0.0",
-    "@reduxjs/toolkit": "^2.0.1",
-    "axios": "^1.6.2",
-    "socket.io-client": "^4.6.0",
-    "tailwindcss": "^3.4.0"
-  }
-}
-```
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Framework | React | 18.x |
+| Build | Vite | 5.x |
+| State | Redux Toolkit | 2.x |
+| Routing | React Router | 6.x |
+| HTTP | Fetch API | native |
+| Styling | Tailwind CSS | 3.x |
+| Icons | Lucide React | 0.x |
 
-### 9.3 DevOps Tools
+### 9.3 AI
 
-- **Version Control**: Git, GitHub
-- **CI/CD**: GitHub Actions, Jenkins
-- **Containerization**: Docker, Docker Compose
-- **Orchestration**: Kubernetes, Helm
-- **Monitoring**: Prometheus, Grafana
-- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
-- **Tracing**: Jaeger
-- **Cloud**: AWS / Google Cloud / Azure
+| Component | Technology |
+|-----------|-----------|
+| LLM Runner | Ollama |
+| Default Model | llama3.2:3b |
+| Protocol | NDJSON streaming |
+| Docker | ollama/ollama:latest |
+
+### 9.4 Infrastructure
+
+| Component | Technology |
+|-----------|-----------|
+| Database | PostgreSQL 16 |
+| DB Admin | pgAdmin 4 |
+| Containers | Docker + Docker Compose |
+| Test DB | H2 in-memory |
+| E2E Tests | Playwright |
+| API Tests | OkHttp MockWebServer |
 
 ---
 
@@ -744,34 +497,29 @@ Request arrives â†’ Generate trace ID
 
 ### 10.1 Design Patterns Used
 
-- **Microservices**: Service decomposition
-- **API Gateway**: Single entry point
-- **Circuit Breaker**: Fault tolerance (Resilience4j)
-- **CQRS**: Command Query Responsibility Segregation
-- **Event Sourcing**: Event-driven architecture
-- **Repository**: Data access abstraction
-- **DTO**: Data transfer objects
-- **Builder**: Object construction
+- **Repository Pattern**: All data access via Spring Data JPA repositories
+- **Service Layer**: Business logic isolated from controllers
+- **DTO Pattern**: Request/Response objects separate from JPA entities
+- **Streaming**: `StreamingResponseBody` for AI NDJSON output
+- **Async Events**: `@EventListener` + `@Async` for notifications
+- **Builder**: Lombok `@Builder` on entities and DTOs
 
 ### 10.2 Code Quality Standards
 
-- **Code Coverage**: > 80% unit tests
-- **Code Style**: Google Java Style Guide
-- **Static Analysis**: SonarQube
-- **Security Scanning**: OWASP Dependency Check
-- **Code Review**: Required for all PRs
+- **Coverage Target**: > 80% unit test coverage
+- **Style**: Google Java Style Guide
+- **Test Framework**: JUnit 5 + Mockito + AssertJ
+- **Integration Tests**: MockMvc + H2 + `@Transactional` rollback
 
 ### 10.3 References
 
 - Spring Boot Docs: https://spring.io/projects/spring-boot
 - PostgreSQL Docs: https://www.postgresql.org/docs/
-- Redis Docs: https://redis.io/docs/
-- Kubernetes Docs: https://kubernetes.io/docs/
-- Docker Docs: https://docs.docker.com/
+- Ollama Docs: https://github.com/ollama/ollama/blob/main/docs/api.md
+- Playwright Docs: https://playwright.dev/docs/intro
 
 ---
 
-**Document Owner**: Technical Lead  
-**Last Review**: February 07, 2026  
-**Next Review**: March 07, 2026
-
+**Document Owner**: Technical Lead
+**Last Review**: February 25, 2026
+**Next Review**: March 25, 2026

@@ -1,12 +1,14 @@
-﻿# Database Schema Document
-## ConnectHub — Social Media Application
+# Database Schema Document
+## ConnectHub � Social Media Application
 
-**Version:** 2.0  
-**Updated:** February 21, 2026  
+**Version:** 3.0  
+**Updated:** February 24, 2026  
 **Database:** PostgreSQL 16 (production), H2 (tests)  
-**Schema management:** Flyway — migrations in `backend/src/main/resources/db/migration/`
+**Schema management:** Flyway � migrations in `backend/src/main/resources/db/migration/`
 
-> **Note:** The authoritative schema is `V1__create_schema.sql`. This document describes the same tables for reference. When adding columns, always create a new numbered migration (e.g. `V2__add_avatar_url.sql`) rather than editing existing files.
+> **Note:** The authoritative schema is the Flyway migrations. This document describes the same tables for reference.
+> Current migrations: `V1__create_schema.sql` (core), `V2__messaging_schema.sql` (messaging), `V3__bookmarks_schema.sql` (bookmarks).
+> When adding columns, always create a new numbered migration rather than editing existing files.
 
 ---
 
@@ -66,61 +68,165 @@
 #### 2.1.1 Users Table
 
 ```sql
-CREATE TABLE users (
-    -- Primary Key
-    id BIGSERIAL PRIMARY KEY,
-    
-    -- Authentication
-    username VARCHAR(30) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    
-    -- Profile Information
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
-    display_name VARCHAR(100),
-    bio TEXT,
-    profile_picture_url VARCHAR(500),
-    cover_photo_url VARCHAR(500),
-    
-    -- Additional Info
-    location VARCHAR(100),
-    website VARCHAR(255),
-    birth_date DATE,
-    
-    -- Status Flags
-    is_verified BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_private BOOLEAN DEFAULT FALSE,
-    email_verified BOOLEAN DEFAULT FALSE,
-    two_factor_enabled BOOLEAN DEFAULT FALSE,
-    
-    -- Timestamps
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login_at TIMESTAMP,
-    
-    -- Constraints
-    CONSTRAINT username_format CHECK (username ~ '^[a-zA-Z0-9_]{3,30}$'),
-    CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
-    CONSTRAINT birth_date_valid CHECK (birth_date <= CURRENT_DATE - INTERVAL '13 years')
+CREATE TABLE IF NOT EXISTS users (
+    id               BIGSERIAL    PRIMARY KEY,
+    username         VARCHAR(30)  NOT NULL UNIQUE,
+    email            VARCHAR(255) NOT NULL UNIQUE,
+    password         VARCHAR(255) NOT NULL,          -- BCrypt hash
+    display_name     VARCHAR(60),
+    bio              VARCHAR(200),
+    avatar_url       VARCHAR(500),
+    followers_count  INT          NOT NULL DEFAULT 0,
+    following_count  INT          NOT NULL DEFAULT 0,
+    posts_count      INT          NOT NULL DEFAULT 0,
+    created_at       TIMESTAMP    NOT NULL
 );
 
--- Indexes
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_created_at ON users(created_at DESC);
-CREATE INDEX idx_users_is_verified ON users(is_verified) WHERE is_verified = TRUE;
-CREATE INDEX idx_users_is_active ON users(is_active) WHERE is_active = TRUE;
-
--- Comments
-COMMENT ON TABLE users IS 'Core user accounts and profile information';
-COMMENT ON COLUMN users.username IS 'Unique username, 3-30 alphanumeric characters';
-COMMENT ON COLUMN users.is_verified IS 'Verified badge for notable accounts';
-COMMENT ON COLUMN users.is_private IS 'Private profile requires follow approval';
+CREATE INDEX IF NOT EXISTS idx_users_username ON users (username);
+CREATE INDEX IF NOT EXISTS idx_users_email    ON users (email);
+-- Trigram indexes for ILIKE search (requires pg_trgm extension)
+CREATE INDEX IF NOT EXISTS idx_users_username_trgm     ON users USING gin (username     gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_users_display_name_trgm ON users USING gin (display_name gin_trgm_ops);
 ```
 
-#### 2.1.2 User Settings Table
+> Denormalised follower/following/posts counts are maintained by application logic for query performance.
+
+#### 2.1.2 Posts Table
+
+```sql
+CREATE TABLE IF NOT EXISTS posts (
+    id             BIGSERIAL     PRIMARY KEY,
+    content        VARCHAR(2000) NOT NULL,
+    image_url      VARCHAR(500),
+    privacy        VARCHAR(20)   NOT NULL DEFAULT 'PUBLIC',  -- PUBLIC | FOLLOWERS_ONLY | PRIVATE
+    author_id      BIGINT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    likes_count    INT           NOT NULL DEFAULT 0,
+    comments_count INT           NOT NULL DEFAULT 0,
+    created_at     TIMESTAMP     NOT NULL,
+    updated_at     TIMESTAMP                                 -- populated on edit
+);
+
+CREATE INDEX IF NOT EXISTS idx_posts_author   ON posts (author_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created  ON posts (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_posts_privacy  ON posts (privacy);
+CREATE INDEX IF NOT EXISTS idx_posts_content_trgm ON posts USING gin (content gin_trgm_ops);
+```
+
+> **Post editing:** `updated_at` is set on `PUT /api/v1/posts/{id}`. Frontend shows *(edited)* badge when `updatedAt != createdAt`.
+
+#### 2.1.3 Comments, Likes, Follows, Notifications (V1 continued)
+
+```sql
+-- comments
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGSERIAL PRIMARY KEY, content VARCHAR(1000) NOT NULL,
+    post_id BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    author_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL
+);
+
+-- post_likes (unique per user+post)
+CREATE TABLE IF NOT EXISTS post_likes (
+    id BIGSERIAL PRIMARY KEY,
+    post_id BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT uq_post_likes UNIQUE (post_id, user_id)
+);
+
+-- follows
+CREATE TABLE IF NOT EXISTS follows (
+    id BIGSERIAL PRIMARY KEY,
+    follower_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    following_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT uq_follows UNIQUE (follower_id, following_id),
+    CONSTRAINT chk_no_self_follow CHECK (follower_id <> following_id)
+);
+
+-- notifications
+CREATE TABLE IF NOT EXISTS notifications (
+    id BIGSERIAL PRIMARY KEY,
+    recipient_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    actor_id     BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    type         VARCHAR(20)  NOT NULL,   -- LIKE | COMMENT | FOLLOW | MENTION | MESSAGE
+    reference_id BIGINT,
+    message      VARCHAR(500) NOT NULL,
+    read_flag    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at   TIMESTAMP NOT NULL
+);
+```
+
+---
+
+### 2.2 Messaging Tables — V2__messaging_schema.sql
+
+#### Conversations Table
+
+```sql
+CREATE TABLE IF NOT EXISTS conversations (
+    id         BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()  -- bumped on each new message
+);
+```
+
+#### Conversation Participants Table
+
+```sql
+CREATE TABLE IF NOT EXISTS conversation_participants (
+    conversation_id BIGINT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    user_id         BIGINT NOT NULL REFERENCES users(id)         ON DELETE CASCADE,
+    PRIMARY KEY (conversation_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_conv_participants_user ON conversation_participants (user_id);
+```
+
+#### Messages Table
+
+```sql
+CREATE TABLE IF NOT EXISTS messages (
+    id              BIGSERIAL     PRIMARY KEY,
+    conversation_id BIGINT        NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id       BIGINT        NOT NULL REFERENCES users(id)         ON DELETE CASCADE,
+    content         VARCHAR(2000) NOT NULL,
+    message_type    VARCHAR(20)   NOT NULL DEFAULT 'text',
+    is_read         BOOLEAN       NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMP     NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages (conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_sender       ON messages (sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_unread       ON messages (conversation_id, is_read)
+    WHERE is_read = FALSE;
+```
+
+> New messages are also broadcast to `/topic/chat/{conversationId}` via STOMP for real-time delivery.
+
+---
+
+### 2.3 Bookmarks Table — V3__bookmarks_schema.sql
+
+```sql
+CREATE TABLE IF NOT EXISTS bookmarks (
+    id         BIGSERIAL PRIMARY KEY,
+    user_id    BIGINT NOT NULL REFERENCES users(id)  ON DELETE CASCADE,
+    post_id    BIGINT NOT NULL REFERENCES posts(id)  ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_bookmarks_user_post UNIQUE (user_id, post_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_bookmarks_post ON bookmarks (post_id);
+```
+
+> `POST /api/v1/posts/{id}/bookmark` is a toggle: inserts if absent, deletes if present.
+
+---
+
+<!-- Legacy detail sections below preserved for reference -->
+
+#### (Legacy detail) User Settings Table — planned
 
 ```sql
 CREATE TABLE user_settings (
@@ -765,58 +871,58 @@ COMMENT ON TABLE moderation_logs IS 'Audit log of moderation actions';
 ### 3.1 ER Diagram (Text Representation)
 
 ```
-USERS (1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< (M) POSTS
-  â”‚                          â”‚
-  â”‚                          â”œâ”€â”€< POST_MEDIA (M)
-  â”‚                          â”œâ”€â”€< POST_HASHTAGS (M) â”€â”€> HASHTAGS
-  â”‚                          â”œâ”€â”€< MENTIONS (M)
-  â”‚                          â”œâ”€â”€< LIKES (M)
-  â”‚                          â”œâ”€â”€< COMMENTS (M)
-  â”‚                          â”œâ”€â”€< SHARES (M)
-  â”‚                          â””â”€â”€< BOOKMARKS (M)
-  â”‚
-  â”œâ”€â”€< USER_SETTINGS (1:1)
-  â”œâ”€â”€< USER_STATS (1:1)
-  â”œâ”€â”€< OAUTH_CONNECTIONS (M)
-  â”œâ”€â”€< FOLLOWS (M) [follower_id, following_id]
-  â”œâ”€â”€< BLOCKS (M) [blocker_id, blocked_id]
-  â”œâ”€â”€< MUTES (M) [muter_id, muted_id]
-  â”œâ”€â”€< CONVERSATIONS (M) via CONVERSATION_PARTICIPANTS
-  â”œâ”€â”€< MESSAGES (M)
-  â”œâ”€â”€< NOTIFICATIONS (M)
-  â””â”€â”€< REPORTS (M)
+USERS (1) ──────────< (M) POSTS
+  │                          │
+  │                          ├──< POST_MEDIA (M)
+  │                          ├──< POST_HASHTAGS (M) ──> HASHTAGS
+  │                          ├──< MENTIONS (M)
+  │                          ├──< LIKES (M)
+  │                          ├──< COMMENTS (M)
+  │                          ├──< SHARES (M)
+  │                          └──< BOOKMARKS (M)
+  │
+  ├──< USER_SETTINGS (1:1)
+  ├──< USER_STATS (1:1)
+  ├──< OAUTH_CONNECTIONS (M)
+  ├──< FOLLOWS (M) [follower_id, following_id]
+  ├──< BLOCKS (M) [blocker_id, blocked_id]
+  ├──< MUTES (M) [muter_id, muted_id]
+  ├──< CONVERSATIONS (M) via CONVERSATION_PARTICIPANTS
+  ├──< MESSAGES (M)
+  ├──< NOTIFICATIONS (M)
+  └──< REPORTS (M)
 
-CONVERSATIONS (1) â”€â”€< (M) MESSAGES
-      â”‚
-      â””â”€â”€< (M) CONVERSATION_PARTICIPANTS â”€â”€> USERS
+CONVERSATIONS (1) ──< (M) MESSAGES
+      │
+      └──< (M) CONVERSATION_PARTICIPANTS ──> USERS
 
-COMMENTS (1) â”€â”€< (M) COMMENT_LIKES
-      â”‚
-      â””â”€â”€< (M) COMMENTS [parent_comment_id - self-referencing]
+COMMENTS (1) ──< (M) COMMENT_LIKES
+      │
+      └──< (M) COMMENTS [parent_comment_id - self-referencing]
 ```
 
 ### 3.2 Key Relationships
 
 **One-to-One**:
-- users â†” user_settings
-- users â†” user_stats
+- users ↔ user_settings
+- users ↔ user_stats
 
 **One-to-Many**:
-- users â†’ posts
-- users â†’ comments
-- users â†’ messages
-- posts â†’ post_media
-- posts â†’ comments
-- conversations â†’ messages
+- users → posts
+- users → comments
+- users → messages
+- posts → post_media
+- posts → comments
+- conversations → messages
 
 **Many-to-Many** (via junction tables):
-- users â†” users (follows)
-- posts â†” hashtags (post_hashtags)
-- users â†” posts (likes, bookmarks, shares)
-- users â†” conversations (conversation_participants)
+- users ↔ users (follows)
+- posts ↔ hashtags (post_hashtags)
+- users ↔ posts (likes, bookmarks, shares)
+- users ↔ conversations (conversation_participants)
 
 **Self-Referencing**:
-- comments.parent_comment_id â†’ comments.id (nested comments)
+- comments.parent_comment_id → comments.id (nested comments)
 
 ---
 
@@ -1133,64 +1239,64 @@ CREATE TRIGGER trigger_initialize_user_settings
 
 **User Cache**:
 ```
-user:{userId}                    â†’ UserDTO (TTL: 5 minutes)
-user:profile:{userId}            â†’ ProfileDTO (TTL: 5 minutes)
-user:stats:{userId}              â†’ UserStatsDTO (TTL: 1 minute)
-user:settings:{userId}           â†’ SettingsDTO (TTL: 10 minutes)
-user:followers:{userId}          â†’ Set<userId> (TTL: 5 minutes)
-user:following:{userId}          â†’ Set<userId> (TTL: 5 minutes)
+user:{userId}                    → UserDTO (TTL: 5 minutes)
+user:profile:{userId}            → ProfileDTO (TTL: 5 minutes)
+user:stats:{userId}              → UserStatsDTO (TTL: 1 minute)
+user:settings:{userId}           → SettingsDTO (TTL: 10 minutes)
+user:followers:{userId}          → Set<userId> (TTL: 5 minutes)
+user:following:{userId}          → Set<userId> (TTL: 5 minutes)
 ```
 
 **Post Cache**:
 ```
-post:{postId}                    â†’ PostDTO (TTL: 10 minutes)
-post:likes:{postId}              â†’ Set<userId> (TTL: 5 minutes)
-post:comments:{postId}           â†’ List<CommentDTO> (TTL: 3 minutes)
-post:user:{userId}               â†’ List<PostDTO> (TTL: 5 minutes)
+post:{postId}                    → PostDTO (TTL: 10 minutes)
+post:likes:{postId}              → Set<userId> (TTL: 5 minutes)
+post:comments:{postId}           → List<CommentDTO> (TTL: 3 minutes)
+post:user:{userId}               → List<PostDTO> (TTL: 5 minutes)
 ```
 
 **Feed Cache**:
 ```
-feed:{userId}                    â†’ List<PostDTO> (TTL: 15 minutes)
-feed:trending                    â†’ List<PostDTO> (TTL: 30 minutes)
-feed:explore                     â†’ List<PostDTO> (TTL: 1 hour)
-feed:hashtag:{tag}               â†’ List<PostDTO> (TTL: 10 minutes)
+feed:{userId}                    → List<PostDTO> (TTL: 15 minutes)
+feed:trending                    → List<PostDTO> (TTL: 30 minutes)
+feed:explore                     → List<PostDTO> (TTL: 1 hour)
+feed:hashtag:{tag}               → List<PostDTO> (TTL: 10 minutes)
 ```
 
 **Session Cache**:
 ```
-session:{sessionId}              â†’ SessionDTO (TTL: 30 days)
-session:user:{userId}            â†’ Set<sessionId> (TTL: 30 days)
-jwt:blacklist:{token}            â†’ true (TTL: 24 hours)
-refresh:token:{token}            â†’ userId (TTL: 30 days)
+session:{sessionId}              → SessionDTO (TTL: 30 days)
+session:user:{userId}            → Set<sessionId> (TTL: 30 days)
+jwt:blacklist:{token}            → true (TTL: 24 hours)
+refresh:token:{token}            → userId (TTL: 30 days)
 ```
 
 **Rate Limiting**:
 ```
-ratelimit:{userId}:{endpoint}    â†’ count (TTL: 1 minute)
-ratelimit:ip:{ipAddress}         â†’ count (TTL: 1 minute)
-ratelimit:global:{endpoint}      â†’ count (TTL: 1 second)
+ratelimit:{userId}:{endpoint}    → count (TTL: 1 minute)
+ratelimit:ip:{ipAddress}         → count (TTL: 1 minute)
+ratelimit:global:{endpoint}      → count (TTL: 1 second)
 ```
 
 **Real-time Data**:
 ```
-online:users                     â†’ Set<userId> (TTL: 5 minutes)
-typing:{conversationId}:{userId} â†’ timestamp (TTL: 10 seconds)
-presence:{userId}                â†’ status (TTL: 5 minutes)
+online:users                     → Set<userId> (TTL: 5 minutes)
+typing:{conversationId}:{userId} → timestamp (TTL: 10 seconds)
+presence:{userId}                → status (TTL: 5 minutes)
 ```
 
 **Trending & Analytics**:
 ```
-trending:hashtags                â†’ SortedSet<tag, score> (TTL: 1 hour)
-trending:posts                   â†’ SortedSet<postId, score> (TTL: 30 minutes)
-trending:users                   â†’ SortedSet<userId, score> (TTL: 1 hour)
-analytics:daily:{date}           â†’ JSONB (TTL: 7 days)
+trending:hashtags                → SortedSet<tag, score> (TTL: 1 hour)
+trending:posts                   → SortedSet<postId, score> (TTL: 30 minutes)
+trending:users                   → SortedSet<userId, score> (TTL: 1 hour)
+analytics:daily:{date}           → JSONB (TTL: 7 days)
 ```
 
 **Notification Queue**:
 ```
-notifications:queue:{userId}     â†’ List<NotificationDTO> (TTL: 1 hour)
-notifications:unread:{userId}    â†’ count (TTL: 5 minutes)
+notifications:queue:{userId}     → List<NotificationDTO> (TTL: 1 hour)
+notifications:unread:{userId}    → count (TTL: 5 minutes)
 ```
 
 ### 6.2 Cache Invalidation Strategy
@@ -1730,11 +1836,11 @@ $ LANGUAGE plpgsql;
 
 | Query Type | Target | Actual | Status |
 |------------|--------|--------|--------|
-| User lookup by ID | < 10ms | 5ms | âœ“ |
-| Feed generation | < 200ms | 150ms | âœ“ |
-| Post creation | < 50ms | 30ms | âœ“ |
-| Search query | < 300ms | 250ms | âœ“ |
-| Follow operation | < 30ms | 20ms | âœ“ |
+| User lookup by ID | < 10ms | 5ms | ✓ |
+| Feed generation | < 200ms | 150ms | ✓ |
+| Post creation | < 50ms | 30ms | ✓ |
+| Search query | < 300ms | 250ms | ✓ |
+| Follow operation | < 30ms | 20ms | ✓ |
 
 ### C. References
 

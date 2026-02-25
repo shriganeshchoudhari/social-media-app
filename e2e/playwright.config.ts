@@ -10,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * Prerequisites (both must be running before tests start):
  *   Backend:  http://localhost:9090  (spring-boot:run -Dspring-boot.run.profiles=postgres,dev)
- *   Frontend: http://localhost:3000  (npm run dev inside /frontend)
+ *   Frontend: http://localhost:3001  (npm run dev inside /frontend)
  */
 export default defineConfig({
   testDir: './tests',
@@ -26,7 +26,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL:       'http://localhost:3000',
+    baseURL:       'http://localhost:3001',
     screenshot:    'only-on-failure',
     video:         'retain-on-failure',
     trace:         'retain-on-failure',

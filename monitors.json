@@ -1,0 +1,23 @@
+{
+  "monitors": [
+    {
+      "name": "Social Media API Hourly Monitor",
+      "collection": {
+        "name": "Social Media API Tests",
+        "file": "postman_collections/Social Media API Tests.postman_collection.json"
+      },
+      "environment": {
+        "name": "local",
+        "file": "postman_environments/local.postman_environment.json"
+      },
+      "schedule": {
+        "cron": "0 * * * *",
+        "timezone": "UTC"
+      },
+      "notifications": {
+        "slackWebhook": "<SLACK_WEBHOOK_PLACEHOLDER>"
+      },
+      "notes": "Local metadata file for monitor intent. To create a cloud Postman Monitor, create a collection and environment in Postman and set this schedule."
+    }
+  ]
+}

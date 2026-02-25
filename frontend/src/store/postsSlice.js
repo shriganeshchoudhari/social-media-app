@@ -37,6 +37,15 @@ export const unlikePostThunk = createAsyncThunk('posts/unlike', async (id, { rej
   }
 })
 
+export const updatePostThunk = createAsyncThunk('posts/update', async ({ id, content, privacy }, { rejectWithValue }) => {
+  try {
+    const { data } = await postsApi.updatePost(id, { content, privacy })
+    return data
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Failed to update post')
+  }
+})
+
 export const deletePostThunk = createAsyncThunk('posts/delete', async (id, { rejectWithValue }) => {
   try {
     await postsApi.deletePost(id)
@@ -99,6 +108,12 @@ const postsSlice = createSlice({
         if (i !== -1) state.feed[i] = payload
       })
       .addCase(unlikePostThunk.fulfilled, (state, { payload }) => {
+        const i = state.feed.findIndex(p => p.id === payload.id)
+        if (i !== -1) state.feed[i] = payload
+      })
+
+      // update
+      .addCase(updatePostThunk.fulfilled, (state, { payload }) => {
         const i = state.feed.findIndex(p => p.id === payload.id)
         if (i !== -1) state.feed[i] = payload
       })

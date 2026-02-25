@@ -1,11 +1,12 @@
 import { useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Image, Globe, Users, Lock, X } from 'lucide-react'
+import { Image, Globe, Users, Lock, X, Sparkles } from 'lucide-react'
 import { createPostThunk } from '../../store/postsSlice.js'
 import { selectUser } from '../../store/authSlice.js'
 import { uploadMedia } from '../../api/media.js'
 import Avatar from '../ui/Avatar.jsx'
 import Button from '../ui/Button.jsx'
+import { openAiPanel, sendChatMessage } from '../../store/aiSlice.js'
 
 const PRIVACY_OPTIONS = [
   { value: 'PUBLIC',         label: 'Public',          Icon: Globe },
@@ -24,8 +25,6 @@ export default function PostComposer({ onPost }) {
   const [uploading, setUploading] = useState(false)
   const [posting,   setPosting]  = useState(false)
   const [error,     setError]    = useState(null)
-
-  const CurrentPrivacyIcon = PRIVACY_OPTIONS.find(o => o.value === privacy).Icon
 
   const handleFile = async (e) => {
     const file = e.target.files?.[0]
@@ -65,6 +64,21 @@ export default function PostComposer({ onPost }) {
     }
   }
 
+  /**
+   * Open the Spark AI panel pre-filled with a post-improvement request.
+   * The AI panel takes it from there — user sees the suggestion in the chat.
+   */
+  const handleImproveWithAi = () => {
+    if (!content.trim()) return
+    dispatch(openAiPanel())
+    dispatch(
+      sendChatMessage(
+        `Help me improve this post draft:\n\n"${content.trim()}"`,
+        'post_improve'
+      )
+    )
+  }
+
   const charLimit = 2000
   const remaining = charLimit - content.length
 
@@ -99,6 +113,25 @@ export default function PostComposer({ onPost }) {
                 <X size={14} />
               </button>
             </div>
+          )}
+
+          {/* ✨ Improve with AI button — only shown when there's draft content */}
+          {content.trim().length > 0 && (
+            <button
+              onClick={handleImproveWithAi}
+              data-testid="improve-with-ai-btn"
+              title="Ask Spark to improve this draft"
+              className="
+                self-start flex items-center gap-1.5 px-3 py-1.5
+                text-xs font-medium text-purple-600
+                border border-purple-200 rounded-full
+                hover:bg-purple-50 hover:border-purple-300
+                transition-colors
+              "
+            >
+              <Sparkles size={13} />
+              Improve with AI
+            </button>
           )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}

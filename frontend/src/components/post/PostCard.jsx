@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Heart, MessageCircle, Trash2, Globe, Lock, Users } from 'lucide-react'
+import { Heart, MessageCircle, Trash2, Globe, Lock, Users, Pencil, Check, X, Bookmark } from 'lucide-react'
 import { selectUser } from '../../store/authSlice.js'
 import {
-  likePostThunk, unlikePostThunk, deletePostThunk,
+  likePostThunk, unlikePostThunk, deletePostThunk, updatePostThunk,
   optimisticLike, optimisticUnlike,
 } from '../../store/postsSlice.js'
+import { toggleBookmarkThunk, selectIsBookmarked } from '../../store/bookmarksSlice.js'
 import Avatar from '../ui/Avatar.jsx'
 
 const privacyIcon = { PUBLIC: Globe, FOLLOWERS_ONLY: Users, PRIVATE: Lock }
@@ -21,10 +22,24 @@ const relativeTime = (iso) => {
 export default function PostCard({ post, onDeleted }) {
   const dispatch  = useDispatch()
   const me        = useSelector(selectUser)
-  const [liking, setLiking] = useState(false)
+  const [liking, setLiking]     = useState(false)
+  const [editing, setEditing]   = useState(false)
+  const [editText, setEditText] = useState(post.content)
+  const [saving, setSaving]     = useState(false)
+  const textareaRef             = useRef(null)
 
-  const Privacy = privacyIcon[post.privacy] || Globe
-  const isOwner = me?.id === post.author?.id || me?.username === post.author?.username
+  const Privacy      = privacyIcon[post.privacy] || Globe
+  const isOwner       = me?.id === post.author?.id || me?.username === post.author?.username
+  const isBookmarked  = useSelector(selectIsBookmarked(post.id))
+
+  // Focus textarea and move cursor to end when editing starts
+  useEffect(() => {
+    if (editing && textareaRef.current) {
+      textareaRef.current.focus()
+      const len = textareaRef.current.value.length
+      textareaRef.current.setSelectionRange(len, len)
+    }
+  }, [editing])
 
   const handleLike = async () => {
     if (liking) return
@@ -43,6 +58,30 @@ export default function PostCard({ post, onDeleted }) {
     if (!window.confirm('Delete this post?')) return
     await dispatch(deletePostThunk(post.id))
     onDeleted?.()
+  }
+
+  const handleEditStart = () => {
+    setEditText(post.content)
+    setEditing(true)
+  }
+
+  const handleEditCancel = () => {
+    setEditText(post.content)
+    setEditing(false)
+  }
+
+  const handleEditSave = async () => {
+    const trimmed = editText.trim()
+    if (!trimmed || trimmed === post.content) { setEditing(false); return }
+    setSaving(true)
+    await dispatch(updatePostThunk({ id: post.id, content: trimmed, privacy: post.privacy }))
+    setSaving(false)
+    setEditing(false)
+  }
+
+  const handleEditKeyDown = (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) handleEditSave()
+    if (e.key === 'Escape') handleEditCancel()
   }
 
   return (
@@ -65,18 +104,52 @@ export default function PostCard({ post, onDeleted }) {
             <span className="text-gray-400 text-xs">@{post.author.username}</span>
             <span className="text-gray-300 text-xs">·</span>
             <span className="text-gray-400 text-xs">{relativeTime(post.createdAt)}</span>
+            {post.updatedAt && post.updatedAt !== post.createdAt && (
+              <span className="text-gray-400 text-xs italic">(edited)</span>
+            )}
             <Privacy size={13} className="text-gray-400" />
           </div>
 
-          {/* Content */}
-          <Link to={`/posts/${post.id}`}>
-            <p className="text-sm text-gray-800 mt-1 leading-relaxed whitespace-pre-wrap break-words">
-              {post.content}
-            </p>
-          </Link>
+          {/* Content — normal or inline editor */}
+          {editing ? (
+            <div className="mt-2">
+              <textarea
+                ref={textareaRef}
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                rows={3}
+                maxLength={2000}
+                className="w-full text-sm text-gray-800 border border-primary-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none leading-relaxed"
+              />
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className="text-xs text-gray-400 flex-1">{editText.length}/2000 · Ctrl+Enter to save · Esc to cancel</span>
+                <button
+                  onClick={handleEditSave}
+                  disabled={saving || !editText.trim()}
+                  className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Check size={13} />
+                  {saving ? 'Saving…' : 'Save'}
+                </button>
+                <button
+                  onClick={handleEditCancel}
+                  className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <X size={13} /> Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link to={`/posts/${post.id}`}>
+              <p className="text-sm text-gray-800 mt-1 leading-relaxed whitespace-pre-wrap break-words">
+                {post.content}
+              </p>
+            </Link>
+          )}
 
           {/* Image */}
-          {post.imageUrl && (
+          {post.imageUrl && !editing && (
             <Link to={`/posts/${post.id}`}>
               <img
                 src={post.imageUrl}
@@ -88,42 +161,67 @@ export default function PostCard({ post, onDeleted }) {
           )}
 
           {/* Actions */}
-          <div className="flex items-center gap-5 mt-3">
-            {/* Like */}
-            <button
-              onClick={handleLike}
-              className={`flex items-center gap-1.5 text-sm transition-colors group ${
-                post.likedByCurrentUser ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'
-              }`}
-              aria-label={post.likedByCurrentUser ? 'Unlike' : 'Like'}
-            >
-              <Heart
-                size={18}
-                className={`transition-transform group-active:scale-125 ${post.likedByCurrentUser ? 'fill-pink-500' : ''}`}
-              />
-              <span>{post.likesCount}</span>
-            </button>
-
-            {/* Comments */}
-            <Link
-              to={`/posts/${post.id}`}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-500 transition-colors"
-            >
-              <MessageCircle size={18} />
-              <span>{post.commentsCount}</span>
-            </Link>
-
-            {/* Delete (owner only) */}
-            {isOwner && (
+          {!editing && (
+            <div className="flex items-center gap-5 mt-3">
+              {/* Like */}
               <button
-                onClick={handleDelete}
-                className="ml-auto text-gray-400 hover:text-red-500 transition-colors p-1"
-                aria-label="Delete post"
+                onClick={handleLike}
+                className={`flex items-center gap-1.5 text-sm transition-colors group ${
+                  post.likedByCurrentUser ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'
+                }`}
+                aria-label={post.likedByCurrentUser ? 'Unlike' : 'Like'}
               >
-                <Trash2 size={16} />
+                <Heart
+                  size={18}
+                  className={`transition-transform group-active:scale-125 ${post.likedByCurrentUser ? 'fill-pink-500' : ''}`}
+                />
+                <span>{post.likesCount}</span>
               </button>
-            )}
-          </div>
+
+              {/* Comments */}
+              <Link
+                to={`/posts/${post.id}`}
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-500 transition-colors"
+              >
+                <MessageCircle size={18} />
+                <span>{post.commentsCount}</span>
+              </Link>
+
+              {/* Bookmark */}
+              <button
+                onClick={() => dispatch(toggleBookmarkThunk(post.id))}
+                className={`flex items-center gap-1.5 text-sm transition-colors ${
+                  isBookmarked ? 'text-primary-500' : 'text-gray-500 hover:text-primary-500'
+                }`}
+                aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+                title={isBookmarked ? 'Saved' : 'Save'}
+              >
+                <Bookmark size={18} className={isBookmarked ? 'fill-primary-500' : ''} />
+              </button>
+
+              {/* Owner actions */}
+              {isOwner && (
+                <div className="ml-auto flex items-center gap-1">
+                  <button
+                    onClick={handleEditStart}
+                    className="text-gray-400 hover:text-primary-500 transition-colors p-1 rounded-lg hover:bg-primary-50"
+                    aria-label="Edit post"
+                    title="Edit"
+                  >
+                    <Pencil size={15} />
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50"
+                    aria-label="Delete post"
+                    title="Delete"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </article>

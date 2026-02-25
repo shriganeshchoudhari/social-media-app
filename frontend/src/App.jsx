@@ -9,6 +9,8 @@ import ProfilePage from './pages/ProfilePage.jsx'
 import PostDetailPage from './pages/PostDetailPage.jsx'
 import SearchPage from './pages/SearchPage.jsx'
 import NotificationsPage from './pages/NotificationsPage.jsx'
+import MessagesPage from './pages/MessagesPage.jsx'
+import BookmarksPage from './pages/BookmarksPage.jsx'
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated)
@@ -35,6 +37,8 @@ export default function App() {
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="profile/:username" element={<ProfilePage />} />
           <Route path="posts/:id" element={<PostDetailPage />} />
+          <Route path="messages" element={<MessagesPage />} />
+          <Route path="bookmarks" element={<BookmarksPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

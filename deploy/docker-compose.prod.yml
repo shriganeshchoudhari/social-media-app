@@ -1,0 +1,64 @@
+# ConnectHub — Production Docker Compose
+# Usage: docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
+#
+# Environment variables (set via .env file or CI secrets):
+#   POSTGRES_PASSWORD       — strong password for the DB user
+#   JWT_SECRET              — min 256-bit secret for HS384 signing
+#   OLLAMA_MODEL            — model name (default: llama3.2:3b)
+#   BACKEND_PORT            — host port for backend (default: 9090)
+#   FRONTEND_PORT           — host port for frontend (default: 3001)
+
+version: "3.9"
+
+services:
+
+  postgres:
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U socialmedia"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      OLLAMA_BASE_URL: http://ollama:11434
+    ports:
+      - "${BACKEND_PORT:-9090}:9090"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/api/v1/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001"
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:9090}
+    depends_on:
+      - backend
+
+  ollama:
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  postgres_data:
+    external: false
+  ollama_data:
+    external: false

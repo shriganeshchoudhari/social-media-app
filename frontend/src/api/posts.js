@@ -5,6 +5,7 @@ export const getFeed      = (page = 0, size = 20) =>
 export const getPost      = (id)  => client.get(`/posts/${id}`)
 export const createPost   = (data) => client.post('/posts', data)
 export const deletePost   = (id)  => client.delete(`/posts/${id}`)
+export const updatePost   = (id, data) => client.put(`/posts/${id}`, data)
 export const likePost     = (id)  => client.post(`/posts/${id}/like`)
 export const unlikePost   = (id)  => client.delete(`/posts/${id}/like`)
 

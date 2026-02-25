@@ -54,6 +54,18 @@ public class PostService {
     }
 
     @Transactional
+    public PostResponse update(Long id, User currentUser, CreatePostRequest req) {
+        Post post = findPost(id);
+        if (!post.getAuthor().getId().equals(currentUser.getId()))
+            throw new ForbiddenException("You can only edit your own posts");
+        post.setContent(req.getContent());
+        if (req.getPrivacy() != null) post.setPrivacy(req.getPrivacy());
+        post = postRepository.save(post);
+        boolean liked = postLikeRepository.existsByPostAndUser(post, currentUser);
+        return toResponse(post, liked);
+    }
+
+    @Transactional
     public void delete(Long id, User currentUser) {
         Post post = findPost(id);
         if (!post.getAuthor().getId().equals(currentUser.getId()))

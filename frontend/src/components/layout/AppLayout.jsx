@@ -2,6 +2,15 @@ import { Outlet } from 'react-router-dom'
 import { ToastProvider } from '../ui/Toast.jsx'
 import Sidebar from './Sidebar.jsx'
 import BottomNav from './BottomNav.jsx'
+import AiChatButton from '../ai/AiChatButton.jsx'
+import AiChatPanel from '../ai/AiChatPanel.jsx'
+import useWebSocket from '../../hooks/useWebSocket.js'
+
+function WebSocketProvider() {
+  // Initialize the app-wide WS connection; renders nothing
+  useWebSocket()
+  return null
+}
 
 export default function AppLayout() {
   return (
@@ -21,6 +30,13 @@ export default function AppLayout() {
 
         {/* Bottom nav — mobile only */}
         <BottomNav />
+
+        {/* ── Spark AI — floating button + slide-over panel ──────────────── */}
+        <AiChatButton />
+        <AiChatPanel />
+
+        {/* ── App-wide WebSocket connection ─────────────────────────────── */}
+        <WebSocketProvider />
       </div>
     </ToastProvider>
   )

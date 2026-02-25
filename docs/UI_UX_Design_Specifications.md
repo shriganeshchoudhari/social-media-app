@@ -1,4 +1,4 @@
-﻿# UI/UX Design Specifications
+# UI/UX Design Specifications
 ## ConnectHub Social Media Platform
 
 **Version:** 1.0  
@@ -107,16 +107,16 @@ This document defines the complete UI/UX design specifications for ConnectHub, e
 ### 2.2 Design Values
 
 ```
-SIMPLE â†â†’ POWERFUL
+SIMPLE ←→ POWERFUL
 Clear, focused interface with advanced capabilities when needed
 
-PLAYFUL â†â†’ PROFESSIONAL  
+PLAYFUL ←→ PROFESSIONAL  
 Friendly, approachable yet trustworthy and reliable
 
-MINIMAL â†â†’ EXPRESSIVE
+MINIMAL ←→ EXPRESSIVE
 Clean aesthetics that allow user content to shine
 
-FAMILIAR â†â†’ INNOVATIVE
+FAMILIAR ←→ INNOVATIVE
 Comfort of known patterns with delightful surprises
 ```
 
@@ -167,7 +167,7 @@ shadow-elevation-2
 ### 3.2 Atomic Design Methodology
 
 ```
-ATOMS â†’ MOLECULES â†’ ORGANISMS â†’ TEMPLATES â†’ PAGES
+ATOMS → MOLECULES → ORGANISMS → TEMPLATES → PAGES
 
 Atoms: Button, Input, Icon, Avatar
 Molecules: Input with Label, Search Bar, User Card
@@ -206,7 +206,7 @@ primary-100: #BBDEFB
 primary-200: #90CAF9
 primary-300: #64B5F6
 primary-400: #42A5F5
-primary-500: #2196F3  â† Primary brand color
+primary-500: #2196F3  ← Primary brand color
 primary-600: #1E88E5
 primary-700: #1976D2
 primary-800: #1565C0
@@ -228,7 +228,7 @@ accent-100: #E1BEE7
 accent-200: #CE93D8
 accent-300: #BA68C8
 accent-400: #AB47BC
-accent-500: #9C27B0  â† Accent color
+accent-500: #9C27B0  ← Accent color
 accent-600: #8E24AA
 accent-700: #7B1FA2
 accent-800: #6A1B9A
@@ -285,15 +285,15 @@ info-700: #1976D2
 ```
 neutral-0:   #FFFFFF  (white)
 neutral-50:  #FAFAFA
-neutral-100: #F5F5F5  â† Background light
+neutral-100: #F5F5F5  ← Background light
 neutral-200: #EEEEEE
-neutral-300: #E0E0E0  â† Borders
+neutral-300: #E0E0E0  ← Borders
 neutral-400: #BDBDBD
-neutral-500: #9E9E9E  â† Disabled text
+neutral-500: #9E9E9E  ← Disabled text
 neutral-600: #757575
-neutral-700: #616161  â† Secondary text
+neutral-700: #616161  ← Secondary text
 neutral-800: #424242
-neutral-900: #212121  â† Primary text
+neutral-900: #212121  ← Primary text
 neutral-1000: #000000  (black)
 ```
 
@@ -315,9 +315,9 @@ accent-dark-500:  #CE93D8
 
 **Backgrounds (Dark Theme)**
 ```
-bg-primary:   #121212  â† Main background
-bg-secondary: #1E1E1E  â† Cards, modals
-bg-tertiary:  #2C2C2C  â† Hover states
+bg-primary:   #121212  ← Main background
+bg-secondary: #1E1E1E  ← Cards, modals
+bg-tertiary:  #2C2C2C  ← Hover states
 ```
 
 **Text (Dark Theme)**
@@ -411,10 +411,10 @@ caption:     12px / 16px
 thin:        100
 extra-light: 200
 light:       300
-regular:     400  â† Default
+regular:     400  ← Default
 medium:      500
-semi-bold:   600  â† Headings
-bold:        700  â† Emphasis
+semi-bold:   600  ← Headings
+bold:        700  ← Emphasis
 extra-bold:  800
 black:       900
 ```
@@ -469,7 +469,7 @@ overflow: hidden;
 ```
 xs:   4px  (0.25rem)
 sm:   8px  (0.5rem)
-md:   16px (1rem)     â† Base unit
+md:   16px (1rem)     ← Base unit
 lg:   24px (1.5rem)
 xl:   32px (2rem)
 2xl:  40px (2.5rem)
@@ -515,7 +515,7 @@ container-sm:  640px
 container-md:  768px
 container-lg:  1024px
 container-xl:  1280px
-container-2xl: 1440px  â† Max content width
+container-2xl: 1440px  ← Max content width
 ```
 
 ### 6.4 Z-Index Scale
@@ -536,7 +536,7 @@ z-notification: 1080
 ```
 radius-none: 0
 radius-sm:   4px
-radius-md:   8px   â† Default
+radius-md:   8px   ← Default
 radius-lg:   12px
 radius-xl:   16px
 radius-2xl:  24px
@@ -638,7 +638,7 @@ large:  padding: 16px 32px, font-size: 18px
 
 **Icon Buttons:**
 ```
-Size: 40px Ã— 40px
+Size: 40px × 40px
 Icon size: 20px
 Border-radius: full (circle)
 Center aligned
@@ -701,7 +701,7 @@ Resize: vertical
 
 **Checkbox:**
 ```
-Size: 20px Ã— 20px
+Size: 20px × 20px
 Border: 2px solid neutral-400
 Border-radius: 4px
 
@@ -714,7 +714,7 @@ Focus: outline: 2px solid primary-300
 
 **Radio:**
 ```
-Size: 20px Ã— 20px
+Size: 20px × 20px
 Border: 2px solid neutral-400
 Border-radius: full
 
@@ -743,7 +743,7 @@ Transition: 200ms ease
 ```
 xs:  24px
 sm:  32px
-md:  40px  â† Default
+md:  40px  ← Default
 lg:  48px
 xl:  64px
 2xl: 96px
@@ -783,7 +783,7 @@ Error: background: error-100, text: error-700
 
 **Notification Badge (Dot):**
 ```
-Size: 8px Ã— 8px
+Size: 8px × 8px
 Border-radius: full
 Background: error-500
 Position: top-right of parent
@@ -978,26 +978,26 @@ Shapes:
 ### 8.1 Home Feed Layout
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Header (Navigation)                            â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
-â”‚  â”‚       â”‚  â”‚                 â”‚  â”‚         â”‚  â”‚
-â”‚  â”‚  Nav  â”‚  â”‚   Feed Area     â”‚  â”‚ Sidebar â”‚  â”‚
-â”‚  â”‚ Left  â”‚  â”‚                 â”‚  â”‚ Right   â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  Post Composer  â”‚  â”‚         â”‚  â”‚
-â”‚  â”‚ 240px â”‚  â”‚                 â”‚  â”‚  320px  â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚  â”‚         â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  â”‚ Post Card â”‚  â”‚  â”‚ Trends  â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚  â”‚         â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚  â”‚ Who to  â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  â”‚ Post Card â”‚  â”‚  â”‚ Follow  â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚  â”‚         â”‚  â”‚
-â”‚  â”‚       â”‚  â”‚      ...        â”‚  â”‚         â”‚  â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
-â”‚                                                 â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────────────────┐
+│  Header (Navigation)                            │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌───────┐  ┌─────────────────┐  ┌─────────┐  │
+│  │       │  │                 │  │         │  │
+│  │  Nav  │  │   Feed Area     │  │ Sidebar │  │
+│  │ Left  │  │                 │  │ Right   │  │
+│  │       │  │  Post Composer  │  │         │  │
+│  │ 240px │  │                 │  │  320px  │  │
+│  │       │  │  ┌───────────┐  │  │         │  │
+│  │       │  │  │ Post Card │  │  │ Trends  │  │
+│  │       │  │  └───────────┘  │  │         │  │
+│  │       │  │  ┌───────────┐  │  │ Who to  │  │
+│  │       │  │  │ Post Card │  │  │ Follow  │  │
+│  │       │  │  └───────────┘  │  │         │  │
+│  │       │  │      ...        │  │         │  │
+│  └───────┘  └─────────────────┘  └─────────┘  │
+│                                                 │
+└─────────────────────────────────────────────────┘
 
 Desktop: 3-column layout
 Tablet: 2-column (hide right sidebar)
@@ -1033,38 +1033,38 @@ Mobile: 1-column (hide both sidebars)
 ### 8.2 User Profile Layout
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Header (Navigation)                            â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚                                                 â”‚
-â”‚         â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”               â”‚
-â”‚         â”‚   Cover Photo         â”‚               â”‚
-â”‚         â”‚                       â”‚               â”‚
-â”‚         â”‚    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”       â”‚               â”‚
-â”‚         â”‚    â”‚  Avatar  â”‚       â”‚               â”‚
-â”‚         â””â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”˜               â”‚
-â”‚              â”‚   Name    â”‚                      â”‚
-â”‚              â”‚ @username â”‚                      â”‚
-â”‚              â”‚    Bio    â”‚                      â”‚
-â”‚              â”‚  Follow   â”‚                      â”‚
-â”‚              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                      â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”        â”‚
-â”‚  â”‚  Tabs: Posts | Replies | Media      â”‚        â”‚
-â”‚  â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤        â”‚
-â”‚  â”‚                                     â”‚        â”‚
-â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”      â”‚        â”‚
-â”‚  â”‚  â”‚ Post Card â”‚  â”‚ Post Card â”‚      â”‚        â”‚
-â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜      â”‚        â”‚
-â”‚  â”‚                                     â”‚        â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜        â”‚
-â”‚                                                 â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────────────────┐
+│  Header (Navigation)                            │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│         ┌───────────────────────┐               │
+│         │   Cover Photo         │               │
+│         │                       │               │
+│         │    ┌──────────┐       │               │
+│         │    │  Avatar  │       │               │
+│         └────┴──────────┴───────┘               │
+│              │   Name    │                      │
+│              │ @username │                      │
+│              │    Bio    │                      │
+│              │  Follow   │                      │
+│              └───────────┘                      │
+│  ┌─────────────────────────────────────┐        │
+│  │  Tabs: Posts | Replies | Media      │        │
+│  ├─────────────────────────────────────┤        │
+│  │                                     │        │
+│  │  ┌───────────┐  ┌───────────┐      │        │
+│  │  │ Post Card │  │ Post Card │      │        │
+│  │  └───────────┘  └───────────┘      │        │
+│  │                                     │        │
+│  └─────────────────────────────────────┘        │
+│                                                 │
+└─────────────────────────────────────────────────┘
 ```
 
 **Sections:**
 
 **1. Profile Header**
-- Cover photo: 1500px Ã— 500px
+- Cover photo: 1500px × 500px
 - Avatar: 128px, overlap cover by 50%
 - Name, username, bio
 - Stats: posts, followers, following
@@ -1083,69 +1083,69 @@ Mobile: 1-column (hide both sidebars)
 ### 8.3 Post Detail Page
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Header (with Back button)                     â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”            â”‚
-â”‚  â”‚   Post Card (Expanded)          â”‚            â”‚
-â”‚  â”‚                                 â”‚            â”‚
-â”‚  â”‚   Author info                   â”‚            â”‚
-â”‚  â”‚   Post content (full)           â”‚            â”‚
-â”‚  â”‚   Media (large display)         â”‚            â”‚
-â”‚  â”‚   Timestamp (detailed)          â”‚            â”‚
-â”‚  â”‚   Engagement metrics            â”‚            â”‚
-â”‚  â”‚   Action buttons                â”‚            â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”            â”‚
-â”‚  â”‚   Comment Input                 â”‚            â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”            â”‚
-â”‚  â”‚   Comments Thread               â”‚            â”‚
-â”‚  â”‚                                 â”‚            â”‚
-â”‚  â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”           â”‚            â”‚
-â”‚  â”‚   â”‚ Comment 1       â”‚           â”‚            â”‚
-â”‚  â”‚   â”‚  â”œâ”€ Reply 1.1   â”‚           â”‚            â”‚
-â”‚  â”‚   â”‚  â””â”€ Reply 1.2   â”‚           â”‚            â”‚
-â”‚  â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜           â”‚            â”‚
-â”‚  â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”           â”‚            â”‚
-â”‚  â”‚   â”‚ Comment 2       â”‚           â”‚            â”‚
-â”‚  â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜           â”‚            â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
-â”‚                                                 â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────────────────┐
+│  Header (with Back button)                     │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌─────────────────────────────────┐            │
+│  │   Post Card (Expanded)          │            │
+│  │                                 │            │
+│  │   Author info                   │            │
+│  │   Post content (full)           │            │
+│  │   Media (large display)         │            │
+│  │   Timestamp (detailed)          │            │
+│  │   Engagement metrics            │            │
+│  │   Action buttons                │            │
+│  └─────────────────────────────────┘            │
+│                                                 │
+│  ┌─────────────────────────────────┐            │
+│  │   Comment Input                 │            │
+│  └─────────────────────────────────┘            │
+│                                                 │
+│  ┌─────────────────────────────────┐            │
+│  │   Comments Thread               │            │
+│  │                                 │            │
+│  │   ┌─────────────────┐           │            │
+│  │   │ Comment 1       │           │            │
+│  │   │  ├─ Reply 1.1   │           │            │
+│  │   │  └─ Reply 1.2   │           │            │
+│  │   └─────────────────┘           │            │
+│  │   ┌─────────────────┐           │            │
+│  │   │ Comment 2       │           │            │
+│  │   └─────────────────┘           │            │
+│  └─────────────────────────────────┘            │
+│                                                 │
+└─────────────────────────────────────────────────┘
 ```
 
 ### 8.4 Messages Page
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Header (Navigation)                            â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
-â”‚  â”‚ Conversation â”‚  â”‚   Active Conversation  â”‚  â”‚
-â”‚  â”‚    List      â”‚  â”‚                        â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  Header: User Info     â”‚  â”‚
-â”‚  â”‚ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚  â”‚
-â”‚  â”‚ â”‚ Conv 1   â”‚ â”‚  â”‚  â”‚  Message Bubble  â”‚ â”‚  â”‚
-â”‚  â”‚ â”‚ Active   â”‚ â”‚  â”‚  â”‚  (Sent)          â”‚ â”‚  â”‚
-â”‚  â”‚ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚  â”‚
-â”‚  â”‚ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚  â”‚
-â”‚  â”‚ â”‚ Conv 2   â”‚ â”‚  â”‚  â”‚  Message Bubble  â”‚ â”‚  â”‚
-â”‚  â”‚ â”‚ Unread:2 â”‚ â”‚  â”‚  â”‚  (Received)      â”‚ â”‚  â”‚
-â”‚  â”‚ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚  â”‚
-â”‚  â”‚ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚  â”‚         ...          â”‚  â”‚
-â”‚  â”‚ â”‚ Conv 3   â”‚ â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚  â”‚
-â”‚  â”‚ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚  â”‚  â”‚  Input Field     â”‚ â”‚  â”‚
-â”‚  â”‚     ...      â”‚  â”‚  â”‚  [Send] [Media]  â”‚ â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚  â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
-â”‚     320px              Flexible width          â”‚
-â”‚                                                 â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────────────────┐
+│  Header (Navigation)                            │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌──────────────┐  ┌────────────────────────┐  │
+│  │ Conversation │  │   Active Conversation  │  │
+│  │    List      │  │                        │  │
+│  │              │  │  Header: User Info     │  │
+│  │ ┌──────────┐ │  │  ┌──────────────────┐ │  │
+│  │ │ Conv 1   │ │  │  │  Message Bubble  │ │  │
+│  │ │ Active   │ │  │  │  (Sent)          │ │  │
+│  │ └──────────┘ │  │  └──────────────────┘ │  │
+│  │ ┌──────────┐ │  │  ┌──────────────────┐ │  │
+│  │ │ Conv 2   │ │  │  │  Message Bubble  │ │  │
+│  │ │ Unread:2 │ │  │  │  (Received)      │ │  │
+│  │ └──────────┘ │  │  └──────────────────┘ │  │
+│  │ ┌──────────┐ │  │         ...          │  │
+│  │ │ Conv 3   │ │  │  ┌──────────────────┐ │  │
+│  │ └──────────┘ │  │  │  Input Field     │ │  │
+│  │     ...      │  │  │  [Send] [Media]  │ │  │
+│  │              │  │  └──────────────────┘ │  │
+│  └──────────────┘  └────────────────────────┘  │
+│     320px              Flexible width          │
+│                                                 │
+└─────────────────────────────────────────────────┘
 ```
 
 **Mobile:**
@@ -1156,62 +1156,62 @@ Mobile: 1-column (hide both sidebars)
 ### 8.5 Explore/Search Page
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Header (with Search Bar)                      â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”            â”‚
-â”‚  â”‚  Tabs: Posts | Users | Tags     â”‚            â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”            â”‚
-â”‚  â”‚  Trending Topics                â”‚            â”‚
-â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚            â”‚
-â”‚  â”‚  â”‚ #Technology  Â· 15.2K postsâ”‚  â”‚            â”‚
-â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚            â”‚
-â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚            â”‚
-â”‚  â”‚  â”‚ #Sports      Â· 8.5K posts â”‚  â”‚            â”‚
-â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚            â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”            â”‚
-â”‚  â”‚  For You (Recommended)          â”‚            â”‚
-â”‚  â”‚                                 â”‚            â”‚
-â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚            â”‚
-â”‚  â”‚  â”‚ Post Card â”‚  â”‚ Post Card â”‚  â”‚            â”‚
-â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚            â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â”‚
-â”‚                                                 â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────────────────┐
+│  Header (with Search Bar)                      │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌─────────────────────────────────┐            │
+│  │  Tabs: Posts | Users | Tags     │            │
+│  └─────────────────────────────────┘            │
+│                                                 │
+│  ┌─────────────────────────────────┐            │
+│  │  Trending Topics                │            │
+│  │  ┌───────────────────────────┐  │            │
+│  │  │ #Technology  · 15.2K posts│  │            │
+│  │  └───────────────────────────┘  │            │
+│  │  ┌───────────────────────────┐  │            │
+│  │  │ #Sports      · 8.5K posts │  │            │
+│  │  └───────────────────────────┘  │            │
+│  └─────────────────────────────────┘            │
+│                                                 │
+│  ┌─────────────────────────────────┐            │
+│  │  For You (Recommended)          │            │
+│  │                                 │            │
+│  │  ┌───────────┐  ┌───────────┐  │            │
+│  │  │ Post Card │  │ Post Card │  │            │
+│  │  └───────────┘  └───────────┘  │            │
+│  └─────────────────────────────────┘            │
+│                                                 │
+└─────────────────────────────────────────────────┘
 ```
 
 ### 8.6 Settings Page
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  Header (Navigation)                            â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚                                                 â”‚
-â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
-â”‚  â”‚  Side Menu   â”‚  â”‚   Settings Content     â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚                        â”‚  â”‚
-â”‚  â”‚  Account     â”‚  â”‚  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚  â”‚
-â”‚  â”‚  Privacy â†   â”‚  â”‚  â”‚  Privacy Settingsâ”‚  â”‚  â”‚
-â”‚  â”‚  Security    â”‚  â”‚  â”‚                  â”‚  â”‚  â”‚
-â”‚  â”‚  Notificationsâ”‚ â”‚  â”‚  Profile Visible â”‚  â”‚  â”‚
-â”‚  â”‚  Display     â”‚  â”‚  â”‚  [ ] Public      â”‚  â”‚  â”‚
-â”‚  â”‚  About       â”‚  â”‚  â”‚  [x] Private     â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â”‚                  â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â”‚  Posts Visible   â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â”‚  [x] Everyone    â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â”‚  [ ] Followers   â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â”‚                  â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â”‚  [Save Changes]  â”‚  â”‚  â”‚
-â”‚  â”‚              â”‚  â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚  â”‚
-â”‚  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
-â”‚     240px              Flexible width          â”‚
-â”‚                                                 â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────────────────────┐
+│  Header (Navigation)                            │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌──────────────┐  ┌────────────────────────┐  │
+│  │  Side Menu   │  │   Settings Content     │  │
+│  │              │  │                        │  │
+│  │  Account     │  │  ┌──────────────────┐  │  │
+│  │  Privacy ←   │  │  │  Privacy Settings│  │  │
+│  │  Security    │  │  │                  │  │  │
+│  │  Notifications│ │  │  Profile Visible │  │  │
+│  │  Display     │  │  │  [ ] Public      │  │  │
+│  │  About       │  │  │  [x] Private     │  │  │
+│  │              │  │  │                  │  │  │
+│  │              │  │  │  Posts Visible   │  │  │
+│  │              │  │  │  [x] Everyone    │  │  │
+│  │              │  │  │  [ ] Followers   │  │  │
+│  │              │  │  │                  │  │  │
+│  │              │  │  │  [Save Changes]  │  │  │
+│  │              │  │  └──────────────────┘  │  │
+│  └──────────────┘  └────────────────────────┘  │
+│     240px              Flexible width          │
+│                                                 │
+└─────────────────────────────────────────────────┘
 ```
 
 ---
@@ -1222,39 +1222,39 @@ Mobile: 1-column (hide both sidebars)
 
 ```
 [Landing Page]
-      â†“
+      ↓
    [Click "Sign Up"]
-      â†“
+      ↓
 [Registration Form]
   - Email
   - Username
   - Password
-      â†“
+      ↓
   [Submit Form]
-      â†“
+      ↓
    [Validation]
-      â”œâ”€ Invalid â†’ Show Errors â†’ Return to Form
-      â””â”€ Valid
-          â†“
+      ├─ Invalid → Show Errors → Return to Form
+      └─ Valid
+          ↓
     [Send Verification Email]
-          â†“
+          ↓
     [Email Sent Confirmation Page]
-          â†“
+          ↓
     [User Checks Email]
-          â†“
+          ↓
     [Click Verification Link]
-          â†“
+          ↓
     [Email Verified Success]
-          â†“
+          ↓
     [Redirect to Login]
-          â†“
+          ↓
     [Login]
-          â†“
+          ↓
     [Welcome Onboarding]
   - Complete profile
   - Upload avatar
   - Find friends
-      â†“
+      ↓
     [Home Feed]
 ```
 
@@ -1262,40 +1262,40 @@ Mobile: 1-column (hide both sidebars)
 
 ```
 [Home Feed]
-      â†“
+      ↓
 [Click "Create Post" or Input Field]
-      â†“
+      ↓
 [Post Composer Opens]
   - Text input active
   - 5000 char limit shown
-      â†“
+      ↓
 [User Types Content]
-      â†“
+      ↓
 [Optional: Add Media]
-  â”œâ”€ Click Media Icon
-  â”œâ”€ Select Files
-  â”œâ”€ Upload Progress
-  â””â”€ Preview Shown
-      â†“
+  ├─ Click Media Icon
+  ├─ Select Files
+  ├─ Upload Progress
+  └─ Preview Shown
+      ↓
 [Optional: Add Privacy Setting]
-  â”œâ”€ Click Privacy Dropdown
-  â””â”€ Select: Public/Followers/Private
-      â†“
+  ├─ Click Privacy Dropdown
+  └─ Select: Public/Followers/Private
+      ↓
 [Click "Post" Button]
-      â†“
+      ↓
 [Validation]
-  â”œâ”€ Empty â†’ Disable button
-  â”œâ”€ Too long â†’ Show error
-  â””â”€ Valid â†’ Continue
-      â†“
+  ├─ Empty → Disable button
+  ├─ Too long → Show error
+  └─ Valid → Continue
+      ↓
 [Optimistic UI]
   - Show post immediately in feed
   - Show "Posting..." indicator
-      â†“
+      ↓
 [API Call]
-  â”œâ”€ Success â†’ Remove indicator, finalize
-  â””â”€ Error â†’ Show error, offer retry
-      â†“
+  ├─ Success → Remove indicator, finalize
+  └─ Error → Show error, offer retry
+      ↓
 [Post Published]
   - Appears in followers' feeds
   - Notifications sent
@@ -1305,38 +1305,38 @@ Mobile: 1-column (hide both sidebars)
 
 ```
 [Messages Page]
-      â†“
+      ↓
 [Select Conversation]
   OR
 [Click "New Message"]
-      â†“
+      ↓
 [If New Message]
-  â”œâ”€ Search for User
-  â”œâ”€ Select Recipient
-  â””â”€ Create Conversation
-      â†“
+  ├─ Search for User
+  ├─ Select Recipient
+  └─ Create Conversation
+      ↓
 [Conversation View Opens]
-      â†“
+      ↓
 [Type Message]
-      â†“
+      ↓
 [Optional: Add Media]
-  â”œâ”€ Click Media Icon
-  â”œâ”€ Select Image/Video
-  â””â”€ Preview Shown
-      â†“
+  ├─ Click Media Icon
+  ├─ Select Image/Video
+  └─ Preview Shown
+      ↓
 [Press Enter or Click Send]
-      â†“
+      ↓
 [Optimistic UI]
   - Message appears immediately
   - "Sending..." indicator
-      â†“
+      ↓
 [WebSocket Send]
-  â”œâ”€ Success
-  â”‚   â”œâ”€ Show "Delivered" checkmark
-  â”‚   â””â”€ Recipient sees in real-time
-  â””â”€ Error
-      â””â”€ Show error, offer retry
-      â†“
+  ├─ Success
+  │   ├─ Show "Delivered" checkmark
+  │   └─ Recipient sees in real-time
+  └─ Error
+      └─ Show error, offer retry
+      ↓
 [Message Sent Successfully]
   - Delivered checkmark
   - Read receipt (if enabled)
@@ -1349,68 +1349,68 @@ Mobile: 1-column (hide both sidebars)
   - Via Search
   - Via Suggestions
   - Via Post
-      â†“
+      ↓
 [View User Profile]
-      â†“
+      ↓
 [Click "Follow" Button]
-      â†“
+      ↓
 [Check Profile Privacy]
-  â”œâ”€ Public Profile
-  â”‚   â”œâ”€ Immediate Follow
-  â”‚   â”œâ”€ Button â†’ "Following"
-  â”‚   â”œâ”€ Follower count +1
-  â”‚   â””â”€ User gets notification
-  â”‚       â†“
-  â”‚   [Start Seeing Posts in Feed]
-  â”‚
-  â””â”€ Private Profile
-      â”œâ”€ Send Follow Request
-      â”œâ”€ Button â†’ "Requested"
-      â””â”€ User gets notification
-          â†“
+  ├─ Public Profile
+  │   ├─ Immediate Follow
+  │   ├─ Button → "Following"
+  │   ├─ Follower count +1
+  │   └─ User gets notification
+  │       ↓
+  │   [Start Seeing Posts in Feed]
+  │
+  └─ Private Profile
+      ├─ Send Follow Request
+      ├─ Button → "Requested"
+      └─ User gets notification
+          ↓
       [User Reviews Request]
-          â”œâ”€ Accept
-          â”‚   â”œâ”€ Follow established
-          â”‚   â”œâ”€ Requester notified
-          â”‚   â””â”€ Requester sees posts
-          â”‚
-          â””â”€ Decline
-              â”œâ”€ Request removed
-              â””â”€ Requester not notified
+          ├─ Accept
+          │   ├─ Follow established
+          │   ├─ Requester notified
+          │   └─ Requester sees posts
+          │
+          └─ Decline
+              ├─ Request removed
+              └─ Requester not notified
 ```
 
 ### 9.5 Search Flow
 
 ```
 [Click Search Bar]
-      â†“
+      ↓
 [Enter Search Query]
-      â†“
+      ↓
 [Real-time Search Results]
   - Autocomplete suggestions
   - Recent searches
-      â†“
+      ↓
 [Press Enter or Select Suggestion]
-      â†“
+      ↓
 [Search Results Page]
-  â”Œâ”€ Tabs:
-  â”‚  - Posts
-  â”‚  - Users
-  â”‚  - Hashtags
-  â”‚
-  â”œâ”€ Filters:
-  â”‚  - Date range
-  â”‚  - Content type
-  â”‚  - From: Everyone/Following
-  â”‚
-  â””â”€ Results List
-      â”œâ”€ Highlighted keywords
-      â””â”€ Pagination
-      â†“
+  ┌─ Tabs:
+  │  - Posts
+  │  - Users
+  │  - Hashtags
+  │
+  ├─ Filters:
+  │  - Date range
+  │  - Content type
+  │  - From: Everyone/Following
+  │
+  └─ Results List
+      ├─ Highlighted keywords
+      └─ Pagination
+      ↓
 [Click Result]
-      â”œâ”€ User â†’ Profile Page
-      â”œâ”€ Post â†’ Post Detail Page
-      â””â”€ Hashtag â†’ Hashtag Page
+      ├─ User → Profile Page
+      ├─ Post → Post Detail Page
+      └─ Hashtag → Hashtag Page
 ```
 
 ---
@@ -1455,7 +1455,7 @@ large:      1440px+         (2xl)
 
 ### 10.3 Touch Targets
 
-**Minimum Touch Target: 44px Ã— 44px**
+**Minimum Touch Target: 44px × 44px**
 
 All interactive elements on mobile:
 - Buttons: minimum 44px height
@@ -1802,7 +1802,7 @@ Crossfade: 200ms (desktop)
 
 **Icon Set: Lucide Icons** (or Heroicons)
 - Consistent 2px stroke width
-- 24px Ã— 24px default size
+- 24px × 24px default size
 - Outlined style (primary)
 - Filled style (for active states)
 
@@ -1810,7 +1810,7 @@ Crossfade: 200ms (desktop)
 ```
 xs:  16px
 sm:  20px
-md:  24px  â† Default
+md:  24px  ← Default
 lg:  32px
 xl:  40px
 ```
@@ -1872,7 +1872,7 @@ Vertical alignment: center
 
 **Icon-only Buttons:**
 ```
-Button size: 40px Ã— 40px
+Button size: 40px × 40px
 Icon size: 20px
 Center aligned
 Tooltip on hover
@@ -1894,16 +1894,16 @@ Disabled: neutral-400
 
 **Structure:**
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                    â”‚
-â”‚      Icon          â”‚ 64px, neutral-400
-â”‚                    â”‚
-â”‚   Primary Text     â”‚ heading-5, bold
-â”‚   Secondary Text   â”‚ body, neutral-600
-â”‚                    â”‚
-â”‚   [Action Button]  â”‚
-â”‚                    â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌────────────────────┐
+│                    │
+│      Icon          │ 64px, neutral-400
+│                    │
+│   Primary Text     │ heading-5, bold
+│   Secondary Text   │ body, neutral-600
+│                    │
+│   [Action Button]  │
+│                    │
+└────────────────────┘
 ```
 
 **Examples:**
@@ -1929,18 +1929,18 @@ Disabled: neutral-400
 
 **Structure:**
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                    â”‚
-â”‚   âš ï¸ Error Icon    â”‚ error-500
-â”‚                    â”‚
-â”‚   Error Title      â”‚ heading-5
-â”‚   Error Message    â”‚ body, neutral-600
-â”‚   Error Code       â”‚ caption, neutral-500
-â”‚                    â”‚
-â”‚   [Retry Button]   â”‚
-â”‚   [Go Back]        â”‚
-â”‚                    â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌────────────────────┐
+│                    │
+│   ⚠️ Error Icon    │ error-500
+│                    │
+│   Error Title      │ heading-5
+│   Error Message    │ body, neutral-600
+│   Error Code       │ caption, neutral-500
+│                    │
+│   [Retry Button]   │
+│   [Go Back]        │
+│                    │
+└────────────────────┘
 ```
 
 **Error Messages:**
@@ -1986,15 +1986,15 @@ Cancel button available
 
 **Structure:**
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  âš ï¸ Warning Icon        â”‚
-â”‚                         â”‚
-â”‚  Confirmation Title     â”‚
-â”‚  Description text       â”‚
-â”‚  Consequences explained â”‚
-â”‚                         â”‚
-â”‚  [Cancel]  [Confirm]    â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────┐
+│  ⚠️ Warning Icon        │
+│                         │
+│  Confirmation Title     │
+│  Description text       │
+│  Consequences explained │
+│                         │
+│  [Cancel]  [Confirm]    │
+└─────────────────────────┘
 ```
 
 **Examples:**
@@ -2048,13 +2048,13 @@ Message: "Looks good!" (optional)
 ### 15.1 Bottom Navigation (iOS/Android)
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                                 â”‚
-â”‚         Content Area            â”‚
-â”‚                                 â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  [Home] [Search] [+] [â¤] [ðŸ‘¤] â”‚ â† 60px height
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────────────────┐
+│                                 │
+│         Content Area            │
+│                                 │
+├─────────────────────────────────┤
+│  [Home] [Search] [+] [❤] [👤] │ ← 60px height
+└─────────────────────────────────┘
 ```
 
 **Tabs:**
@@ -2122,31 +2122,31 @@ Side safe areas: 20px
 
 **Structure:**
 ```
-ðŸ“ ConnectHub Design System
-  â”œâ”€ ðŸ“„ Cover Page
-  â”œâ”€ ðŸ“„ Design Tokens
-  â”œâ”€ ðŸ“„ Color Palette
-  â”œâ”€ ðŸ“„ Typography
-  â”œâ”€ ðŸ“„ Components
-  â”œâ”€ ðŸ“„ Icons
-  â”œâ”€ ðŸ“„ Patterns
-  â””â”€ ðŸ“„ Templates
+📁 ConnectHub Design System
+  ├─ 📄 Cover Page
+  ├─ 📄 Design Tokens
+  ├─ 📄 Color Palette
+  ├─ 📄 Typography
+  ├─ 📄 Components
+  ├─ 📄 Icons
+  ├─ 📄 Patterns
+  └─ 📄 Templates
 
-ðŸ“ ConnectHub Screens
-  â”œâ”€ ðŸ“„ Authentication
-  â”œâ”€ ðŸ“„ Home & Feed
-  â”œâ”€ ðŸ“„ Profile
-  â”œâ”€ ðŸ“„ Messages
-  â”œâ”€ ðŸ“„ Notifications
-  â”œâ”€ ðŸ“„ Search & Explore
-  â”œâ”€ ðŸ“„ Settings
-  â””â”€ ðŸ“„ Modals & Overlays
+📁 ConnectHub Screens
+  ├─ 📄 Authentication
+  ├─ 📄 Home & Feed
+  ├─ 📄 Profile
+  ├─ 📄 Messages
+  ├─ 📄 Notifications
+  ├─ 📄 Search & Explore
+  ├─ 📄 Settings
+  └─ 📄 Modals & Overlays
 
-ðŸ“ ConnectHub Prototypes
-  â”œâ”€ ðŸ“„ User Flows
-  â”œâ”€ ðŸ“„ Desktop Prototype
-  â”œâ”€ ðŸ“„ Mobile Prototype
-  â””â”€ ðŸ“„ Interactions
+📁 ConnectHub Prototypes
+  ├─ 📄 User Flows
+  ├─ 📄 Desktop Prototype
+  ├─ 📄 Mobile Prototype
+  └─ 📄 Interactions
 ```
 
 ### 16.2 Component Library
@@ -2215,7 +2215,7 @@ ConnectHub
 - Monochrome (white, black)
 
 **Clear Space:**
-- Minimum: Logo height Ã— 0.5 on all sides
+- Minimum: Logo height × 0.5 on all sides
 
 **Minimum Size:**
 - Digital: 120px width
@@ -2232,23 +2232,23 @@ ConnectHub
 **Sizes:**
 ```
 iOS:
-  - 1024Ã—1024 (App Store)
-  - 180Ã—180 (iPhone)
-  - 167Ã—167 (iPad Pro)
-  - 152Ã—152 (iPad)
-  - 120Ã—120 (iPhone)
+  - 1024×1024 (App Store)
+  - 180×180 (iPhone)
+  - 167×167 (iPad Pro)
+  - 152×152 (iPad)
+  - 120×120 (iPhone)
 
 Android:
-  - 512Ã—512 (Play Store)
-  - xxxhdpi: 192Ã—192
-  - xxhdpi: 144Ã—144
-  - xhdpi: 96Ã—96
-  - hdpi: 72Ã—72
+  - 512×512 (Play Store)
+  - xxxhdpi: 192×192
+  - xxhdpi: 144×144
+  - xhdpi: 96×96
+  - hdpi: 72×72
 
 Web:
-  - favicon.ico: 32Ã—32, 16Ã—16
-  - apple-touch-icon: 180Ã—180
-  - android-chrome: 192Ã—192, 512Ã—512
+  - favicon.ico: 32×32, 16×16
+  - apple-touch-icon: 180×180
+  - android-chrome: 192×192, 512×512
 ```
 
 **Design:**
@@ -2279,14 +2279,14 @@ Web:
 
 **Examples:**
 ```
-âŒ Bad: "Error 500. Server failed."
-âœ… Good: "Something went wrong on our end. We're working to fix it. Please try again in a moment."
+❌ Bad: "Error 500. Server failed."
+✅ Good: "Something went wrong on our end. We're working to fix it. Please try again in a moment."
 
-âŒ Bad: "Invalid input."
-âœ… Good: "Username must be 3-30 characters and contain only letters, numbers, and underscores."
+❌ Bad: "Invalid input."
+✅ Good: "Username must be 3-30 characters and contain only letters, numbers, and underscores."
 
-âŒ Bad: "You can't do that."
-âœ… Good: "To send messages, you need to follow this user first."
+❌ Bad: "You can't do that."
+✅ Good: "To send messages, you need to follow this user first."
 ```
 
 ---
@@ -2468,11 +2468,9 @@ Web:
 
 **END OF DOCUMENT**
 
-**Status:** âœ… COMPLETE  
+**Status:** ✅ COMPLETE  
 **Pages:** 70+  
 **Components Documented:** 50+  
 **Design System:** Fully Defined  
 **Ready for:** Development Implementation
-
-
 

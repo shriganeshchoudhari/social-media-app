@@ -5,6 +5,7 @@ import com.socialmedia.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import jakarta.servlet.DispatcherType;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -35,11 +36,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Spring MVC async dispatch (StreamingResponseBody, DeferredResult):
+                        // The security context is not available on the re-dispatched thread,
+                        // so we skip re-authentication for ASYNC dispatcher type.
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                         // Public endpoints
                         .requestMatchers("/api/v1/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/media/files/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        // WebSocket SockJS handshake endpoint
+                        .requestMatchers("/ws/**").permitAll()
                         // Everything else requires auth
                         .anyRequest().authenticated()
                 )

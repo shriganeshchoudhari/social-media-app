@@ -9,7 +9,9 @@ import Button from '../components/ui/Button.jsx'
 import Modal from '../components/ui/Modal.jsx'
 import Input from '../components/ui/Input.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
-import { ArrowLeft, Edit2 } from 'lucide-react'
+import { ArrowLeft, Edit2, MessageCircle } from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { sendMessageThunk, setActiveConversation } from '../store/messagingSlice.js'
 
 export default function ProfilePage() {
   const { username } = useParams()
@@ -29,7 +31,18 @@ export default function ProfilePage() {
   const [editForm, setEditForm]       = useState({})
   const [saving, setSaving]           = useState(false)
 
-  const isMe = me?.username === username
+  const isMe     = me?.username === username
+  const dispatch2 = useDispatch()
+
+  const handleMessageUser = () => {
+    dispatch2(sendMessageThunk({ recipientId: profile?.id, content: '👋' }))
+      .unwrap()
+      .then((msg) => {
+        dispatch2(setActiveConversation(msg.conversationId))
+        navigate('/messages')
+      })
+      .catch(() => {})
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -118,14 +131,24 @@ export default function ProfilePage() {
                 <Edit2 size={14} /> Edit profile
               </Button>
             ) : (
-              <Button
-                variant={following ? 'secondary' : 'primary'}
-                size="sm"
-                loading={followLoading}
-                onClick={toggleFollow}
-              >
-                {following ? 'Unfollow' : 'Follow'}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleMessageUser}
+                  title="Send message"
+                >
+                  <MessageCircle size={14} />
+                </Button>
+                <Button
+                  variant={following ? 'secondary' : 'primary'}
+                  size="sm"
+                  loading={followLoading}
+                  onClick={toggleFollow}
+                >
+                  {following ? 'Unfollow' : 'Follow'}
+                </Button>
+              </div>
             )}
           </div>
         </div>

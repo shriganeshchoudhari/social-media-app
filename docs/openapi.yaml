@@ -1,14 +1,47 @@
 openapi: 3.0.3
 info:
-  title: Social Media API
-  version: 1.0.0
+  title: ConnectHub Social Media API
+  version: 1.3.0
   description: >
-    REST API for the Social Media Clone application.
+    Complete REST + WebSocket API for the ConnectHub social media platform.
     All protected endpoints require a Bearer JWT token obtained via /auth/login or /auth/register.
+    Real-time features use STOMP over SockJS at ws://localhost:9090/ws.
+
+    **New in v1.2:** Post editing (PUT /posts/{id}), Bookmarks (toggle + list), Messaging (REST + WebSocket)
+
+    **New in v1.3:** OpenAPI fully covers all implemented endpoints including AI Assistant (Spark), Media, Search, Notifications, Messaging, Bookmarks, and WebSocket events.
 
 servers:
-  - url: http://localhost:8080
-    description: Local development
+  - url: http://localhost:9090/api/v1
+    description: Local development (Spring Boot)
+  - url: http://backend:9090/api/v1
+    description: Docker Compose network
+
+tags:
+  - name: Health
+    description: Service health checks
+  - name: Auth
+    description: Registration, login, token management
+  - name: Users
+    description: User profiles, search, follow graph
+  - name: Posts
+    description: Post CRUD, likes, bookmarks
+  - name: Comments
+    description: Post comments
+  - name: Follow
+    description: Follow / unfollow relationships
+  - name: Feed
+    description: Personalised home feed
+  - name: Messaging
+    description: Direct messaging (REST + WebSocket)
+  - name: Notifications
+    description: In-app notifications
+  - name: Search
+    description: Full-text search across users, posts, hashtags
+  - name: Media
+    description: File upload and serving
+  - name: AI
+    description: Spark AI assistant (Ollama-powered, free, local)
 
 components:
   securitySchemes:
@@ -58,7 +91,7 @@ components:
       properties:
         token:
           type: string
-          description: JWT access token
+          description: JWT access token (7-day expiry)
         user:
           $ref: '#/components/schemas/UserResponse'
 
@@ -101,6 +134,25 @@ components:
         avatarUrl:
           type: string
 
+    PagedUsersResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        last:
+          type: boolean
+
     # ── Posts ────────────────────────────────────────────────
     CreatePostRequest:
       type: object
@@ -118,6 +170,19 @@ components:
           type: string
           enum: [PUBLIC, FOLLOWERS_ONLY, PRIVATE]
           default: PUBLIC
+
+    UpdatePostRequest:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          example: "Updated content"
+        privacy:
+          type: string
+          enum: [PUBLIC, FOLLOWERS_ONLY, PRIVATE]
 
     PostResponse:
       type: object
@@ -140,12 +205,17 @@ components:
           type: integer
         likedByCurrentUser:
           type: boolean
+        bookmarkedByCurrentUser:
+          type: boolean
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
+          description: >
+            Set when the post is edited. Frontend displays an "(edited)" badge
+            when updatedAt differs from createdAt.
 
     PagedPostsResponse:
       type: object
@@ -165,6 +235,13 @@ components:
           type: integer
         last:
           type: boolean
+
+    BookmarkToggleResponse:
+      type: object
+      properties:
+        bookmarked:
+          type: boolean
+          description: true if the post is now bookmarked, false if it was removed
 
     # ── Comments ─────────────────────────────────────────────
     CreateCommentRequest:
@@ -224,6 +301,191 @@ components:
         followingCount:
           type: integer
 
+    # ── Messaging ────────────────────────────────────────────
+    SendMessageRequest:
+      type: object
+      required: [recipientId, content]
+      properties:
+        recipientId:
+          type: integer
+          format: int64
+          description: User ID of the message recipient
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+
+    MessageDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        conversationId:
+          type: integer
+          format: int64
+        senderId:
+          type: integer
+          format: int64
+        content:
+          type: string
+        messageType:
+          type: string
+          default: text
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    ConversationDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        otherUser:
+          $ref: '#/components/schemas/UserResponse'
+        lastMessage:
+          $ref: '#/components/schemas/MessageDto'
+        updatedAt:
+          type: string
+          format: date-time
+
+    PagedMessagesResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageDto'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        last:
+          type: boolean
+
+    # ── Notifications ─────────────────────────────────────────
+    NotificationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum: [LIKE, COMMENT, FOLLOW, MENTION, MESSAGE]
+        message:
+          type: string
+        referenceId:
+          type: integer
+          format: int64
+        actorId:
+          type: integer
+          format: int64
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    PagedNotificationsResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        last:
+          type: boolean
+
+    UnreadCountResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+
+    # ── Media ─────────────────────────────────────────────────
+    MediaUploadResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Publicly accessible URL to serve the uploaded file
+          example: "http://localhost:9090/api/v1/media/files/abc123.jpg"
+        filename:
+          type: string
+        contentType:
+          type: string
+
+    # ── AI ───────────────────────────────────────────────────
+    ChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: User's message to the AI assistant
+        conversationHistory:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+                enum: [user, assistant]
+              content:
+                type: string
+        context:
+          type: string
+          enum: [general, feed_summary, post_improve]
+          default: general
+          description: >
+            Context mode — general: injects user profile; feed_summary: injects latest 20 public posts;
+            post_improve: prompts Ollama to rewrite draft text and suggest hashtags.
+
+    AiHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        ollamaReachable:
+          type: boolean
+        model:
+          type: string
+          example: llama3.2:3b
+        ollamaUrl:
+          type: string
+          example: http://localhost:11434
+
+    # ── Search ────────────────────────────────────────────────
+    HashtagResult:
+      type: object
+      properties:
+        tag:
+          type: string
+        postCount:
+          type: integer
+
     # ── Errors ───────────────────────────────────────────────
     ApiError:
       type: object
@@ -241,17 +503,17 @@ components:
 # ── Paths ─────────────────────────────────────────────────────
 paths:
 
-  # Health
-  /api/v1/health:
+  # ── Health ────────────────────────────────────────────────
+  /health:
     get:
       tags: [Health]
-      summary: Health check
+      summary: Backend health check (public)
       responses:
         '200':
           description: Service is up
 
   # ── Auth ──────────────────────────────────────────────────
-  /api/v1/auth/register:
+  /auth/register:
     post:
       tags: [Auth]
       summary: Register a new user
@@ -281,7 +543,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
 
-  /api/v1/auth/login:
+  /auth/login:
     post:
       tags: [Auth]
       summary: Login and obtain JWT
@@ -306,7 +568,7 @@ paths:
                 $ref: '#/components/schemas/ApiError'
 
   # ── Users ─────────────────────────────────────────────────
-  /api/v1/users/me:
+  /users/me:
     get:
       tags: [Users]
       summary: Get own profile
@@ -348,7 +610,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
 
-  /api/v1/users/search:
+  /users/me/bookmarks:
+    get:
+      tags: [Users]
+      summary: Get saved posts (bookmarks) for the current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated saved posts, newest bookmark first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPostsResponse'
+        '401':
+          description: Not authenticated
+
+  /users/search:
     get:
       tags: [Users]
       summary: Search users by username or display name
@@ -373,23 +662,13 @@ paths:
             default: 20
       responses:
         '200':
-          description: Matching users
+          description: Matching users (paginated)
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/UserResponse'
-                  page:
-                    type: integer
-                  totalElements:
-                    type: integer
-                    format: int64
+                $ref: '#/components/schemas/PagedUsersResponse'
 
-  /api/v1/users/{username}:
+  /users/{username}:
     get:
       tags: [Users]
       summary: Get a user's public profile
@@ -415,7 +694,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
 
-  /api/v1/users/{username}/posts:
+  /users/{username}/posts:
     get:
       tags: [Users]
       summary: Get posts by a specific user
@@ -447,8 +726,133 @@ paths:
         '404':
           description: User not found
 
+  # ── Follow ───────────────────────────────────────────────
+  /users/{username}/follow:
+    post:
+      tags: [Follow]
+      summary: Follow a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowStatusResponse'
+        '403':
+          description: Cannot follow yourself
+        '409':
+          description: Already following
+    delete:
+      tags: [Follow]
+      summary: Unfollow a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unfollow successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowStatusResponse'
+        '409':
+          description: Not following
+
+  /users/{username}/follow/status:
+    get:
+      tags: [Follow]
+      summary: Check if current user follows a given user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: true if following, false otherwise
+          content:
+            application/json:
+              schema:
+                type: boolean
+
+  /users/{username}/followers:
+    get:
+      tags: [Follow]
+      summary: List followers of a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of followers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedUsersResponse'
+
+  /users/{username}/following:
+    get:
+      tags: [Follow]
+      summary: List users that a user is following
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of users being followed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedUsersResponse'
+
   # ── Posts ─────────────────────────────────────────────────
-  /api/v1/posts:
+  /posts:
     post:
       tags: [Posts]
       summary: Create a post
@@ -476,10 +880,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
 
-  /api/v1/posts/feed:
+  /posts/feed:
     get:
-      tags: [Posts]
-      summary: Get home feed (posts from followed users + own posts)
+      tags: [Feed]
+      summary: Get home feed (own posts + followed users, privacy-aware)
       security:
         - bearerAuth: []
       parameters:
@@ -503,7 +907,7 @@ paths:
         '401':
           description: Not authenticated
 
-  /api/v1/posts/{id}:
+  /posts/{id}:
     get:
       tags: [Posts]
       summary: Get a post by ID
@@ -523,6 +927,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostResponse'
+        '404':
+          description: Post not found
+    put:
+      tags: [Posts]
+      summary: Edit a post (author only)
+      description: >
+        Updates post content and/or privacy. Sets `updatedAt` on the post entity.
+        Returns 403 if the requester is not the post author.
+        The frontend shows an "(edited)" badge when updatedAt ≠ createdAt.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostRequest'
+      responses:
+        '200':
+          description: Updated post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '403':
+          description: Not the post author
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '404':
           description: Post not found
     delete:
@@ -545,7 +986,7 @@ paths:
         '404':
           description: Post not found
 
-  /api/v1/posts/{id}/like:
+  /posts/{id}/like:
     post:
       tags: [Posts]
       summary: Like a post
@@ -586,11 +1027,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostResponse'
-        '409':
-          description: Not liked yet
+
+  /posts/{id}/bookmark:
+    post:
+      tags: [Posts]
+      summary: Toggle bookmark on a post
+      description: >
+        Single toggle endpoint. If the post is not yet bookmarked, it is saved.
+        If it is already bookmarked, the bookmark is removed.
+        Returns `{ "bookmarked": true }` or `{ "bookmarked": false }` accordingly.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Bookmark toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkToggleResponse'
+        '401':
+          description: Not authenticated
+        '404':
+          description: Post not found
 
   # ── Comments ──────────────────────────────────────────────
-  /api/v1/posts/{postId}/comments:
+  /posts/{postId}/comments:
     post:
       tags: [Comments]
       summary: Add a comment to a post
@@ -650,7 +1118,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedCommentsResponse'
 
-  /api/v1/posts/{postId}/comments/{commentId}:
+  /posts/{postId}/comments/{commentId}:
     delete:
       tags: [Comments]
       summary: Delete a comment (comment author or post author only)
@@ -673,84 +1141,194 @@ paths:
         '204':
           description: Deleted
         '403':
-          description: Not the comment or post owner
+          description: Not authorised
         '404':
           description: Comment or post not found
 
-  # ── Follow ───────────────────────────────────────────────
-  /api/v1/users/{username}/follow:
+  # ── Messaging ─────────────────────────────────────────────
+  /messages/conversations:
+    get:
+      tags: [Messaging]
+      summary: List all conversations for the current user
+      description: Returns conversations ordered by most recent message. Each entry includes the other participant and the last message.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationDto'
+        '401':
+          description: Not authenticated
+
+  /messages:
     post:
-      tags: [Follow]
-      summary: Follow a user
+      tags: [Messaging]
+      summary: Send a message (creates conversation if needed)
+      description: >
+        If a conversation between the current user and the recipient already exists,
+        the message is appended to that thread. Otherwise a new conversation is created automatically.
+        The new message is also broadcast to /topic/chat/{conversationId} via STOMP.
       security:
         - bearerAuth: []
-      parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
       responses:
         '200':
-          description: Follow successful
+          description: Message sent
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FollowStatusResponse'
+                $ref: '#/components/schemas/MessageDto'
+        '401':
+          description: Not authenticated
+        '404':
+          description: Recipient not found
+
+  /messages/conversations/{conversationId}/messages:
+    get:
+      tags: [Messaging]
+      summary: Get message history for a conversation
+      description: Paginated, ordered newest-first. Only participants can access.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 40
+      responses:
+        '200':
+          description: Paginated message history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedMessagesResponse'
         '403':
-          description: Cannot follow yourself
-        '409':
-          description: Already following
-    delete:
-      tags: [Follow]
-      summary: Unfollow a user
+          description: Not a participant in this conversation
+        '404':
+          description: Conversation not found
+
+  /messages/conversations/{conversationId}/read:
+    put:
+      tags: [Messaging]
+      summary: Mark all unread messages in a conversation as read
       security:
         - bearerAuth: []
       parameters:
-        - name: username
+        - name: conversationId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         '200':
-          description: Unfollow successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FollowStatusResponse'
-        '409':
-          description: Not following
+          description: Messages marked as read
+        '403':
+          description: Not a participant in this conversation
 
-  /api/v1/users/{username}/follow/status:
+  # ── Notifications ─────────────────────────────────────────
+  /notifications:
     get:
-      tags: [Follow]
-      summary: Check if current user follows a user
+      tags: [Notifications]
+      summary: List notifications for the current user
       security:
         - bearerAuth: []
       parameters:
-        - name: username
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedNotificationsResponse'
+        '401':
+          description: Not authenticated
+
+  /notifications/unread-count:
+    get:
+      tags: [Notifications]
+      summary: Get unread notification count
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnreadCountResponse'
+
+  /notifications/read-all:
+    patch:
+      tags: [Notifications]
+      summary: Mark all notifications as read
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All notifications marked as read
+
+  /notifications/{id}/read:
+    patch:
+      tags: [Notifications]
+      summary: Mark a single notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         '200':
-          description: true if following, false otherwise
-          content:
-            application/json:
-              schema:
-                type: boolean
+          description: Notification marked as read
+        '404':
+          description: Notification not found
 
-  /api/v1/users/{username}/followers:
+  # ── Search ────────────────────────────────────────────────
+  /search/users:
     get:
-      tags: [Follow]
-      summary: List followers of a user
+      tags: [Search]
+      summary: Search users by username or display name
       security:
         - bearerAuth: []
       parameters:
-        - name: username
-          in: path
+        - name: q
+          in: query
           required: true
           schema:
             type: string
@@ -766,26 +1344,21 @@ paths:
             default: 20
       responses:
         '200':
-          description: Paginated list of followers
+          description: Matching users (paginated)
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/UserResponse'
+                $ref: '#/components/schemas/PagedUsersResponse'
 
-  /api/v1/users/{username}/following:
+  /search/posts:
     get:
-      tags: [Follow]
-      summary: List users that a user is following
+      tags: [Search]
+      summary: Search post content
       security:
         - bearerAuth: []
       parameters:
-        - name: username
-          in: path
+        - name: q
+          in: query
           required: true
           schema:
             type: string
@@ -801,13 +1374,165 @@ paths:
             default: 20
       responses:
         '200':
-          description: Paginated list of users being followed
+          description: Matching posts (paginated)
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/UserResponse'
+                $ref: '#/components/schemas/PagedPostsResponse'
+
+  /search/hashtags:
+    get:
+      tags: [Search]
+      summary: Search hashtags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matching hashtags with post counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HashtagResult'
+
+  # ── Media ─────────────────────────────────────────────────
+  /media/upload:
+    post:
+      tags: [Media]
+      summary: Upload an image or video file
+      description: >
+        Accepts multipart/form-data. Validates MIME type (image/jpeg, image/png, image/gif, image/webp, video/mp4)
+        and file size (images ≤ 10 MB, videos ≤ 100 MB). Returns a URL that can be stored as `imageUrl` in a post.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Upload successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaUploadResponse'
+        '400':
+          description: Invalid file type or size exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: Not authenticated
+
+  /media/files/{filename}:
+    get:
+      tags: [Media]
+      summary: Serve an uploaded file (public)
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File content
+        '404':
+          description: File not found
+
+  # ── AI (Spark) ────────────────────────────────────────────
+  /ai/chat:
+    post:
+      tags: [AI]
+      summary: Chat with Spark AI assistant (streaming NDJSON)
+      description: >
+        Powered by Ollama (llama3.2:3b — free, local, no API key).
+        Returns a streaming NDJSON response where each line is a JSON object.
+        Delta tokens: `{"delta":"<text>"}`. End of stream: `{"done":true,"usage":{...}}`.
+        Rate limited to 60 requests per user per hour.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Streaming NDJSON response
+          content:
+            application/x-ndjson:
+              schema:
+                type: string
+                description: >
+                  One JSON object per line.
+                  `{"delta":"text"}` for content tokens.
+                  `{"done":true,"usage":{"inputTokens":N,"outputTokens":N}}` at end.
+                  `{"error":"rate_limit","message":"...","resetAt":"ISO8601"}` if rate limited.
+                  `{"error":"ai_unavailable","message":"..."}` if Ollama is down.
+        '400':
+          description: Validation error (message empty or too long)
+        '401':
+          description: Not authenticated
+        '429':
+          description: AI rate limit exceeded (60 req/user/hour)
+        '503':
+          description: Ollama is not running
+
+  /ai/health:
+    get:
+      tags: [AI]
+      summary: Check Ollama reachability and loaded model
+      description: >
+        Used by the frontend to show a "starting up" message when Ollama is not yet ready.
+        The frontend polls this every 10 s when status is degraded, and auto-enables the chat panel when healthy.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ollama is running and healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiHealthResponse'
+        '503':
+          description: Ollama is not reachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiHealthResponse'
+
+# ── WebSocket Events (informational, not part of REST) ────────
+# ConnectHub uses STOMP over SockJS at ws://localhost:9090/ws
+# JWT is passed as the 'Authorization' STOMP connect header.
+#
+# SUBSCRIBE  /topic/chat/{conversationId}     — incoming messages for a conversation
+# SUBSCRIBE  /user/queue/notifications        — personal real-time notifications (user-scoped)
+# SUBSCRIBE  /topic/typing/{conversationId}   — typing indicators
+# SEND       /app/send-message               — broadcast a new message
+# SEND       /app/typing                     — emit typing indicator
+#
+# Message payload (from /topic/chat/{id}):
+#   { id, conversationId, sender: {UserResponse}, content, messageType, createdAt }
+#
+# Notification payload (from /user/queue/notifications):
+#   { id, type, message, referenceId, actorId, createdAt }
+#
+# Typing payload (from /topic/typing/{id}):
+#   { userId, username, isTyping }

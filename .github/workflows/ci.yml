@@ -1,0 +1,181 @@
+name: CI — Build, Test & Docker
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: "21"
+  NODE_VERSION: "20"
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/connecthub
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # 1. Backend — build & unit tests
+  # ─────────────────────────────────────────────────────────────
+  backend-test:
+    name: Backend — Maven build + tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build and run tests (unit + integration)
+        working-directory: backend
+        run: mvn --no-transfer-progress clean verify
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: backend/target/surefire-reports/
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/target/site/jacoco/
+
+  # ─────────────────────────────────────────────────────────────
+  # 2. Frontend — install & lint
+  # ─────────────────────────────────────────────────────────────
+  frontend-build:
+    name: Frontend — npm install + build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build (Vite production)
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: http://localhost:9090
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+
+  # ─────────────────────────────────────────────────────────────
+  # 3. Docker — build images (always); push only on main/master
+  # ─────────────────────────────────────────────────────────────
+  docker:
+    name: Docker — build ${{ matrix.service }} image
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-build]
+    strategy:
+      matrix:
+        include:
+          - service: backend
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            image: connecthub-backend
+          - service: frontend
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+            image: connecthub-frontend
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+
+      - name: Build (and push if on main)
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────────────────────
+  # 4. E2E — Playwright (requires running stack, run manually)
+  # ─────────────────────────────────────────────────────────────
+  # Uncomment to enable E2E in CI (needs postgres + ollama services)
+  # e2e:
+  #   name: E2E — Playwright
+  #   runs-on: ubuntu-latest
+  #   needs: docker
+  #   services:
+  #     postgres:
+  #       image: postgres:16-alpine
+  #       env:
+  #         POSTGRES_DB: socialmedia
+  #         POSTGRES_USER: socialmedia
+  #         POSTGRES_PASSWORD: socialmedia
+  #       ports:
+  #         - 5432:5432
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Start backend + frontend via compose
+  #       run: docker compose -f docker-compose.yml up -d backend frontend
+  #     - name: Wait for backend
+  #       run: npx wait-on http://localhost:9090/api/v1/health --timeout 60000
+  #     - name: Install Playwright
+  #       working-directory: e2e
+  #       run: npm ci && npx playwright install --with-deps
+  #     - name: Run E2E tests
+  #       working-directory: e2e
+  #       run: npm test
+  #     - name: Upload Playwright report
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: playwright-report
+  #         path: e2e/playwright-report/

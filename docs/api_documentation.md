@@ -1,14 +1,17 @@
-﻿# API Documentation
+# API Documentation
 ## ConnectHub Social Media Platform - Complete API Reference
 
-**Version:** 1.0.0  
-**Base URL:** `https://api.connecthub.com/api/v1`  
-**Last Updated:** February 07, 2026  
+**Version:** 1.2.0  
+**Base URL (local dev):** `http://localhost:9090/api/v1` | **Frontend:** `http://localhost:3001`  
+**Last Updated:** February 24, 2026  
 **Status:** Production Ready
+
+> **v1.1 additions:** AI Assistant endpoint (`/ai/chat`) — powered by **Ollama** (free local LLM, no API key). See Section 17A and `docs/ai_assistant.md` for streaming protocol details.
+> **v1.2 additions:** Post editing (`PUT /posts/{id}`), Bookmarks toggle (`POST /posts/{id}/bookmark`), Saved posts list (`GET /users/me/bookmarks`), Real-time messaging via WebSocket (STOMP over SockJS at `/ws`).
 
 ---
 
-## ðŸ“– Table of Contents
+## 📖 Table of Contents
 
 1. [Introduction](#1-introduction)
 2. [Getting Started](#2-getting-started)
@@ -44,16 +47,16 @@
 ConnectHub API is a comprehensive RESTful API that provides programmatic access to all features of the ConnectHub social media platform. Built with modern technologies and industry best practices, it enables developers to create powerful applications, integrations, and extensions.
 
 **Key Features:**
-- âœ… RESTful architecture with JSON responses
-- âœ… JWT-based authentication
-- âœ… OAuth2 social login support
-- âœ… Real-time WebSocket connections
-- âœ… Comprehensive error handling
-- âœ… Rate limiting and throttling
-- âœ… Extensive filtering and pagination
-- âœ… Webhook support for events
-- âœ… Batch operations
-- âœ… File upload and media processing
+- ✅ RESTful architecture with JSON responses
+- ✅ JWT-based authentication
+- ✅ OAuth2 social login support
+- ✅ Real-time WebSocket connections
+- ✅ Comprehensive error handling
+- ✅ Rate limiting and throttling
+- ✅ Extensive filtering and pagination
+- ✅ Webhook support for events
+- ✅ Batch operations
+- ✅ File upload and media processing
 
 ### 1.2 API Principles
 
@@ -800,7 +803,7 @@ For private accounts:
 **Request:**
 ```json
 {
-  "content": "Just launched my new project! ðŸš€ #tech #launch",
+  "content": "Just launched my new project! 🚀 #tech #launch",
   "mediaIds": [123, 124],
   "privacyLevel": "public",
   "location": "San Francisco, CA"
@@ -821,7 +824,7 @@ For private accounts:
       "profilePictureUrl": "...",
       "isVerified": true
     },
-    "content": "Just launched my new project! ðŸš€ #tech #launch",
+    "content": "Just launched my new project! 🚀 #tech #launch",
     "media": [
       {
         "id": 123,
@@ -874,28 +877,34 @@ For private accounts:
 
 **Endpoint:** `PUT /posts/{id}`  
 **Auth:** Required (author only)  
-**Note:** Can only edit within 15 minutes of creation
+**Ownership:** 403 Forbidden if requester is not the post author
 
 **Request:**
 ```json
 {
   "content": "Updated content",
-  "privacyLevel": "followers"
+  "privacy": "FOLLOWERS_ONLY"
 }
 ```
+
+Privacy values: `PUBLIC`, `FOLLOWERS_ONLY`, `PRIVATE`
 
 **Response (200):**
 ```json
 {
-  "status": "success",
-  "data": {
-    "id": 456,
-    "content": "Updated content",
-    "isEdited": true,
-    "editedAt": "2026-02-07T10:32:00Z"
-  }
+  "id": 456,
+  "content": "Updated content",
+  "privacy": "FOLLOWERS_ONLY",
+  "author": { "id": 123, "username": "johndoe", "displayName": "John Doe" },
+  "likesCount": 45,
+  "commentsCount": 12,
+  "likedByCurrentUser": false,
+  "createdAt": "2026-02-07T09:00:00Z",
+  "updatedAt": "2026-02-07T10:32:00Z"
 }
 ```
+
+**Note:** The frontend displays an *(edited)* badge when `updatedAt` differs from `createdAt`.
 
 ### 9.4 Delete Post
 
@@ -1044,38 +1053,49 @@ For private accounts:
 }
 ```
 
-### 9.11 Bookmark Post
+### 9.11 Toggle Bookmark
 
-**Endpoint:** `POST /posts/{id}/bookmark`
+**Endpoint:** `POST /posts/{id}/bookmark`  
+**Auth:** Required  
+**Behaviour:** Single toggle endpoint — bookmarks the post if not already saved, removes the bookmark if it is. No request body needed.
 
-**Request:**
+**Response (200) — Bookmarked:**
 ```json
 {
-  "collectionName": "Tech Reads"
+  "status": "success",
+  "data": {
+    "bookmarked": true
+  }
 }
 ```
+
+**Response (200) — Unbookmarked:**
+```json
+{
+  "status": "success",
+  "data": {
+    "bookmarked": false
+  }
+}
+```
+
+### 9.12 Get Saved Posts (Bookmarks)
+
+**Endpoint:** `GET /users/me/bookmarks?page=0&size=20`  
+**Auth:** Required
 
 **Response (200):**
 ```json
 {
   "status": "success",
   "data": {
-    "postId": 456,
-    "collectionName": "Tech Reads",
-    "bookmarkedAt": "2026-02-07T10:30:00Z"
+    "content": [ /* array of PostResponse objects, newest bookmark first */ ],
+    "page": 0,
+    "size": 20,
+    "totalElements": 42,
+    "totalPages": 3,
+    "last": false
   }
-}
-```
-
-### 9.12 Remove Bookmark
-
-**Endpoint:** `DELETE /posts/{id}/bookmark`
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "message": "Bookmark removed"
 }
 ```
 
@@ -1163,60 +1183,61 @@ For private accounts:
 
 ### 12.1 Get Conversations
 
-**Endpoint:** `GET /conversations?page=0&size=20`
+**Endpoint:** `GET /messages/conversations`  
+**Auth:** Required  
+Returns all conversations the current user participates in, ordered by most recent message.
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 123,
+      "otherUser": {
+        "id": 234,
+        "username": "janedoe",
+        "displayName": "Jane Doe",
+        "avatarUrl": "..."
+      },
+      "lastMessage": {
+        "id": 456,
+        "content": "Hey!",
+        "senderId": 234,
+        "isRead": false,
+        "createdAt": "2026-02-07T10:25:00Z"
+      },
+      "updatedAt": "2026-02-07T10:25:00Z"
+    }
+  ]
+}
+```
+
+### 12.2 Send Message (Start or Continue Conversation)
+
+**Endpoint:** `POST /messages`  
+**Auth:** Required  
+If a conversation with the recipient already exists, the message is appended to that thread. Otherwise a new conversation is created automatically.
+
+**Request:**
+```json
+{
+  "recipientId": 234,
+  "content": "Hello!"
+}
+```
 
 **Response (200):**
 ```json
 {
   "status": "success",
   "data": {
-    "content": [
-      {
-        "id": 123,
-        "type": "direct",
-        "participants": [
-          {
-            "id": 234,
-            "username": "janedoe",
-            "displayName": "Jane Doe",
-            "isOnline": true
-          }
-        ],
-        "lastMessage": {
-          "id": 456,
-          "content": "Hey!",
-          "createdAt": "2026-02-07T10:25:00Z"
-        },
-        "unreadCount": 2,
-        "updatedAt": "2026-02-07T10:25:00Z"
-      }
-    ],
-    "totalUnread": 5,
-    "page": {...}
-  }
-}
-```
-
-### 12.2 Create Conversation
-
-**Endpoint:** `POST /conversations`
-
-**Request:**
-```json
-{
-  "participantIds": [234],
-  "type": "direct"
-}
-```
-
-**Response (201):**
-```json
-{
-  "status": "success",
-  "data": {
     "id": 789,
-    "type": "direct",
-    "participants": [...],
+    "conversationId": 123,
+    "senderId": 123,
+    "content": "Hello!",
+    "messageType": "text",
+    "isRead": false,
     "createdAt": "2026-02-07T10:30:00Z"
   }
 }
@@ -1224,7 +1245,9 @@ For private accounts:
 
 ### 12.3 Get Messages
 
-**Endpoint:** `GET /conversations/{id}/messages?page=0&size=50`
+**Endpoint:** `GET /messages/conversations/{conversationId}/messages?page=0&size=40`  
+**Auth:** Required  
+Paginated message history for a single conversation, ordered newest-first.
 
 **Response (200):**
 ```json
@@ -1234,67 +1257,34 @@ For private accounts:
     "content": [
       {
         "id": 456,
-        "sender": {...},
+        "conversationId": 123,
+        "senderId": 234,
         "content": "Hey!",
         "messageType": "text",
         "isRead": true,
         "createdAt": "2026-02-07T10:25:00Z"
       }
     ],
-    "page": {...}
+    "page": 0,
+    "size": 40,
+    "totalElements": 87,
+    "totalPages": 3,
+    "last": false
   }
 }
 ```
 
-### 12.4 Send Message
+### 12.4 Mark Conversation as Read
 
-**Endpoint:** `POST /conversations/{id}/messages`
-
-**Request:**
-```json
-{
-  "content": "Hello!",
-  "messageType": "text"
-}
-```
-
-**Response (201):**
-```json
-{
-  "status": "success",
-  "data": {
-    "id": 789,
-    "content": "Hello!",
-    "createdAt": "2026-02-07T10:30:00Z"
-  }
-}
-```
-
-### 12.5 Mark as Read
-
-**Endpoint:** `PUT /messages/{id}/read`
+**Endpoint:** `PUT /messages/conversations/{conversationId}/read`  
+**Auth:** Required  
+Marks all unread messages in the conversation as read for the current user.
 
 **Response (200):**
 ```json
 {
   "status": "success",
-  "data": {
-    "messageId": 456,
-    "isRead": true,
-    "readAt": "2026-02-07T10:30:00Z"
-  }
-}
-```
-
-### 12.6 Delete Message
-
-**Endpoint:** `DELETE /messages/{id}?deleteForAll=false`
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "message": "Message deleted"
+  "message": "Marked as read"
 }
 ```
 
@@ -1687,22 +1677,132 @@ Form Data:
 
 ---
 
+## 17A. AI Assistant Endpoint
+
+### Overview
+
+The AI Assistant (`Spark`) is powered by **Ollama** — a free, locally-installed LLM runner. No API key is required. All inference happens on the server running ConnectHub (your machine or Docker container). No data leaves your infrastructure.
+
+The client sends messages via `POST /ai/chat` and receives a **streaming NDJSON response** — one JSON object per line — that renders progressively in the chat panel.
+
+**Model:** `llama3.2:3b` (default) — runs on CPU, no GPU required, ~2 GB download (once).
+**Rate limit:** 60 requests per user per hour (server protection, not cost-based).
+**Ollama URL:** `http://localhost:11434` (local) or `http://ollama:11434` (Docker network).
+
+> For architecture, Ollama setup, Docker integration, prompt engineering, and full implementation guide, see `docs/ai_assistant.md`.
+> For developer setup instructions, see `SETUP_GUIDE.md`.
+
+### POST /ai/chat
+
+**Auth:** Required (JWT Bearer)  
+**Content-Type:** `application/json`  
+**Response Content-Type:** `application/x-ndjson` (streaming)
+
+**Request:**
+```json
+{
+  "message": "Help me write a post about my morning run",
+  "conversationHistory": [
+    { "role": "user",      "content": "Hi" },
+    { "role": "assistant", "content": "Hello! How can I help?" }
+  ],
+  "context": "general"
+}
+```
+
+**Field reference:**
+
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| message | string | ✅ | 1–1000 characters |
+| conversationHistory | array | No | Max 20 items (10 turns) |
+| context | string | No | `general` \| `feed_summary` \| `post_improve` |
+
+**Streaming Response (200):** Each line is a JSON object.
+```
+{"delta":"Here"}
+{"delta":" is"}
+{"delta":" a post idea..."}
+{"done":true,"usage":{"inputTokens":145,"outputTokens":87}}
+```
+
+**Error Responses:**
+```json
+// 400 — validation failure
+{ "status": "error", "message": "Message must not exceed 1000 characters" }
+
+// 401 — unauthenticated
+{ "status": "error", "message": "Authentication required" }
+
+// 429 — rate limited
+{ "status": "error", "message": "AI rate limit reached",
+  "resetAt": "2026-02-22T15:30:00Z", "remaining": 0 }
+
+// 503 — Ollama unavailable
+{ "status": "error", "message": "AI service temporarily unavailable" }
+```
+
+**Context modes:**
+
+| Context | What the backend does |
+|---------|----------------------|
+| `general` | Injects user's display name, bio, follower/following count into system prompt |
+| `feed_summary` | Fetches user's latest 20 PUBLIC feed posts and summarises them as context |
+| `post_improve` | No extra DB fetch — draft text is in the message; backend prompts Ollama to rewrite and suggest hashtags |
+
+---
+
+### GET /ai/health
+
+Check whether Ollama is reachable and which model is loaded. Useful for the frontend to show a graceful "starting up" message if Ollama is not yet ready.
+
+**Auth:** Required (JWT Bearer)
+
+**Response (200) — Ollama running:**
+```json
+{
+  "status": "ok",
+  "ollamaReachable": true,
+  "model": "llama3.2:3b",
+  "ollamaUrl": "http://localhost:11434"
+}
+```
+
+**Response (503) — Ollama not running:**
+```json
+{
+  "status": "degraded",
+  "ollamaReachable": false,
+  "model": "llama3.2:3b",
+  "message": "Ollama is not running. Start it with: ollama serve"
+}
+```
+
+> The frontend polls this endpoint every 10 s when Ollama is unavailable, and automatically re-enables the chat panel when it becomes healthy.
+
+---
+
 ## 17. WebSocket Real-time Events
 
 ### 17.1 Connection
 
-**URL:** `wss://ws.connecthub.com/ws`
+**URL:** `ws://localhost:9090/ws` (local dev) — SockJS + STOMP over WebSocket  
+**Protocol:** STOMP v1.2 over SockJS fallback
 
 **Connection:**
 ```javascript
-const socket = new WebSocket('wss://ws.connecthub.com/ws');
-const stomp = Stomp.over(socket);
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 
-stomp.connect(
-  {'Authorization': 'Bearer ' + token},
-  onConnected,
-  onError
-);
+const client = new Client({
+  webSocketFactory: () => new SockJS('http://localhost:9090/ws'),
+  connectHeaders: { Authorization: 'Bearer ' + token },
+  onConnect: () => { /* subscribe here */ },
+  onDisconnect: () => { /* handle disconnect */ },
+  reconnectDelay: 5000,
+});
+
+client.activate();
 ```
 
 ### 17.2 Subscribe to Chat
@@ -1773,17 +1873,26 @@ stomp.subscribe('/topic/typing/123', (event) => {
 
 ### 17.6 Real-time Notifications
 
-**Topic:** `/topic/notifications/{userId}`
+**Topic:** `/user/queue/notifications` (user-scoped — only the authenticated user receives their own notifications)
 
 **Event:**
 ```json
 {
   "id": 456,
-  "type": "like",
-  "content": "janedoe liked your post",
-  "actor": {...},
+  "type": "LIKE",
+  "message": "janedoe liked your post",
+  "referenceId": 789,
+  "actorId": 234,
   "createdAt": "2026-02-07T10:30:00Z"
 }
+```
+
+**Subscribe:**
+```javascript
+client.subscribe('/user/queue/notifications', (frame) => {
+  const notification = JSON.parse(frame.body);
+  dispatch(addNotification(notification));
+});
 ```
 
 ---
@@ -2360,29 +2469,29 @@ A: Follow the migration guide with breaking changes and update examples.
 ## 24. Support & Resources
 
 ### 24.1 Documentation
-- ðŸ“š Full Docs: https://docs.connecthub.com
-- ðŸŽ“ Tutorials: https://youtube.com/connecthub-dev
-- ðŸ“– API Reference: https://api.connecthub.com/docs
+- 📚 Full Docs: https://docs.connecthub.com
+- 🎓 Tutorials: https://youtube.com/connecthub-dev
+- 📖 API Reference: https://api.connecthub.com/docs
 
 ### 24.2 Community
-- ðŸ’¬ Forum: https://forum.connecthub.com
-- ðŸ› Issues: https://github.com/connecthub/api/issues
-- ðŸ’¡ Discord: https://discord.gg/connecthub
-- ðŸ¦ Twitter: @ConnectHubDev
+- 💬 Forum: https://forum.connecthub.com
+- 🐛 Issues: https://github.com/connecthub/api/issues
+- 💡 Discord: https://discord.gg/connecthub
+- 🐦 Twitter: @ConnectHubDev
 
 ### 24.3 Support
-- âœ‰ï¸ Email: api-support@connecthub.com
-- ðŸš¨ Emergency: emergency@connecthub.com
-- â±ï¸ Response: 24-48 hours
+- ✉️ Email: api-support@connecthub.com
+- 🚨 Emergency: emergency@connecthub.com
+- ⏱️ Response: 24-48 hours
 
 ### 24.4 Status
-- ðŸ“Š API Status: https://status.connecthub.com
-- ðŸ“ Changelog: https://connecthub.com/changelog
-- ðŸ”” Updates: Subscribe to developer newsletter
+- 📊 API Status: https://status.connecthub.com
+- 📝 Changelog: https://connecthub.com/changelog
+- 🔔 Updates: Subscribe to developer newsletter
 
 ---
 
-## ðŸ“‹ Quick Reference
+## 📋 Quick Reference
 
 ### Authentication
 ```bash
@@ -2402,26 +2511,38 @@ GET    /users/{id}/posts
 ### Posts
 ```bash
 POST   /posts
+GET    /posts/feed
 GET    /posts/{id}
-PUT    /posts/{id}
+PUT    /posts/{id}                  # Edit (author only)
 DELETE /posts/{id}
 POST   /posts/{id}/like
+DELETE /posts/{id}/like
+POST   /posts/{id}/bookmark          # Toggle bookmark
+GET    /posts/{id}/comments
 POST   /posts/{id}/comments
+DELETE /posts/{postId}/comments/{id}
 ```
 
-### Feed
+### Bookmarks
 ```bash
-GET /feed
-GET /feed/trending
-GET /feed/explore
+GET  /users/me/bookmarks             # Saved posts (paginated)
 ```
 
 ### Messaging
 ```bash
-GET  /conversations
-POST /conversations
-GET  /conversations/{id}/messages
-POST /conversations/{id}/messages
+GET  /messages/conversations
+POST /messages                       # Send (creates conversation if needed)
+GET  /messages/conversations/{id}/messages
+PUT  /messages/conversations/{id}/read
+```
+
+### WebSocket (STOMP)
+```bash
+CONNECT  ws://localhost:9090/ws      # SockJS endpoint
+SUB      /topic/chat/{conversationId}        # Incoming messages
+SUB      /user/queue/notifications            # Personal notifications
+SEND     /app/send-message                   # Send WS message
+SEND     /app/typing                         # Typing indicator
 ```
 
 ### Search
@@ -2433,25 +2554,24 @@ GET /search/hashtags?q=
 
 ---
 
-## ðŸŽ¯ Summary
+## 🎯 Summary
 
 This API documentation provides:
-- âœ… Complete endpoint reference (100+ endpoints)
-- âœ… Request/response examples
-- âœ… Error handling guide
-- âœ… Rate limiting details
-- âœ… WebSocket real-time events
-- âœ… Code examples (React, Node, Python, Java)
-- âœ… SDK documentation
-- âœ… Best practices
-- âœ… Troubleshooting guide
-- âœ… FAQ and support resources
+- ✅ Complete endpoint reference (100+ endpoints)
+- ✅ Request/response examples
+- ✅ Error handling guide
+- ✅ Rate limiting details
+- ✅ WebSocket real-time events
+- ✅ Code examples (React, Node, Python, Java)
+- ✅ SDK documentation
+- ✅ Best practices
+- ✅ Troubleshooting guide
+- ✅ FAQ and support resources
 
-**Version:** 1.0.0  
-**Last Updated:** February 07, 2026  
-**Status:** âœ… **COMPLETE & PRODUCTION READY**
+**Version:** 1.2.0  
+**Last Updated:** February 24, 2026  
+**Status:** ✅ **COMPLETE & PRODUCTION READY**
 
 ---
 
-*Built with â¤ï¸ by the ConnectHub Team*
-
+*Built with ❤️ by the ConnectHub Team*

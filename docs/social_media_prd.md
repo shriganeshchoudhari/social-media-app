@@ -1,4 +1,4 @@
-﻿# Product Requirements Document (PRD)
+# Product Requirements Document (PRD)
 ## Social Media Clone Application
 
 ---
@@ -61,17 +61,20 @@ To create a scalable, secure, and user-friendly social media platform that foste
 ## 3. Product Scope
 
 ### 3.1 In Scope (MVP - Phase 1)
-âœ… User authentication and authorization
-âœ… User profile management
-âœ… Post creation (text, images)
-âœ… News feed with basic algorithm
-âœ… Social interactions (like, comment, share)
-âœ… Follow/unfollow system
-âœ… Direct messaging (text)
-âœ… Notifications
-âœ… Search functionality
-âœ… Hashtags
-âœ… Privacy settings
+✅ User authentication and authorization
+✅ User profile management
+✅ Post creation (text, images)
+✅ Post editing (inline editor, author-only; *(edited)* badge on UI)
+✅ News feed with basic algorithm
+✅ Social interactions (like, comment, share)
+✅ Follow/unfollow system
+✅ Bookmarks / saved posts (toggle + personal saved-posts page)
+✅ Direct messaging (text, real-time via WebSocket/STOMP)
+✅ Real-time notifications (WebSocket push + polling fallback)
+✅ AI Assistant (Spark) — powered by Ollama, local LLM, no API key required
+✅ Search functionality
+✅ Hashtags
+✅ Privacy settings
 
 ### 3.2 Future Phases
 
@@ -84,7 +87,7 @@ To create a scalable, secure, and user-friendly social media platform that foste
 - Live streaming
 
 **Phase 3 (6-12 months post-MVP):**
-- AI-powered recommendations
+- AI-powered feed recommendations (algorithmic ranking)
 - Analytics dashboard
 - Monetization features
 - AR filters
@@ -92,10 +95,10 @@ To create a scalable, secure, and user-friendly social media platform that foste
 - Advanced moderation tools
 
 ### 3.3 Out of Scope
-âŒ Native mobile apps (Phase 1)
-âŒ Blockchain integration
-âŒ Cryptocurrency payments
-âŒ VR/AR experiences (Phase 1)
+❌ Native mobile apps (Phase 1)
+❌ Blockchain integration
+❌ Cryptocurrency payments
+❌ VR/AR experiences (Phase 1)
 
 ---
 
@@ -161,7 +164,7 @@ To create a scalable, secure, and user-friendly social media platform that foste
 - Privacy settings (public, followers, private)
 
 **FR-3.2: Post Actions**
-- Edit posts (within 15 minutes)
+- Edit posts — inline editor in PostCard; Ctrl+Enter to save, Esc to cancel; 2000-char limit; *(edited)* badge when `updatedAt` differs from `createdAt`
 - Delete posts
 - Pin posts to profile
 - Save drafts
@@ -194,9 +197,10 @@ To create a scalable, secure, and user-friendly social media platform that foste
 - Share external links
 
 **FR-4.4: Save/Bookmark**
-- Save posts for later
-- Organize saved posts in collections
-- Private bookmarks
+✅ Toggle bookmark via `POST /api/v1/posts/{id}/bookmark` — single endpoint (inserts or removes)
+✅ Personal bookmarks page at `/bookmarks` showing saved posts newest-first
+✅ Bookmark icon in PostCard fills when saved; state managed in Redux `bookmarksSlice`
+- Organize saved posts in named collections (future)
 
 ### 4.5 Follow System
 
@@ -1023,14 +1027,17 @@ GET /api/v1/search/hashtags?q={query}
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-02-07 | Product Team | Initial PRD creation |
+| 1.1 | 2026-02-21 | Engineering | Added AI Assistant (Spark/Ollama) — moved to Phase 1 implemented |
+| 1.2 | 2026-02-24 | Engineering | Added post editing, bookmarks, real-time messaging & notifications |
+| 1.3 | 2026-02-25 | Engineering | Updated scope table, FR-3.2, FR-4.4; moved AI from Phase 3 to Phase 1 |
 
 ---
 
 ## 17. Approval
 
 **Prepared by:** Product Team  
-**Review Date:** 2025-02-07  
-**Next Review:** 2025-03-07
+**Review Date:** 2026-02-25  
+**Next Review:** 2026-03-25
 
 **Approvals Required:**
 - [ ] Product Manager

@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "Social Media API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "",
+              "pm.test('Response body is object or array', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json, 'response is array or object').to.be.ok;",
+              "  pm.expect(Array.isArray(json) || (json && typeof json === 'object')).to.be.true;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Post",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \"Test Post\", \"body\": \"This is a test\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/posts"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "",
+              "pm.test('Post id present', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.be.an('object');",
+              "  pm.expect(json.id, 'post id present').to.exist;",
+              "});",
+              "",
+              "// Persist created id for subsequent request (falls back if API doesn't return id)",
+              "try {",
+              "  const json = pm.response.json();",
+              "  if (json && json.id !== undefined && json.id !== null) {",
+              "    pm.environment.set('postId', String(json.id));",
+              "  }",
+              "} catch (e) {}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Post by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/posts/{{postId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "",
+              "pm.test('id matches environment postId', function () {",
+              "  const json = pm.response.json();",
+              "  const expected = pm.environment.get('postId');",
+              "  pm.expect(json).to.be.an('object');",
+              "  pm.expect(String(json.id), 'id matches').to.eql(String(expected));",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

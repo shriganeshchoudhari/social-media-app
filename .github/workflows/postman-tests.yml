@@ -1,0 +1,45 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+  schedule:
+    - cron: "0 * * * *"  # hourly
+  workflow_dispatch:
+
+jobs:
+  postman-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman collection (Newman)
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
+        run: |
+          newman run "postman_collections/Social Media API Tests.postman_collection.json" \
+            -e "postman_environments/local.postman_environment.json" \
+            --env-var "baseUrl=${BASE_URL:-http://localhost:3000}" \
+            --env-var "apiKey=${API_KEY}" \
+            --reporters cli,junit \
+            --reporter-junit-export "newman-results.xml"
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-results
+          path: |
+            newman-results.xml

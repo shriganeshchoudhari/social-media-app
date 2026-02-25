@@ -1170,53 +1170,203 @@ Content-Type: application/json
 
 
 # ═══════════════════════════════════════════════════════════════
-# 11. SECURITY & HEADERS
+# 11. AI ASSISTANT (Spark) — powered by Ollama (free, local, no API key)
+# ═══════════════════════════════════════════════════════════════
+# Requires: backend running, Ollama running (ollama serve), user authenticated
+# Install: https://ollama.com/download  then:  ollama pull llama3.2:3b
+# Ollama URL: http://localhost:11434 (or http://ollama:11434 inside Docker)
+# Responses are NDJSON-streamed; REST Client shows the raw token stream
+#
+# Stream format:
+#   Token: {"delta":"<text>"}
+#   End:   {"done":true}
+#   Error: {"error":"rate_limit"|"ai_unavailable","message":"...","retryable":true}
+
+### 11.1 AI Health check ✅ — verify Ollama is reachable
+GET {{baseUrl}}/ai/health
+Authorization: Bearer {{token}}
+
+###
+
+### 11.2 AI Health check — Ollama running ✅ (expect 200, ollamaReachable: true)
+# Alias for 11.1 — useful to run as standalone sanity check before testing chat
+GET {{baseUrl}}/ai/health
+Authorization: Bearer {{token}}
+
+###
+
+### 11.3 AI Health check ❌ — no auth (expect 401)
+GET {{baseUrl}}/ai/health
+
+###
+
+### 11.4 AI Chat — general question ✅
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "What can you help me with on ConnectHub?",
+  "context": "general"
+}
+
+###
+
+### 11.5 AI Chat — feed summary ✅
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "Summarise what's in my feed today",
+  "context": "feed_summary"
+}
+
+###
+
+### 11.6 AI Chat — improve a post draft ✅
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "Improve this post: 'went for a run this morning it was pretty good'",
+  "context": "post_improve"
+}
+
+###
+
+### 11.7 AI Chat — people recommendations ✅
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "Who should I follow based on my interests?",
+  "context": "general"
+}
+
+###
+
+### 11.8 AI Chat — multi-turn conversation ✅
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "Can you make it shorter?",
+  "conversationHistory": [
+    { "role": "user",      "content": "Write a post about coffee" },
+    { "role": "assistant", "content": "Here is a post idea: Morning coffee ritual — the smell, the warmth, the focus it brings. There's something almost meditative about that first cup. #MorningRoutine #CoffeeLover" }
+  ],
+  "context": "post_improve"
+}
+
+###
+
+### 11.9 AI Chat ❌ — no auth (expect 401)
+POST {{baseUrl}}/ai/chat
+Content-Type: application/json
+
+{
+  "message": "Hello"
+}
+
+###
+
+### 11.10 AI Chat ❌ — empty message (expect 400)
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": ""
+}
+
+###
+
+### 11.11 AI Chat ❌ — message too long (expect 400)
+# message is 1001 characters
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}
+
+###
+
+### 11.12 AI Chat — invalid context value ❌ (expect 400)
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message": "Hello",
+  "context": "invalid_context_value"
+}
+
+###
+
+### 11.13 AI Chat ❌ — invalid token (expect 401)
+POST {{baseUrl}}/ai/chat
+Authorization: Bearer not.a.real.token
+Content-Type: application/json
+
+{
+  "message": "Hello"
+}
+
+
+# ═══════════════════════════════════════════════════════════════
+# 12. SECURITY & HEADERS
 # ═══════════════════════════════════════════════════════════════
 
-### 11.1 Protected endpoint — no token (expect 401)
+### 12.1 Protected endpoint — no token (expect 401)
 GET {{baseUrl}}/users/me
 
 ###
 
-### 11.2 Protected endpoint — invalid token (expect 401)
+### 12.2 Protected endpoint — invalid token (expect 401)
 GET {{baseUrl}}/users/me
 Authorization: Bearer not.a.valid.jwt.token
 
 ###
 
-### 11.3 Protected endpoint — tampered signature (expect 401)
+### 12.3 Protected endpoint — tampered signature (expect 401)
 GET {{baseUrl}}/posts/feed
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSJ9.invalidsignature
 
 ###
 
-### 11.4 Protected endpoint — expired token structure (expect 401)
+### 12.4 Protected endpoint — expired token structure (expect 401)
 GET {{baseUrl}}/notifications
 Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbGljZSIsImlhdCI6MTAwMDAwMDAwMCwiZXhwIjoxMDAwMDg2NDAwfQ.fake_sig
 
 ###
 
-### 11.5 X-Content-Type-Options header check ✅
+### 12.5 X-Content-Type-Options header check ✅
 # Verify "nosniff" in response headers
 GET {{baseUrl}}/users/alice
 Authorization: Bearer {{token}}
 
 ###
 
-### 11.6 X-RateLimit headers check ✅
+### 12.6 X-RateLimit headers check ✅
 # Verify X-RateLimit-Limit and X-RateLimit-Remaining are present
 GET {{baseUrl}}/posts/feed?page=0&size=1
 Authorization: Bearer {{token}}
 
 ###
 
-### 11.7 SQL injection in search — should return 200 (not 500)
+### 12.7 SQL injection in search — should return 200 (not 500)
 GET {{baseUrl}}/search/users?q=%27+OR+%271%27%3D%271
 Authorization: Bearer {{token}}
 
 ###
 
-### 11.8 XSS payload in post content — stored safely, not executed
+### 12.8 XSS payload in post content — stored safely, not executed
 POST {{baseUrl}}/posts
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -1228,12 +1378,12 @@ Content-Type: application/json
 
 ###
 
-### 11.9 No stack trace in 404 error body — verify clean error response
+### 12.9 No stack trace in 404 error body — verify clean error response
 GET {{baseUrl}}/posts/99999999
 Authorization: Bearer {{token}}
 
 ###
 
-### 11.10 Self-follow prevention ❌ — (expect 403)
+### 12.10 Self-follow prevention ❌ — (expect 403)
 POST {{baseUrl}}/users/alice/follow
 Authorization: Bearer {{token}}

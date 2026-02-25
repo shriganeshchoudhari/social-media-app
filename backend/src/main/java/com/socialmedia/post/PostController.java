@@ -41,6 +41,14 @@ public class PostController {
         return ResponseEntity.ok(postService.getById(id, currentUser));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PostResponse> update(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody CreatePostRequest req) {
+        return ResponseEntity.ok(postService.update(id, currentUser, req));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,

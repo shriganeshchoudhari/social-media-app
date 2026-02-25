@@ -1,19 +1,33 @@
 version: "3.9"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Local development stack for ConnectHub
+# ConnectHub — Full Local Development Stack
+#
+# Services:
+#   postgres      – PostgreSQL 16 database           → localhost:5432
+#   pgadmin       – Database admin UI                → localhost:5050
+#   ollama        – Local LLM runtime (Spark AI)     → localhost:11434
+#   ollama-init   – One-time model pull (llama3.2:3b)
+#   backend       – Spring Boot API                  → localhost:9090
+#   frontend      – React + Vite SPA                 → localhost:3001
 #
 # Usage:
-#   docker compose up -d          # start postgres (and optionally pgAdmin)
-#   docker compose down -v        # stop and wipe volumes
+#   docker compose up -d              # start all services
+#   docker compose logs -f ollama-init  # watch model download (first run only, ~2 GB)
+#   docker compose down               # stop all (data kept in volumes)
+#   docker compose down -v            # stop all AND wipe volumes
 #
-# Then run the backend with:
-#   cd backend
-#   DB_PASSWORD=secret mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+# AI model is stored in the 'ollama_data' volume — downloaded only once.
+# No API keys or secrets are required to run the AI assistant.
+#
+# Changing the AI model:
+#   Set AI_MODEL env var in the backend service, e.g. AI_MODEL=llama3.1:8b
+#   Then re-run: docker compose run --rm ollama-init ollama pull llama3.1:8b
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
 
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: connecthub-postgres
@@ -33,7 +47,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Optional pgAdmin UI – comment out if not needed
+  # ── pgAdmin UI ─────────────────────────────────────────────────────────────
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: connecthub-pgadmin
@@ -47,5 +61,117 @@ services:
       postgres:
         condition: service_healthy
 
+  # ── Ollama — Local LLM Runtime (Spark AI) ──────────────────────────────────
+  # Exposes an OpenAI-compatible REST API at port 11434.
+  # The model is stored in a named volume so it survives container restarts.
+  #
+  # GPU acceleration (optional — makes responses ~5–10× faster):
+  #   Uncomment the 'deploy' block below if you have an NVIDIA GPU.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: connecthub-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/version || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    # ── Uncomment for NVIDIA GPU support ───────────────────────────────────
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # ── Ollama Model Initialiser ───────────────────────────────────────────────
+  # Runs once on first 'docker compose up' to pull the AI model.
+  # Subsequent starts are instant (model is cached in ollama_data volume).
+  # Download size: ~2 GB for llama3.2:3b.
+  #
+  # To use a different model, change AI_MODEL here AND in the backend service.
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: connecthub-ollama-init
+    restart: "no"
+    environment:
+      OLLAMA_HOST: "http://ollama:11434"
+    entrypoint: ["ollama", "pull", "llama3.2:3b"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  # ── Spring Boot Backend ────────────────────────────────────────────────────
+  # Builds from ./backend using the Dockerfile at ./backend/Dockerfile.
+  # Waits for both postgres and ollama to be healthy before starting.
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: connecthub-backend
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    environment:
+      # Database
+      DB_HOST:     postgres
+      DB_PORT:     5432
+      DB_NAME:     socialmedia
+      DB_USER:     socialmedia
+      DB_PASSWORD: secret
+
+      # Spring profiles — 'dev' activates seed data (alice/bob/carol/dave/eve)
+      SPRING_PROFILES_ACTIVE: postgres,dev
+
+      # AI / Ollama — points to the internal Docker service name
+      OLLAMA_BASE_URL: http://ollama:11434
+      AI_MODEL:        llama3.2:3b
+      AI_MAX_TOKENS:   1024
+      AI_RATE_LIMIT_PER_HOUR: 60
+      AI_MAX_CONCURRENT:      3
+
+      # JWT — override in production
+      JWT_SECRET: 404e635266556a586e3272357538782f413f4428472b4b6250645367566b5970
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9090/actuator/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ── React + Vite Frontend ──────────────────────────────────────────────────
+  # Builds from ./frontend using the Dockerfile at ./frontend/Dockerfile.
+  # Vite proxies /api calls to the backend service on port 9090.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: connecthub-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      # Tells Vite where the backend is inside Docker network
+      VITE_API_BASE_URL: http://backend:9090
+    depends_on:
+      backend:
+        condition: service_healthy
+
+# ── Volumes ────────────────────────────────────────────────────────────────
 volumes:
   postgres_data:
+    # PostgreSQL data — survives container restarts
+  ollama_data:
+    # Ollama model cache — model is downloaded once (~2 GB) and reused

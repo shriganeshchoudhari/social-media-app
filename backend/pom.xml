@@ -35,6 +35,7 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- ── Spring Web (servlet stack) ──────────────────────── -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -91,6 +92,13 @@
             <artifactId>lombok</artifactId>
             <scope>compile</scope>
         </dependency>
+        <!-- ── WebSocket / STOMP ───────────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- ── Test ───────────────────────────────────────────── -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -99,6 +107,13 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- OkHttp MockWebServer: lightweight fake HTTP server for OllamaClient tests -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.12.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

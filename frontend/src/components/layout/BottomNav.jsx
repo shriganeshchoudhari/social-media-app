@@ -1,17 +1,20 @@
 import { NavLink } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { Home, Search, Bell, User } from 'lucide-react'
+import { Home, Search, Bell, User, MessageCircle } from 'lucide-react'
 import { selectUser } from '../../store/authSlice.js'
 import { selectUnreadCount } from '../../store/notificationsSlice.js'
+import { selectTotalUnread as selectMsgUnread } from '../../store/messagingSlice.js'
 
 export default function BottomNav() {
-  const user   = useSelector(selectUser)
-  const unread = useSelector(selectUnreadCount)
+  const user     = useSelector(selectUser)
+  const unread   = useSelector(selectUnreadCount)
+  const msgUnread = useSelector(selectMsgUnread)
 
   const links = [
-    { to: '/',              Icon: Home, label: 'Home' },
-    { to: '/search',        Icon: Search, label: 'Search' },
-    { to: '/notifications', Icon: Bell,   label: 'Alerts', badge: unread },
+    { to: '/',              Icon: Home,          label: 'Home' },
+    { to: '/search',        Icon: Search,        label: 'Search' },
+    { to: '/messages',      Icon: MessageCircle, label: 'DMs',   badge: msgUnread },
+    { to: '/notifications', Icon: Bell,          label: 'Alerts', badge: unread },
     { to: user ? `/profile/${user.username}` : '/login', Icon: User, label: 'Profile' },
   ]
 

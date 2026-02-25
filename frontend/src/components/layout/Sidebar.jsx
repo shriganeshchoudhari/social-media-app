@@ -1,14 +1,17 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Home, Search, Bell, User, LogOut } from 'lucide-react'
+import { Home, Search, Bell, User, LogOut, MessageCircle, Bookmark } from 'lucide-react'
 import { logout, selectUser } from '../../store/authSlice.js'
 import { selectUnreadCount } from '../../store/notificationsSlice.js'
+import { selectTotalUnread as selectMsgUnread } from '../../store/messagingSlice.js'
 import Avatar from '../ui/Avatar.jsx'
 
 const links = [
   { to: '/',             label: 'Home',          Icon: Home },
   { to: '/search',       label: 'Search',         Icon: Search },
+  { to: '/messages',     label: 'Messages',       Icon: MessageCircle, badge: 'messages' },
   { to: '/notifications',label: 'Notifications',  Icon: Bell },
+  { to: '/bookmarks',    label: 'Saved',          Icon: Bookmark },
 ]
 
 export default function Sidebar() {
@@ -16,6 +19,7 @@ export default function Sidebar() {
   const navigate  = useNavigate()
   const user      = useSelector(selectUser)
   const unread    = useSelector(selectUnreadCount)
+  const msgUnread = useSelector(selectMsgUnread)
 
   const handleLogout = () => {
     dispatch(logout())
@@ -31,27 +35,30 @@ export default function Sidebar() {
 
       {/* Nav links */}
       <nav className="flex flex-col gap-1 flex-1">
-        {links.map(({ to, label, Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors relative
-              ${isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`
-            }
-          >
-            <div className="relative">
-              <Icon size={20} />
-              {label === 'Notifications' && unread > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5">
-                  {unread > 99 ? '99+' : unread}
-                </span>
-              )}
-            </div>
-            {label}
-          </NavLink>
-        ))}
+        {links.map(({ to, label, Icon, badge }) => {
+          const badgeCount = badge === 'messages' ? msgUnread : (label === 'Notifications' ? unread : 0)
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors relative
+                ${isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`
+              }
+            >
+              <div className="relative">
+                <Icon size={20} />
+                {badgeCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5">
+                    {badgeCount > 99 ? '99+' : badgeCount}
+                  </span>
+                )}
+              </div>
+              {label}
+            </NavLink>
+          )
+        })}
 
         {user && (
           <NavLink

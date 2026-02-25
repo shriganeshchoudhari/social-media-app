@@ -23,7 +23,13 @@ const notificationsSlice = createSlice({
     totalPages:  0,
     loading:     false,
   },
-  reducers: {},
+  reducers: {
+    // Called by WebSocket hook when a real-time notification arrives
+    addNotification(state, { payload }) {
+      state.items.unshift(payload)
+      if (!payload.read) state.unreadCount += 1
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUnreadCount.fulfilled, (state, { payload }) => {
@@ -44,6 +50,7 @@ const notificationsSlice = createSlice({
   },
 })
 
+export const { addNotification } = notificationsSlice.actions
 export const selectNotifications = (s) => s.notifications.items
 export const selectUnreadCount   = (s) => s.notifications.unreadCount
 export const selectNotifLoading  = (s) => s.notifications.loading
