@@ -7,10 +7,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -32,6 +36,28 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(postService.getFeed(currentUser, PageRequest.of(page, size)));
+    }
+
+    /**
+     * Keyset-paginated feed — lower latency on deep pages.
+     * GET /api/v1/posts/feed/cursor?before=2024-03-01T10:00:00&size=20
+     * Response: { posts: [...], nextCursor: "ISO-8601" | null }
+     * Pass nextCursor as `before` in the next request. null = end of feed.
+     */
+    @GetMapping("/feed/cursor")
+    public ResponseEntity<java.util.Map<String, Object>> feedCursor(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime before,
+            @RequestParam(defaultValue = "20") int size) {
+
+        LocalDateTime cursor = before != null ? before : LocalDateTime.now();
+        List<PostResponse> posts = postService.getFeedBefore(currentUser, cursor, Math.min(size, 50));
+        String nextCursor = posts.isEmpty() ? null : posts.get(posts.size() - 1).getCreatedAt().toString();
+        return ResponseEntity.ok(java.util.Map.of(
+                "posts",      posts,
+                "nextCursor", nextCursor != null ? nextCursor : "",
+                "hasMore",    !posts.isEmpty()));
     }
 
     @GetMapping("/{id}")

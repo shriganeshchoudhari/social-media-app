@@ -1,0 +1,400 @@
+{
+  "info": {
+    "_postman_id": "ch-users-col-002",
+    "name": "02 - ConnectHub User Management",
+    "description": "User profile CRUD, password change, follow lists, and account deletion (TC-USER-001 to TC-USER-013).\n\nPrerequisite: Run collection 01 first so ALICE_TOKEN, BOB_TOKEN, CHARLIE_TOKEN are set.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "if (!pm.environment.get('ALICE_TOKEN')) {",
+          "    console.warn('ALICE_TOKEN not set — run collection 01 first');",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "✅ TC-USER-001 Get own profile (Alice)",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-USER-001: Returns alice user object', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.username).to.equal('alice');",
+              "    pm.expect(json).to.have.property('displayName');",
+              "    pm.expect(json).to.have.property('followersCount');",
+              "    pm.expect(json).to.have.property('followingCount');",
+              "    pm.expect(json).to.have.property('postsCount');",
+              "    pm.expect(json).to.have.property('role');",
+              "});",
+              "pm.test('TC-USER-001: Email present for own profile', () => {",
+              "    pm.expect(pm.response.json()).to.have.property('email');",
+              "});",
+              "pm.test('TC-USER-001: No password in response', () => {",
+              "    pm.expect(pm.response.text()).to.not.include('password');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "✅ TC-USER-002 Get Bob's public profile",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-002: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-USER-002: Returns bob user object', () => {",
+              "    pm.expect(pm.response.json().username).to.equal('bob');",
+              "});",
+              "pm.test('TC-USER-002: Email NOT in public profile', () => {",
+              "    pm.expect(pm.response.json()).to.not.have.property('email');",
+              "});",
+              "pm.test('TC-USER-002: Has isFollowedByMe field', () => {",
+              "    pm.expect(pm.response.json()).to.have.property('isFollowedByMe');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+        "url": { "raw": "{{BASE_URL}}/users/bob", "host": ["{{BASE_URL}}"], "path": ["users", "bob"] }
+      }
+    },
+    {
+      "name": "❌ TC-USER-003 Get non-existent user",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-003: Status 404 Not Found', () => { pm.response.to.have.status(404); });",
+              "pm.test('TC-USER-003: Error message about user not found', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/not found|user/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+        "url": { "raw": "{{BASE_URL}}/users/ghost_xyz_no_such_user_999", "host": ["{{BASE_URL}}"], "path": ["users", "ghost_xyz_no_such_user_999"] }
+      }
+    },
+    {
+      "name": "✅ TC-USER-004 Update own profile",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const ts = Date.now();",
+              "pm.environment.set('PROFILE_BIO', `Bio updated at ${ts}`);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-004: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-USER-004: Updated fields reflected in response', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.bio).to.equal(pm.environment.get('PROFILE_BIO'));",
+              "    pm.expect(json.displayName).to.equal('Alice Updated E2E');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"displayName\": \"Alice Updated E2E\",\n  \"bio\": \"{{PROFILE_BIO}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "❌ TC-USER-005 Update profile with bio over 200 chars",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": ["pm.environment.set('LONG_BIO', 'a'.repeat(201));"],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-005: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-USER-005: Error mentions bio length', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/bio|200|character/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"bio\": \"{{LONG_BIO}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "❌ TC-USER-006 Update another user's profile",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-006: Status 403 Forbidden', () => { pm.response.to.have.status(403); });",
+              "pm.test('TC-USER-006: No profile changed', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.not.include('hacked_by_alice');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"displayName\": \"hacked_by_alice\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/bob", "host": ["{{BASE_URL}}"], "path": ["users", "bob"] }
+      }
+    },
+    {
+      "name": "✅ TC-USER-007 Change own password",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-007: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-USER-007: Success message returned', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/success|updated|password/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{CHARLIE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"Test1234!\",\n  \"newPassword\": \"ChangedPass99!\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me/password", "host": ["{{BASE_URL}}"], "path": ["users", "me", "password"] }
+      }
+    },
+    {
+      "name": "✅ TC-USER-007b Restore Charlie password",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('TC-USER-007b: Password restore success', () => { pm.response.to.have.status(200); });"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{CHARLIE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"ChangedPass99!\",\n  \"newPassword\": \"Test1234!\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me/password", "host": ["{{BASE_URL}}"], "path": ["users", "me", "password"] }
+      }
+    },
+    {
+      "name": "❌ TC-USER-008 Change password wrong current password",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-008: Status 403 Forbidden', () => { pm.response.to.have.status(403); });",
+              "pm.test('TC-USER-008: Error mentions incorrect current password', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/current|incorrect|password/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"WrongPass!\",\n  \"newPassword\": \"NewSecure99!\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me/password", "host": ["{{BASE_URL}}"], "path": ["users", "me", "password"] }
+      }
+    },
+    {
+      "name": "❌ TC-USER-009 Change password too short new password",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-009: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-USER-009: Validation error on new password', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/password|8|short|length/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"Test1234!\",\n  \"newPassword\": \"abc\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me/password", "host": ["{{BASE_URL}}"], "path": ["users", "me", "password"] }
+      }
+    },
+    {
+      "name": "✅ TC-USER-010 Get users Alice is following",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-010: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-USER-010: Response is paginated', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json).to.have.property('content');",
+              "    pm.expect(json.content).to.be.an('array');",
+              "    pm.expect(json).to.have.property('totalElements');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+        "url": { "raw": "{{BASE_URL}}/users/alice/following?page=0&size=20", "host": ["{{BASE_URL}}"], "path": ["users", "alice", "following"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+      }
+    },
+    {
+      "name": "✅ TC-USER-011 Get Alice's followers",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-011: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-USER-011: Followers list includes Bob (seed data)', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.content).to.be.an('array');",
+              "    pm.expect(json.content.map(u => u.username)).to.include('bob');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+        "url": { "raw": "{{BASE_URL}}/users/alice/followers?page=0&size=20", "host": ["{{BASE_URL}}"], "path": ["users", "alice", "followers"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+      }
+    },
+    {
+      "name": "❌ TC-USER-013 Delete account wrong confirmation",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-USER-013: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-USER-013: Account NOT deleted on wrong confirmation', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/confirm|username|mismatch|incorrect/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"confirmUsername\": \"wrong_username_confirmation\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    }
+  ]
+}

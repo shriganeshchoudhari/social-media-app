@@ -6,6 +6,8 @@ import com.socialmedia.user.User;
 import com.socialmedia.websocket.WebSocketNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,20 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class NotificationService {
 
-    private final NotificationRepository           notificationRepository;
-    private final WebSocketNotificationService      webSocketNotificationService;
+    private final NotificationRepository          notificationRepository;
+    private final WebSocketNotificationService     webSocketNotificationService;
 
     // ── Async event listener ──────────────────────────────────
 
     /**
      * Consumed asynchronously so the caller's transaction commits first.
-     * Never notifies a user of their own actions (actor == recipient guard).
+     * Evicts the recipient's cached unread count so next poll gets fresh data.
      */
     @Async
     @EventListener
     @Transactional
+    @CacheEvict(value = "notif-count", key = "#event.recipient.id")
     public void handleNotificationEvent(NotificationEvent event) {
-        // Don't notify users about their own actions
         if (event.getActor().getId().equals(event.getRecipient().getId())) return;
 
         Notification notification = Notification.builder()
@@ -46,7 +48,6 @@ public class NotificationService {
         log.debug("Notification saved: type={} recipient={}", event.getType(),
                 event.getRecipient().getUsername());
 
-        // Push real-time update if user is connected via WebSocket
         NotificationResponse dto = toResponse(notification);
         webSocketNotificationService.sendToUser(event.getRecipient().getUsername(), dto);
     }
@@ -60,23 +61,27 @@ public class NotificationService {
                 .map(this::toResponse);
     }
 
+    /**
+     * Cached per user for 60 s. Evicted on any notification write.
+     */
     @Transactional(readOnly = true)
+    @Cacheable(value = "notif-count", key = "#currentUser.id")
     public long countUnread(User currentUser) {
         return notificationRepository.countByRecipientAndReadFalse(currentUser);
     }
 
     @Transactional
+    @CacheEvict(value = "notif-count", key = "#currentUser.id")
     public void markAllRead(User currentUser) {
         notificationRepository.markAllRead(currentUser);
     }
 
     @Transactional
+    @CacheEvict(value = "notif-count", key = "#currentUser.id")
     public void markRead(Long id, User currentUser) {
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found: " + id));
-        if (!notification.getRecipient().getId().equals(currentUser.getId())) {
-            return; // silently ignore — not the owner
-        }
+        if (!notification.getRecipient().getId().equals(currentUser.getId())) return;
         notification.setRead(true);
         notificationRepository.save(notification);
     }

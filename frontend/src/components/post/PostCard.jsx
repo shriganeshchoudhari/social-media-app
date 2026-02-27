@@ -11,12 +11,38 @@ import { toggleBookmarkThunk, selectIsBookmarked } from '../../store/bookmarksSl
 import Avatar from '../ui/Avatar.jsx'
 
 const privacyIcon = { PUBLIC: Globe, FOLLOWERS_ONLY: Users, PRIVATE: Lock }
+
 const relativeTime = (iso) => {
   const diff = (Date.now() - new Date(iso)) / 1000
-  if (diff < 60)   return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 60)    return 'just now'
+  if (diff < 3600)  return `${Math.floor(diff / 60)}m`
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`
   return `${Math.floor(diff / 86400)}d`
+}
+
+/** Renders post content with clickable #hashtags */
+function PostContent({ content }) {
+  const parts = content.split(/(#\w+)/g)
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (/^#\w+$/.test(part)) {
+          const tag = part.slice(1).toLowerCase()
+          return (
+            <Link
+              key={i}
+              to={`/hashtag/${tag}`}
+              className="text-primary-500 hover:text-primary-600 hover:underline font-medium"
+              onClick={e => e.stopPropagation()}
+            >
+              {part}
+            </Link>
+          )
+        }
+        return <span key={i}>{part}</span>
+      })}
+    </>
+  )
 }
 
 export default function PostCard({ post, onDeleted }) {
@@ -28,11 +54,10 @@ export default function PostCard({ post, onDeleted }) {
   const [saving, setSaving]     = useState(false)
   const textareaRef             = useRef(null)
 
-  const Privacy      = privacyIcon[post.privacy] || Globe
-  const isOwner       = me?.id === post.author?.id || me?.username === post.author?.username
-  const isBookmarked  = useSelector(selectIsBookmarked(post.id))
+  const Privacy     = privacyIcon[post.privacy] || Globe
+  const isOwner     = me?.id === post.author?.id || me?.username === post.author?.username
+  const isBookmarked = useSelector(selectIsBookmarked(post.id))
 
-  // Focus textarea and move cursor to end when editing starts
   useEffect(() => {
     if (editing && textareaRef.current) {
       textareaRef.current.focus()
@@ -60,15 +85,8 @@ export default function PostCard({ post, onDeleted }) {
     onDeleted?.()
   }
 
-  const handleEditStart = () => {
-    setEditText(post.content)
-    setEditing(true)
-  }
-
-  const handleEditCancel = () => {
-    setEditText(post.content)
-    setEditing(false)
-  }
+  const handleEditStart  = () => { setEditText(post.content); setEditing(true) }
+  const handleEditCancel = () => { setEditText(post.content); setEditing(false) }
 
   const handleEditSave = async () => {
     const trimmed = editText.trim()
@@ -85,7 +103,7 @@ export default function PostCard({ post, onDeleted }) {
   }
 
   return (
-    <article className="bg-white border-b border-gray-200 px-4 py-4 hover:bg-gray-50/50 transition-colors">
+    <article className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors">
       {/* Author row */}
       <div className="flex items-start gap-3">
         <Link to={`/profile/${post.author.username}`}>
@@ -97,17 +115,17 @@ export default function PostCard({ post, onDeleted }) {
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               to={`/profile/${post.author.username}`}
-              className="font-semibold text-gray-900 hover:underline text-sm truncate"
+              className="font-semibold text-gray-900 dark:text-gray-100 hover:underline text-sm truncate"
             >
               {post.author.displayName || post.author.username}
             </Link>
-            <span className="text-gray-400 text-xs">@{post.author.username}</span>
-            <span className="text-gray-300 text-xs">·</span>
-            <span className="text-gray-400 text-xs">{relativeTime(post.createdAt)}</span>
+            <span className="text-gray-400 dark:text-gray-500 text-xs">@{post.author.username}</span>
+            <span className="text-gray-300 dark:text-gray-600 text-xs">·</span>
+            <span className="text-gray-400 dark:text-gray-500 text-xs">{relativeTime(post.createdAt)}</span>
             {post.updatedAt && post.updatedAt !== post.createdAt && (
-              <span className="text-gray-400 text-xs italic">(edited)</span>
+              <span className="text-gray-400 dark:text-gray-500 text-xs italic">(edited)</span>
             )}
-            <Privacy size={13} className="text-gray-400" />
+            <Privacy size={13} className="text-gray-400 dark:text-gray-500" />
           </div>
 
           {/* Content — normal or inline editor */}
@@ -120,10 +138,10 @@ export default function PostCard({ post, onDeleted }) {
                 onKeyDown={handleEditKeyDown}
                 rows={3}
                 maxLength={2000}
-                className="w-full text-sm text-gray-800 border border-primary-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none leading-relaxed"
+                className="w-full text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 border border-primary-300 dark:border-primary-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none leading-relaxed"
               />
               <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-xs text-gray-400 flex-1">{editText.length}/2000 · Ctrl+Enter to save · Esc to cancel</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 flex-1">{editText.length}/2000 · Ctrl+Enter to save · Esc to cancel</span>
                 <button
                   onClick={handleEditSave}
                   disabled={saving || !editText.trim()}
@@ -134,7 +152,7 @@ export default function PostCard({ post, onDeleted }) {
                 </button>
                 <button
                   onClick={handleEditCancel}
-                  className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   <X size={13} /> Cancel
                 </button>
@@ -142,8 +160,8 @@ export default function PostCard({ post, onDeleted }) {
             </div>
           ) : (
             <Link to={`/posts/${post.id}`}>
-              <p className="text-sm text-gray-800 mt-1 leading-relaxed whitespace-pre-wrap break-words">
-                {post.content}
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-1 leading-relaxed whitespace-pre-wrap break-words">
+                <PostContent content={post.content} />
               </p>
             </Link>
           )}
@@ -154,7 +172,7 @@ export default function PostCard({ post, onDeleted }) {
               <img
                 src={post.imageUrl}
                 alt="Post media"
-                className="mt-3 rounded-xl max-h-80 w-full object-cover border border-gray-100"
+                className="mt-3 rounded-xl max-h-80 w-full object-cover border border-gray-100 dark:border-gray-800"
                 loading="lazy"
               />
             </Link>
@@ -167,7 +185,7 @@ export default function PostCard({ post, onDeleted }) {
               <button
                 onClick={handleLike}
                 className={`flex items-center gap-1.5 text-sm transition-colors group ${
-                  post.likedByCurrentUser ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'
+                  post.likedByCurrentUser ? 'text-pink-500' : 'text-gray-500 dark:text-gray-400 hover:text-pink-500'
                 }`}
                 aria-label={post.likedByCurrentUser ? 'Unlike' : 'Like'}
               >
@@ -181,7 +199,7 @@ export default function PostCard({ post, onDeleted }) {
               {/* Comments */}
               <Link
                 to={`/posts/${post.id}`}
-                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-500 transition-colors"
+                className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-500 transition-colors"
               >
                 <MessageCircle size={18} />
                 <span>{post.commentsCount}</span>
@@ -191,7 +209,7 @@ export default function PostCard({ post, onDeleted }) {
               <button
                 onClick={() => dispatch(toggleBookmarkThunk(post.id))}
                 className={`flex items-center gap-1.5 text-sm transition-colors ${
-                  isBookmarked ? 'text-primary-500' : 'text-gray-500 hover:text-primary-500'
+                  isBookmarked ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400 hover:text-primary-500'
                 }`}
                 aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
                 title={isBookmarked ? 'Saved' : 'Save'}
@@ -204,7 +222,7 @@ export default function PostCard({ post, onDeleted }) {
                 <div className="ml-auto flex items-center gap-1">
                   <button
                     onClick={handleEditStart}
-                    className="text-gray-400 hover:text-primary-500 transition-colors p-1 rounded-lg hover:bg-primary-50"
+                    className="text-gray-400 dark:text-gray-500 hover:text-primary-500 transition-colors p-1 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20"
                     aria-label="Edit post"
                     title="Edit"
                   >
@@ -212,7 +230,7 @@ export default function PostCard({ post, onDeleted }) {
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50"
+                    className="text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950"
                     aria-label="Delete post"
                     title="Delete"
                   >

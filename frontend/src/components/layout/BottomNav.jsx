@@ -19,7 +19,10 @@ export default function BottomNav() {
   ]
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 flex">
+    <nav
+      aria-label="Main navigation"
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 dark:border-gray-800 border-t border-gray-200 z-30 flex"
+    >
       {links.map(({ to, Icon, label, badge }) => (
         <NavLink
           key={to}
@@ -33,7 +36,10 @@ export default function BottomNav() {
           <div className="relative">
             <Icon size={22} />
             {badge > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+              <span
+                aria-label={`${badge} unread`}
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5"
+              >
                 {badge > 99 ? '99+' : badge}
               </span>
             )}

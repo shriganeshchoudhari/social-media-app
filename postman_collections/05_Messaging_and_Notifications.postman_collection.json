@@ -1,0 +1,477 @@
+{
+  "info": {
+    "_postman_id": "ch-msg-col-005",
+    "name": "05 - ConnectHub Messaging & Notifications",
+    "description": "Conversations, messages, notifications, and unread counts (TC-MSG-001 to TC-MSG-011, TC-NOTIF-001 to TC-NOTIF-006).\n\nPrerequisite: Run collection 01 so ALICE_TOKEN, BOB_TOKEN, CHARLIE_TOKEN are set.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "if (!pm.environment.get('ALICE_TOKEN')) {",
+          "    console.warn('ALICE_TOKEN not set — run collection 01 first');",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "✅ TC-MSG-001 Create conversation",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MSG-001: Status 200 or 201', () => { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('TC-MSG-001: Conversation object returned', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('participants');",
+                  "    pm.environment.set('CONVERSATION_ID', json.id);",
+                  "    const usernames = json.participants.map(p => p.username);",
+                  "    pm.expect(usernames).to.include('alice');",
+                  "    pm.expect(usernames).to.include('bob');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"participantUsername\": \"bob\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations", "host": ["{{BASE_URL}}"], "path": ["conversations"] }
+          }
+        },
+        {
+          "name": "✅ TC-MSG-004 Duplicate conversation is idempotent",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MSG-004: Status 200 OK — returns existing conversation', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-MSG-004: Same conversation ID — no duplicate created', () => {",
+                  "    pm.expect(String(pm.response.json().id)).to.equal(String(pm.environment.get('CONVERSATION_ID')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"participantUsername\": \"bob\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations", "host": ["{{BASE_URL}}"], "path": ["conversations"] }
+          }
+        },
+        {
+          "name": "❌ TC-MSG-002 Create conversation with self",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MSG-002: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-MSG-002: Error about messaging self', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/self|yourself|own/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"participantUsername\": \"alice\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations", "host": ["{{BASE_URL}}"], "path": ["conversations"] }
+          }
+        },
+        {
+          "name": "❌ TC-MSG-003 Create conversation with non-existent user",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MSG-003: Status 404 Not Found', () => { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"participantUsername\": \"ghost_xyz_999\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations", "host": ["{{BASE_URL}}"], "path": ["conversations"] }
+          }
+        },
+        {
+          "name": "✅ TC-MSG-005 Send message in conversation",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MSG-005: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.test('TC-MSG-005: Message object returned', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.content).to.equal('Hey Bob! E2E test message.');",
+                  "    pm.expect(json.sender.username).to.equal('alice');",
+                  "    pm.expect(json).to.have.property('sentAt');",
+                  "    pm.expect(json.read).to.equal(false);",
+                  "    pm.environment.set('MESSAGE_ID', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Hey Bob! E2E test message.\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations/{{CONVERSATION_ID}}/messages", "host": ["{{BASE_URL}}"], "path": ["conversations", "{{CONVERSATION_ID}}", "messages"] }
+          }
+        },
+        {
+          "name": "❌ TC-MSG-006 Send empty message",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MSG-006: Status 400 Bad Request', () => { pm.response.to.have.status(400); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations/{{CONVERSATION_ID}}/messages", "host": ["{{BASE_URL}}"], "path": ["conversations", "{{CONVERSATION_ID}}", "messages"] }
+          }
+        },
+        {
+          "name": "❌ TC-MSG-007 Send to conversation you're not part of",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MSG-007: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{CHARLIE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Charlie should not see this\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/conversations/{{CONVERSATION_ID}}/messages", "host": ["{{BASE_URL}}"], "path": ["conversations", "{{CONVERSATION_ID}}", "messages"] }
+          }
+        },
+        {
+          "name": "✅ TC-MSG-008 Get all conversations",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MSG-008: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-MSG-008: Returns list with Alice-Bob conversation', () => {",
+                  "    const conversations = pm.response.json().content || pm.response.json();",
+                  "    pm.expect(conversations).to.be.an('array');",
+                  "    pm.expect(conversations.map(c => String(c.id))).to.include(String(pm.environment.get('CONVERSATION_ID')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/conversations", "host": ["{{BASE_URL}}"], "path": ["conversations"] }
+          }
+        },
+        {
+          "name": "✅ TC-MSG-009 Get messages in conversation",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MSG-009: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-MSG-009: Message list contains sent message', () => {",
+                  "    const messages = pm.response.json().content || pm.response.json();",
+                  "    pm.expect(messages.map(m => String(m.id))).to.include(String(pm.environment.get('MESSAGE_ID')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/conversations/{{CONVERSATION_ID}}/messages?page=0&size=30",
+              "host": ["{{BASE_URL}}"],
+              "path": ["conversations", "{{CONVERSATION_ID}}", "messages"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "30" }]
+            }
+          }
+        },
+        {
+          "name": "❌ TC-MSG-010 Get messages in conversation you're not part of",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MSG-010: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{CHARLIE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/conversations/{{CONVERSATION_ID}}/messages", "host": ["{{BASE_URL}}"], "path": ["conversations", "{{CONVERSATION_ID}}", "messages"] }
+          }
+        },
+        {
+          "name": "✅ TC-MSG-011 Mark messages as read",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MSG-011: Status 200 OK', () => { pm.response.to.have.status(200); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{BOB_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/conversations/{{CONVERSATION_ID}}/read", "host": ["{{BASE_URL}}"], "path": ["conversations", "{{CONVERSATION_ID}}", "read"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "✅ TC-NOTIF-001 Get notifications",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-NOTIF-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-NOTIF-001: Paginated notification list', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('content');",
+                  "    pm.expect(json.content).to.be.an('array');",
+                  "    if (json.content.length > 0) pm.environment.set('NOTIFICATION_ID', json.content[0].id);",
+                  "});",
+                  "pm.test('TC-NOTIF-001: Notification objects have required fields', () => {",
+                  "    const notifications = pm.response.json().content;",
+                  "    if (notifications.length > 0) {",
+                  "        ['id','type','read','createdAt'].forEach(f => pm.expect(notifications[0]).to.have.property(f));",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications", "host": ["{{BASE_URL}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "✅ TC-NOTIF-002 Get unread notification count",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-NOTIF-002: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-NOTIF-002: Count is a non-negative integer', () => {",
+                  "    const count = pm.response.json().count;",
+                  "    pm.expect(count).to.be.a('number').and.at.least(0);",
+                  "    pm.environment.set('INITIAL_UNREAD_COUNT', count);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications/unread-count", "host": ["{{BASE_URL}}"], "path": ["notifications", "unread-count"] }
+          }
+        },
+        {
+          "name": "✅ TC-NOTIF-004 Mark single notification as read",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["// NOTIFICATION_ID set by TC-NOTIF-001"], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-NOTIF-004: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-NOTIF-004: read=true in response', () => {",
+                  "    pm.expect(pm.response.json().read).to.equal(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications/{{NOTIFICATION_ID}}/read", "host": ["{{BASE_URL}}"], "path": ["notifications", "{{NOTIFICATION_ID}}", "read"] }
+          }
+        },
+        {
+          "name": "❌ TC-NOTIF-005 Mark another user's notification as read",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-NOTIF-005: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{BOB_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications/{{NOTIFICATION_ID}}/read", "host": ["{{BASE_URL}}"], "path": ["notifications", "{{NOTIFICATION_ID}}", "read"] }
+          }
+        },
+        {
+          "name": "✅ TC-NOTIF-003 Mark all notifications as read",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-NOTIF-003: Status 200 OK', () => { pm.response.to.have.status(200); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications/read-all", "host": ["{{BASE_URL}}"], "path": ["notifications", "read-all"] }
+          }
+        },
+        {
+          "name": "✅ TC-NOTIF-003b Unread count drops to 0 after read-all",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-NOTIF-003b: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-NOTIF-003b: Unread count is 0 after read-all', () => {",
+                  "    pm.expect(pm.response.json().count).to.equal(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications/unread-count", "host": ["{{BASE_URL}}"], "path": ["notifications", "unread-count"] }
+          }
+        },
+        {
+          "name": "❌ TC-NOTIF-006 Get notifications unauthenticated",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-NOTIF-006: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/notifications", "host": ["{{BASE_URL}}"], "path": ["notifications"] }
+          }
+        }
+      ]
+    }
+  ]
+}

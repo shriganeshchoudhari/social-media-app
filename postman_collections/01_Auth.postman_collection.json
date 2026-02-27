@@ -1,0 +1,527 @@
+{
+  "info": {
+    "_postman_id": "ch-auth-col-001",
+    "name": "01 - ConnectHub Authentication",
+    "description": "All authentication API test cases (TC-AUTH-001 to TC-AUTH-015).\nCovers registration, login, token validation, and injection attacks.\n\nRun order: Execute top-to-bottom. Tokens for Alice, Bob, Charlie, and Admin\nare auto-captured and stored in environment variables for use by other collections.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "col-pre-auth",
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('BASE_URL')) {",
+          "    pm.environment.set('BASE_URL', 'http://localhost:8080/api/v1');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "col-test-auth",
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "✅ TC-AUTH-001 Register with valid data",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const ts = Date.now();",
+              "const username = `e2e_user_${ts}`;",
+              "pm.environment.set('DYNAMIC_USERNAME', username);",
+              "pm.environment.set('DYNAMIC_EMAIL', `${username}@e2e.test`);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-001: Status 201 Created', () => { pm.response.to.have.status(201); });",
+              "pm.test('TC-AUTH-001: Response has token', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json).to.have.property('token');",
+              "    pm.expect(json.token).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test('TC-AUTH-001: User object in response', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json).to.have.property('user');",
+              "    pm.expect(json.user.username).to.equal(pm.environment.get('DYNAMIC_USERNAME'));",
+              "    pm.expect(json.user.role).to.equal('USER');",
+              "});",
+              "pm.test('TC-AUTH-001: Password NOT in response', () => {",
+              "    const body = pm.response.text();",
+              "    pm.expect(body).to.not.include('Test1234!');",
+              "    pm.expect(body).to.not.include('password_hash');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{DYNAMIC_USERNAME}}\",\n  \"email\": \"{{DYNAMIC_EMAIL}}\",\n  \"password\": \"Secure123!\",\n  \"displayName\": \"E2E Tester\"\n}"
+        },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-002 Register duplicate username",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "exec": ["// alice must already exist in DB (seed data)"], "type": "text/javascript" }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-002: Status 409 Conflict', () => { pm.response.to.have.status(409); });",
+              "pm.test('TC-AUTH-002: Error mentions username taken', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.error || json.message).to.match(/username|already taken/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"unique_dup@e2e.test\",\n  \"password\": \"Secure123!\",\n  \"displayName\": \"Duplicate\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-003 Register duplicate email",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-003: Status 409 Conflict', () => { pm.response.to.have.status(409); });",
+              "pm.test('TC-AUTH-003: Error mentions email in use', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.error || json.message).to.match(/email|already in use/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"unique_user_dup\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Secure123!\",\n  \"displayName\": \"Unique\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-004 Register weak password",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-004: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-AUTH-004: Error mentions password length', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.error || json.message || JSON.stringify(json)).to.match(/password|8 char/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"weakpass_user\",\n  \"email\": \"weak@e2e.test\",\n  \"password\": \"123\",\n  \"displayName\": \"Weak\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-005 Register missing required fields",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-005: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-AUTH-005: Validation errors present', () => {",
+              "    const body = JSON.stringify(pm.response.json());",
+              "    pm.expect(body).to.match(/username|displayName|field|required/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"noname@e2e.test\",\n  \"password\": \"Secure123!\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-006 Register invalid email format",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-006: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-AUTH-006: Error mentions invalid email', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/email|invalid|format/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"bademail_user\",\n  \"email\": \"not-an-email\",\n  \"password\": \"Secure123!\",\n  \"displayName\": \"Bad Email\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    },
+    {
+      "name": "✅ TC-AUTH-007 Login with valid credentials (Alice)",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-007: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-AUTH-007: Token returned and stored', () => {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.token).to.be.a('string').and.not.empty;",
+              "    pm.environment.set('ALICE_TOKEN', json.token);",
+              "    if (json.user && json.user.id) pm.environment.set('ALICE_ID', json.user.id);",
+              "});",
+              "pm.test('TC-AUTH-007: Correct username returned', () => {",
+              "    pm.expect(pm.response.json().user.username).to.equal('alice');",
+              "});",
+              "pm.test('TC-AUTH-007: Content-Type is JSON', () => {",
+              "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"{{ALICE_USERNAME}}\",\n  \"password\": \"{{ALICE_PASSWORD}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "✅ TC-AUTH-008 Login with email instead of username",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-008: Status 200 OK', () => { pm.response.to.have.status(200); });",
+              "pm.test('TC-AUTH-008: Token returned when logging in via email', () => {",
+              "    pm.expect(pm.response.json().token).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test('TC-AUTH-008: Same user returned', () => {",
+              "    pm.expect(pm.response.json().user.username).to.equal('alice');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"alice@example.com\",\n  \"password\": \"{{ALICE_PASSWORD}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "✅ TC-AUTH-007b Login Bob",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login Bob: Status 200', () => { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "if (json.token) pm.environment.set('BOB_TOKEN', json.token);",
+              "if (json.user && json.user.id) pm.environment.set('BOB_ID', json.user.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"{{BOB_USERNAME}}\",\n  \"password\": \"{{BOB_PASSWORD}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "✅ TC-AUTH-007c Login Charlie",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login Charlie: Status 200', () => { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "if (json.token) pm.environment.set('CHARLIE_TOKEN', json.token);",
+              "if (json.user && json.user.id) pm.environment.set('CHARLIE_ID', json.user.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"{{CHARLIE_USERNAME}}\",\n  \"password\": \"{{CHARLIE_PASSWORD}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "✅ TC-AUTH-007d Login Admin",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login Admin: Status 200', () => { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "if (json.token) pm.environment.set('ADMIN_TOKEN', json.token);",
+              "if (json.user && json.user.id) pm.environment.set('ADMIN_ID', json.user.id);",
+              "pm.test('Admin role correct', () => { pm.expect(json.user.role).to.equal('ADMIN'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"{{ADMIN_USERNAME}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-009 Login wrong password",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-009: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });",
+              "pm.test('TC-AUTH-009: Error is invalid credentials', () => {",
+              "    pm.expect(pm.response.json().error || pm.response.json().message).to.match(/invalid|credentials/i);",
+              "});",
+              "pm.test('TC-AUTH-009: No token in response', () => {",
+              "    pm.expect(pm.response.json()).to.not.have.property('token');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"alice\",\n  \"password\": \"WrongPass!\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-010 Login non-existent user",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-010: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });",
+              "pm.test('TC-AUTH-010: Must not reveal user existence via 404', () => {",
+              "    pm.expect(pm.response.code).to.not.equal(404);",
+              "});",
+              "pm.test('TC-AUTH-010: Generic error message', () => {",
+              "    pm.expect(pm.response.json().error || pm.response.json().message).to.match(/invalid|credentials/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"ghost_user_xyz_999\",\n  \"password\": \"Anything1!\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-011 No token on protected endpoint",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-011: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });",
+              "pm.test('TC-AUTH-011: No user data leaked', () => {",
+              "    pm.expect(pm.response.text()).to.not.include('alice');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-012 Malformed token",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('TC-AUTH-012: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer this.is.garbage.token.xyz" }],
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-013 Expired token",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.environment.set('EXPIRED_TOKEN', 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwMDAwMDAxfQ.invalid_signature');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-013: Status 401 for expired token', () => { pm.response.to.have.status(401); });",
+              "pm.test('TC-AUTH-013: Error mentions expired or invalid', () => {",
+              "    pm.expect(JSON.stringify(pm.response.json())).to.match(/expired|invalid|unauthorized/i);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{EXPIRED_TOKEN}}" }],
+        "url": { "raw": "{{BASE_URL}}/users/me", "host": ["{{BASE_URL}}"], "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-014 SQL injection in login",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-014: Status 401 - SQL injection rejected', () => { pm.response.to.have.status(401); });",
+              "pm.test('TC-AUTH-014: No SQL error in response', () => {",
+              "    const body = pm.response.text().toLowerCase();",
+              "    pm.expect(body).to.not.include('sql');",
+              "    pm.expect(body).to.not.include('syntax error');",
+              "    pm.expect(body).to.not.include('exception');",
+              "});",
+              "pm.test('TC-AUTH-014: No token returned', () => {",
+              "    pm.expect(pm.response.json()).to.not.have.property('token');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usernameOrEmail\": \"' OR '1'='1\",\n  \"password\": \"' OR '1'='1\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/login", "host": ["{{BASE_URL}}"], "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "❌ TC-AUTH-015 XSS payload in username",
+      "event": [
+        { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('TC-AUTH-015: Status 400 - XSS payload rejected', () => { pm.response.to.have.status(400); });",
+              "pm.test('TC-AUTH-015: Raw script tag not reflected in response', () => {",
+              "    pm.expect(pm.response.text()).to.not.include('<script>alert(1)</script>');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"<script>alert(1)</script>\",\n  \"email\": \"xss@test.com\",\n  \"password\": \"Secure123!\",\n  \"displayName\": \"XSS Tester\"\n}" },
+        "url": { "raw": "{{BASE_URL}}/auth/register", "host": ["{{BASE_URL}}"], "path": ["auth", "register"] }
+      }
+    }
+  ]
+}

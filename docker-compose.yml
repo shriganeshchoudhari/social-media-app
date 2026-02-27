@@ -47,6 +47,22 @@ services:
       timeout: 5s
       retries: 5
 
+  # ── Redis ───────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: connecthub-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # ── pgAdmin UI ─────────────────────────────────────────────────────────────
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -136,6 +152,10 @@ services:
       AI_RATE_LIMIT_PER_HOUR: 60
       AI_MAX_CONCURRENT:      3
 
+      # Redis cache
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
       # JWT — override in production
       JWT_SECRET: 404e635266556a586e3272357538782f413f4428472b4b6250645367566b5970
 
@@ -143,6 +163,8 @@ services:
       postgres:
         condition: service_healthy
       ollama:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:9090/actuator/health || exit 1"]
@@ -175,3 +197,5 @@ volumes:
     # PostgreSQL data — survives container restarts
   ollama_data:
     # Ollama model cache — model is downloaded once (~2 GB) and reused
+  redis_data:
+    # Redis cache — AOF persistence, 256 MB maxmemory, LRU eviction

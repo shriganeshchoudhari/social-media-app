@@ -171,32 +171,46 @@ This file converts the implementation plan into actionable tasks grouped by phas
 - [x] `docs/openapi.yaml` — OpenAPI 3.0 spec v1.3.0 (all endpoints) ✅
 - Deliverable: CI pipeline, deployment manifests, onboarding guide, complete OpenAPI spec ✅
 
-## Phase 10 — Iterate & polish 🔄 IN PROGRESS
+## Phase 10 — Iterate & polish ✅ MOSTLY COMPLETE
 
 ### Performance improvements
-- [ ] Redis cache for feed, profiles, trending hashtags (TTL-based)
-- [ ] Add `@QueryHints` / second-level cache on frequently-read entities
-- [ ] Activate trigram GIN indexes in `deploy/init.sql` for LIKE-free full-text search
-- [ ] Add pagination cursor support to feed (keyset instead of OFFSET)
+- [x] Redis cache — `CacheConfig.java` with per-cache TTL (posts 5m, users 10m, notif-count 60s, trending-tags 5m) ✅
+- [x] `@QueryHints` (HINT_READ_ONLY + HINT_FETCH_SIZE) on all hot queries in PostRepository + UserRepository ✅
+- [x] Trigram GIN indexes in `deploy/init.sql` — posts content, users username + displayName (activated) ✅
+- [x] Keyset (cursor) pagination for feed — `GET /posts/feed/cursor?before=<ISO>&size=20` ✅
+  - `PostRepository.findFeedBefore()`, `PostService.getFeedBefore()`, `PostController.feedCursor()`
 
 ### Accessibility & UX
-- [ ] WCAG 2.1 AA audit — keyboard nav, ARIA labels, focus rings
-- [ ] Dark mode toggle (currently Tailwind dark: classes are present but no toggle UI)
-- [ ] Loading skeletons for feed cards (replace spinner with skeleton screens)
-- [ ] Optimistic comment deletion in frontend
+- [x] WCAG 2.1 AA improvements — ARIA labels on nav, sidebar, badges, textarea autocomplete, role=tab in settings ✅
+- [x] Dark mode toggle in Sidebar — `themeSlice.js` persists to localStorage, applies immediately ✅
+- [x] Loading skeletons — `PostSkeleton.jsx` + `FeedSkeleton` used in FeedPage, HashtagFeedPage ✅
+- [x] Optimistic comment deletion — CommentList removes immediately, restores on API error ✅
 
-### Future features (optional backlog)
-- [ ] Hashtag pages — clickable `#tag` links in posts → tag feed page
-- [ ] User mentions — `@username` autocomplete in composer + mention notifications
-- [ ] Admin panel — user management, report queue, analytics dashboard
-- [ ] Privacy settings page — profile visibility, data export (GDPR)
+### Features completed in Phase 10
+- [x] Hashtag pages — `HashtagFeedPage.jsx` + `/hashtag/:tag` route + clickable `#tag` in PostCard + CommentList ✅
+- [x] User mentions autocomplete — `PostComposer` detects `@word`, debounced search, dropdown with keyboard nav (↑↓ Enter Tab Esc) ✅
+  - Backend already fires `MENTION` notification events on post create/edit
+- [x] Admin panel — `AdminController.java` (`/api/v1/admin/stats|users`) with `@PreAuthorize("hasRole('ADMIN')")` ✅
+  - `AdminPage.jsx` — stats cards, paginated user list, search, role toggle (promote/demote), delete user
+  - Admin link in Sidebar (visible only to ADMIN users)
+  - `V4__user_roles.sql` migration + `User.Role` enum already in place
+- [x] Settings page — `SettingsPage.jsx` at `/settings` ✅
+  - Profile tab: edit displayName, bio, avatarUrl — calls `PUT /api/v1/users/me`
+  - Password tab: change password with show/hide toggle — calls `PUT /api/v1/users/me/password`
+  - Account tab: account info, privacy notice, danger zone (delete account confirmation flow)
+  - Backend: `PUT /api/v1/users/me/password` endpoint in `UserController`
+- [x] `UserResponse` now includes `role` field — frontend can gate admin UI ✅
+
+### Optional backlog (not yet implemented)
 - [ ] Email verification flow
-- [ ] Password reset via email
+- [ ] Password reset via email (requires email service / SMTP config)
 - [ ] OAuth / social login (Google, GitHub)
 - [ ] Two-factor authentication (TOTP)
 - [ ] Algorithmic feed scoring (engagement-weighted)
 - [ ] Stories (24-hour ephemeral content)
 - [ ] Group messaging (multi-participant conversations)
+- [ ] Report / moderation queue in admin panel
+- [ ] Full GDPR data export endpoint
 
 ---
 
@@ -208,6 +222,7 @@ This file converts the implementation plan into actionable tasks grouped by phas
 - **M5:** ✅ Frontend integrated + E2E tests
 - **M6:** ✅ AI Assistant (Spark), WebSocket, Messaging, Bookmarks, Post editing
 - **M7:** ✅ CI/CD pipeline, production deployment manifests, full OpenAPI spec, onboarding docs
+- **M8:** ✅ Admin panel, settings page, @mention autocomplete, keyset pagination, @QueryHints, WCAG ARIA
 
 # Run & dev commands
 

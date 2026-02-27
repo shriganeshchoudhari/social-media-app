@@ -1,0 +1,677 @@
+{
+  "info": {
+    "_postman_id": "ch-posts-col-003",
+    "name": "03 - ConnectHub Posts & Feed",
+    "description": "Post creation, editing, deletion, feed pagination, and cursor-based pagination (TC-POST-001 to TC-POST-018, TC-FEED-001 to TC-FEED-008).\n\nPrerequisite: Run collection 01 first so ALICE_TOKEN, BOB_TOKEN are set.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "if (!pm.environment.get('ALICE_TOKEN')) {",
+          "    console.warn('ALICE_TOKEN not set — run collection 01 first');",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "✅ TC-POST-001 Create text post",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.environment.set('POST_CONTENT', `Hello world from E2E test at ${ts}! #testing`);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-001: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.test('TC-POST-001: Post object returned', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.content).to.equal(pm.environment.get('POST_CONTENT'));",
+                  "    pm.expect(json.author.username).to.equal('alice');",
+                  "    pm.expect(json.likesCount).to.equal(0);",
+                  "    pm.expect(json.commentsCount).to.equal(0);",
+                  "    pm.expect(json).to.have.property('createdAt');",
+                  "    pm.environment.set('CREATED_POST_ID', json.id);",
+                  "    pm.environment.set('ALICE_POST_ID', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"{{POST_CONTENT}}\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-002 Create post at max length (280 chars)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": ["pm.environment.set('MAX_CONTENT', 'A'.repeat(280));"],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-002: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.test('TC-POST-002: Content length is exactly 280', () => {",
+                  "    pm.expect(pm.response.json().content.length).to.equal(280);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"{{MAX_CONTENT}}\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-003 Create post exceeding 280 chars",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": ["pm.environment.set('OVER_CONTENT', 'B'.repeat(281));"],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-003: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-POST-003: Error mentions 280 character limit', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/280|content|character/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"{{OVER_CONTENT}}\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-004 Create empty post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-004: Status 400 for empty post', () => { pm.response.to.have.status(400); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-005 Create whitespace-only post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-005: Status 400 for whitespace-only post', () => { pm.response.to.have.status(400); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"     \"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-006 Create post unauthenticated",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-006: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"No auth post\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-007 Get existing post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-007: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-POST-007: Post has expected fields', () => {",
+                  "    const json = pm.response.json();",
+                  "    ['id','content','author','likesCount','commentsCount','createdAt'].forEach(f => {",
+                  "        pm.expect(json).to.have.property(f);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{CREATED_POST_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{CREATED_POST_ID}}"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-008 Get non-existent post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-008: Status 404 Not Found', () => { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/9999999", "host": ["{{BASE_URL}}"], "path": ["posts", "9999999"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-009 Edit own post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["// CREATED_POST_ID must be < 15 min old"], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-009: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-POST-009: Edited flag set', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.content).to.equal('Edited content from E2E test');",
+                  "    pm.expect(json.edited).to.equal(true);",
+                  "    pm.expect(json).to.have.property('editedAt');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Edited content from E2E test\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts/{{CREATED_POST_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{CREATED_POST_ID}}"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-010 Edit another user's post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-010: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{BOB_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Hacked by bob\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-012 Delete own post",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const baseUrl = pm.environment.get('BASE_URL');",
+                  "const token = pm.environment.get('ALICE_TOKEN');",
+                  "pm.sendRequest({",
+                  "    url: `${baseUrl}/posts`,",
+                  "    method: 'POST',",
+                  "    header: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },",
+                  "    body: { mode: 'raw', raw: JSON.stringify({ content: 'Post to be deleted' }) }",
+                  "}, (err, res) => {",
+                  "    if (!err) pm.environment.set('DELETE_POST_ID', res.json().id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-012: Status 204 No Content', () => { pm.response.to.have.status(204); });",
+                  "pm.test('TC-POST-012: Response body is empty', () => { pm.expect(pm.response.text()).to.be.empty; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{DELETE_POST_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{DELETE_POST_ID}}"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-013 Delete another user's post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-013: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{BOB_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}"] }
+          }
+        },
+        {
+          "name": "❌ TC-POST-014 Delete already-deleted post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["// DELETE_POST_ID already deleted above"], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-POST-014: Status 404 for already-deleted post', () => { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{DELETE_POST_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{DELETE_POST_ID}}"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-016 Pagination - get page 1 of Alice posts",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-016: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-POST-016: Paginated response structure', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('content');",
+                  "    pm.expect(json).to.have.property('totalPages');",
+                  "    pm.expect(json.number).to.equal(0);",
+                  "    pm.expect(json.size).to.equal(10);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/users/alice/posts?page=0&size=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "alice", "posts"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-POST-017 Post with hashtag is indexed",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.environment.set('HASHTAG_TAG', `e2etag${ts}`);",
+                  "pm.environment.set('HASHTAG_CONTENT', `Testing #e2etag${ts} integration!`);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-017: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.environment.set('HASHTAG_POST_ID', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"{{HASHTAG_CONTENT}}\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-017b Hashtag feed contains new post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-017b: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-POST-017b: Tagged post appears in hashtag feed', () => {",
+                  "    const ids = pm.response.json().content.map(p => String(p.id));",
+                  "    pm.expect(ids).to.include(String(pm.environment.get('HASHTAG_POST_ID')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/hashtag/{{HASHTAG_TAG}}", "host": ["{{BASE_URL}}"], "path": ["posts", "hashtag", "{{HASHTAG_TAG}}"] }
+          }
+        },
+        {
+          "name": "✅ TC-POST-018 Post with @mention creates notification",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-POST-018: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.test('TC-POST-018: Post content contains @bob', () => {",
+                  "    pm.expect(pm.response.json().content).to.include('@bob');",
+                  "    pm.environment.set('MENTION_POST_ID', pm.response.json().id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Hey @bob check this out!\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feed",
+      "item": [
+        {
+          "name": "✅ TC-FEED-001 Standard paginated feed",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FEED-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FEED-001: Paginated feed structure', () => {",
+                  "    pm.expect(pm.response.json()).to.have.property('content');",
+                  "    pm.expect(pm.response.json().content).to.be.an('array');",
+                  "});",
+                  "pm.test('TC-FEED-001: Feed posts sorted newest first', () => {",
+                  "    const posts = pm.response.json().content;",
+                  "    if (posts.length > 1) {",
+                  "        pm.expect(new Date(posts[0].createdAt).getTime()).to.be.at.least(new Date(posts[1].createdAt).getTime());",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/posts/feed?page=0&size=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["posts", "feed"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }]
+            }
+          }
+        },
+        {
+          "name": "❌ TC-FEED-003 Feed unauthenticated",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-FEED-003: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/posts/feed", "host": ["{{BASE_URL}}"], "path": ["posts", "feed"] }
+          }
+        },
+        {
+          "name": "✅ TC-FEED-004 Cursor-based feed initial load",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FEED-004: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FEED-004: Cursor response shape', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('posts');",
+                  "    pm.expect(json).to.have.property('nextCursor');",
+                  "    pm.expect(json).to.have.property('hasMore');",
+                  "    pm.expect(json.posts).to.be.an('array');",
+                  "    if (json.nextCursor) pm.environment.set('CURSOR_VALUE', json.nextCursor);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/posts/feed/cursor?size=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["posts", "feed", "cursor"],
+              "query": [{ "key": "size", "value": "20" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-FEED-005 Cursor-based feed next page",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["// Uses CURSOR_VALUE from previous request"], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FEED-005: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FEED-005: Posts are older than cursor', () => {",
+                  "    const json = pm.response.json();",
+                  "    const cursor = pm.environment.get('CURSOR_VALUE');",
+                  "    if (json.posts.length > 0 && cursor) {",
+                  "        json.posts.forEach(p => {",
+                  "            pm.expect(new Date(p.createdAt).getTime()).to.be.below(new Date(cursor).getTime());",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/posts/feed/cursor?before={{CURSOR_VALUE}}&size=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["posts", "feed", "cursor"],
+              "query": [{ "key": "before", "value": "{{CURSOR_VALUE}}" }, { "key": "size", "value": "20" }]
+            }
+          }
+        },
+        {
+          "name": "❌ TC-FEED-007 Cursor with invalid date format",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-FEED-007: Status 400 for invalid cursor', () => { pm.response.to.have.status(400); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/posts/feed/cursor?before=not-a-date&size=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["posts", "feed", "cursor"],
+              "query": [{ "key": "before", "value": "not-a-date" }, { "key": "size", "value": "20" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-FEED-008 Feed size capped at 50",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FEED-008: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FEED-008: Results capped at 50', () => {",
+                  "    pm.expect(pm.response.json().posts.length).to.be.at.most(50);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/posts/feed/cursor?size=999",
+              "host": ["{{BASE_URL}}"],
+              "path": ["posts", "feed", "cursor"],
+              "query": [{ "key": "size", "value": "999" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

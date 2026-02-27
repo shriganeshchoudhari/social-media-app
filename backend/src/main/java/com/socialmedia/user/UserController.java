@@ -1,5 +1,6 @@
 package com.socialmedia.user;
 
+import com.socialmedia.exception.ForbiddenException;
 import com.socialmedia.post.PostService;
 import com.socialmedia.post.dto.PostResponse;
 import com.socialmedia.user.dto.UpdateProfileRequest;
@@ -10,7 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,6 +23,8 @@ public class UserController {
 
     private final UserService userService;
     private final PostService postService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getMe(@AuthenticationPrincipal User currentUser) {
@@ -30,6 +36,30 @@ public class UserController {
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UpdateProfileRequest req) {
         return ResponseEntity.ok(userService.updateProfile(currentUser, req));
+    }
+
+    /**
+     * PUT /api/v1/users/me/password
+     * Body: { currentPassword, newPassword }
+     * Changes the current user's password after verifying the old one.
+     */
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody Map<String, String> body) {
+
+        String current = body.getOrDefault("currentPassword", "");
+        String next    = body.getOrDefault("newPassword", "");
+
+        if (!passwordEncoder.matches(current, currentUser.getPassword()))
+            throw new ForbiddenException("Current password is incorrect");
+
+        if (next.length() < 8)
+            throw new IllegalArgumentException("New password must be at least 8 characters");
+
+        currentUser.setPassword(passwordEncoder.encode(next));
+        userRepository.save(currentUser);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")

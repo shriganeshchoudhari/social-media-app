@@ -1,0 +1,591 @@
+{
+  "info": {
+    "_postman_id": "ch-social-col-004",
+    "name": "04 - ConnectHub Social Features",
+    "description": "Likes, Bookmarks, Comments, and Follow system (TC-LIKE-001 to TC-LIKE-009, TC-COMMENT-001 to TC-COMMENT-007, TC-FOLLOW-001 to TC-FOLLOW-007).\n\nPrerequisite: Run collections 01 and 03 first so tokens and ALICE_POST_ID are set.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "if (!pm.environment.get('ALICE_TOKEN') || !pm.environment.get('ALICE_POST_ID')) {",
+          "    console.warn('Missing ALICE_TOKEN or ALICE_POST_ID — run collections 01 and 03 first');",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Likes",
+      "item": [
+        {
+          "name": "✅ TC-LIKE-001 Like a post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-LIKE-001: liked=true in response', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.liked).to.equal(true);",
+                  "    pm.expect(json.likesCount).to.be.a('number').and.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/like", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "like"] }
+          }
+        },
+        {
+          "name": "❌ TC-LIKE-002 Like same post twice",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-002: Status 200 (toggle) or 409 (conflict)', () => {",
+                  "    pm.expect([200, 409]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/like", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "like"] }
+          }
+        },
+        {
+          "name": "✅ TC-LIKE-001b Bob likes post (setup for unlike)",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Bob likes post: Status 200', () => { pm.expect([200,409]).to.include(pm.response.code); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{BOB_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/like", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "like"] }
+          }
+        },
+        {
+          "name": "✅ TC-LIKE-003 Unlike a post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-003: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-LIKE-003: liked=false in response', () => {",
+                  "    pm.expect(pm.response.json().liked).to.equal(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{BOB_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/like", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "like"] }
+          }
+        },
+        {
+          "name": "❌ TC-LIKE-004 Unlike a post not previously liked",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-004: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-LIKE-004: Error about not having liked', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/not liked|have not liked/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{CHARLIE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/like", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "like"] }
+          }
+        },
+        {
+          "name": "❌ TC-LIKE-005 Like non-existent post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-LIKE-005: Status 404 Not Found', () => { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/9999999/like", "host": ["{{BASE_URL}}"], "path": ["posts", "9999999", "like"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookmarks",
+      "item": [
+        {
+          "name": "✅ TC-LIKE-006 Bookmark a post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-006: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-LIKE-006: bookmarked=true', () => {",
+                  "    pm.expect(pm.response.json().bookmarked).to.equal(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/bookmark", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "bookmark"] }
+          }
+        },
+        {
+          "name": "✅ TC-LIKE-008 Get bookmarks list",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-008: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-LIKE-008: Bookmarked post appears in list', () => {",
+                  "    const ids = pm.response.json().content.map(p => String(p.id));",
+                  "    pm.expect(ids).to.include(String(pm.environment.get('ALICE_POST_ID')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/me/bookmarks", "host": ["{{BASE_URL}}"], "path": ["users", "me", "bookmarks"] }
+          }
+        },
+        {
+          "name": "❌ TC-LIKE-009 Get another user's bookmarks",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-LIKE-009: Status 403 Forbidden — bookmarks are private', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/bob/bookmarks", "host": ["{{BASE_URL}}"], "path": ["users", "bob", "bookmarks"] }
+          }
+        },
+        {
+          "name": "✅ TC-LIKE-007 Remove bookmark",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-LIKE-007: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-LIKE-007: bookmarked=false', () => {",
+                  "    pm.expect(pm.response.json().bookmarked).to.equal(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/bookmark", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "bookmark"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "✅ TC-COMMENT-001 Add comment to post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-COMMENT-001: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.test('TC-COMMENT-001: Comment object returned', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.content).to.equal('Great post from E2E!');",
+                  "    pm.expect(json.author.username).to.equal('alice');",
+                  "    pm.expect(json).to.have.property('createdAt');",
+                  "    pm.environment.set('CREATED_COMMENT_ID', json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Great post from E2E!\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/comments", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "comments"] }
+          }
+        },
+        {
+          "name": "❌ TC-COMMENT-002 Add empty comment",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-COMMENT-002: Status 400 Bad Request', () => { pm.response.to.have.status(400); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/comments", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "comments"] }
+          }
+        },
+        {
+          "name": "❌ TC-COMMENT-003 Add comment to non-existent post",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-COMMENT-003: Status 404 Not Found', () => { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Comment on ghost post\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts/9999999/comments", "host": ["{{BASE_URL}}"], "path": ["posts", "9999999", "comments"] }
+          }
+        },
+        {
+          "name": "✅ TC-COMMENT-007 Get comments paginated",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-COMMENT-007: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-COMMENT-007: Paginated response', () => {",
+                  "    pm.expect(pm.response.json().content).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/comments?page=0&size=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["posts", "{{ALICE_POST_ID}}", "comments"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-COMMENT-006 Post author deletes another's comment (moderation)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const baseUrl = pm.environment.get('BASE_URL');",
+                  "const bobToken = pm.environment.get('BOB_TOKEN');",
+                  "const postId = pm.environment.get('ALICE_POST_ID');",
+                  "pm.sendRequest({",
+                  "    url: `${baseUrl}/posts/${postId}/comments`,",
+                  "    method: 'POST',",
+                  "    header: { 'Authorization': `Bearer ${bobToken}`, 'Content-Type': 'application/json' },",
+                  "    body: { mode: 'raw', raw: JSON.stringify({ content: 'Bob comment to be deleted by alice' }) }",
+                  "}, (err, res) => {",
+                  "    if (!err) pm.environment.set('BOB_COMMENT_ID', res.json().id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-COMMENT-006: Status 204 No Content (author moderation)', () => { pm.response.to.have.status(204); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/comments/{{BOB_COMMENT_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "comments", "{{BOB_COMMENT_ID}}"] }
+          }
+        },
+        {
+          "name": "✅ TC-COMMENT-004 Delete own comment",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-COMMENT-004: Status 204 No Content', () => { pm.response.to.have.status(204); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/{{ALICE_POST_ID}}/comments/{{CREATED_COMMENT_ID}}", "host": ["{{BASE_URL}}"], "path": ["posts", "{{ALICE_POST_ID}}", "comments", "{{CREATED_COMMENT_ID}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Follow System",
+      "item": [
+        {
+          "name": "✅ TC-FOLLOW-001 Alice follows Charlie",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FOLLOW-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FOLLOW-001: following=true', () => {",
+                  "    pm.expect(pm.response.json().following).to.equal(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/charlie/follow", "host": ["{{BASE_URL}}"], "path": ["users", "charlie", "follow"] }
+          }
+        },
+        {
+          "name": "❌ TC-FOLLOW-002 Follow already-followed user",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-FOLLOW-002: Status 200 or 409', () => { pm.expect([200, 409]).to.include(pm.response.code); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/charlie/follow", "host": ["{{BASE_URL}}"], "path": ["users", "charlie", "follow"] }
+          }
+        },
+        {
+          "name": "❌ TC-FOLLOW-003 Follow yourself",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FOLLOW-003: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-FOLLOW-003: Error mentions cannot follow yourself', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/self|yourself|follow/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/alice/follow", "host": ["{{BASE_URL}}"], "path": ["users", "alice", "follow"] }
+          }
+        },
+        {
+          "name": "❌ TC-FOLLOW-004 Follow non-existent user",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-FOLLOW-004: Status 404 Not Found', () => { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/ghost_xyz_999/follow", "host": ["{{BASE_URL}}"], "path": ["users", "ghost_xyz_999", "follow"] }
+          }
+        },
+        {
+          "name": "✅ TC-FOLLOW-005 Unfollow Charlie",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FOLLOW-005: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FOLLOW-005: following=false', () => {",
+                  "    pm.expect(pm.response.json().following).to.equal(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/charlie/follow", "host": ["{{BASE_URL}}"], "path": ["users", "charlie", "follow"] }
+          }
+        },
+        {
+          "name": "❌ TC-FOLLOW-006 Unfollow user you don't follow",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FOLLOW-006: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-FOLLOW-006: Error mentions not following', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/not following/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/users/charlie/follow", "host": ["{{BASE_URL}}"], "path": ["users", "charlie", "follow"] }
+          }
+        },
+        {
+          "name": "✅ TC-FOLLOW-007 Follow creates notification for target",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const baseUrl = pm.environment.get('BASE_URL');",
+                  "const token = pm.environment.get('ALICE_TOKEN');",
+                  "pm.sendRequest({ url: `${baseUrl}/users/charlie/follow`, method: 'POST', header: { 'Authorization': `Bearer ${token}` } }, () => {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-FOLLOW-007: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-FOLLOW-007: FOLLOW notification exists for charlie', () => {",
+                  "    const followNotifs = pm.response.json().content.filter(n => n.type === 'FOLLOW' && n.actor && n.actor.username === 'alice');",
+                  "    pm.expect(followNotifs.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{CHARLIE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/notifications", "host": ["{{BASE_URL}}"], "path": ["notifications"] }
+          }
+        }
+      ]
+    }
+  ]
+}

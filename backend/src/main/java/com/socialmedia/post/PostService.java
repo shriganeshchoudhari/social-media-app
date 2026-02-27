@@ -12,17 +12,24 @@ import com.socialmedia.user.User;
 import com.socialmedia.user.UserRepository;
 import com.socialmedia.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
+    private static final Pattern MENTION_PATTERN = Pattern.compile("@(\\w{3,30})");
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
@@ -43,10 +50,26 @@ public class PostService {
         author.setPostsCount(author.getPostsCount() + 1);
         userRepository.save(author);
 
+        // Fire MENTION notifications for every @username in the content
+        final Post savedPost = post;
+        extractMentions(req.getContent()).forEach(username -> {
+            userRepository.findByUsername(username).ifPresent(mentioned -> {
+                eventPublisher.publishEvent(new NotificationEvent(
+                        this, author, mentioned,
+                        Notification.Type.MENTION, savedPost.getId(),
+                        author.getUsername() + " mentioned you in a post"));
+            });
+        });
+
         return toResponse(post, false);
     }
 
+    /**
+     * Cached by post ID for 5 minutes (see CacheConfig).
+     * Evicted on update, delete, like, or unlike.
+     */
     @Transactional(readOnly = true)
+    @Cacheable(value = "posts", key = "#id + '-' + #currentUser.id")
     public PostResponse getById(Long id, User currentUser) {
         Post post = findPost(id);
         boolean liked = postLikeRepository.existsByPostAndUser(post, currentUser);
@@ -54,6 +77,7 @@ public class PostService {
     }
 
     @Transactional
+    @CacheEvict(value = "posts", allEntries = true)
     public PostResponse update(Long id, User currentUser, CreatePostRequest req) {
         Post post = findPost(id);
         if (!post.getAuthor().getId().equals(currentUser.getId()))
@@ -66,6 +90,7 @@ public class PostService {
     }
 
     @Transactional
+    @CacheEvict(value = "posts", allEntries = true)
     public void delete(Long id, User currentUser) {
         Post post = findPost(id);
         if (!post.getAuthor().getId().equals(currentUser.getId()))
@@ -83,6 +108,23 @@ public class PostService {
                 .map(p -> toResponse(p, postLikeRepository.existsByPostAndUser(p, currentUser)));
     }
 
+    /**
+     * Keyset-paginated feed.
+     * Returns posts created before {@code before} (ISO-8601 cursor), up to {@code size} items.
+     * The cursor for the next page is the {@code createdAt} of the last returned post.
+     * Returns an empty list when there are no more items.
+     */
+    @Transactional(readOnly = true)
+    public List<PostResponse> getFeedBefore(User currentUser, LocalDateTime before, int size) {
+        List<Long> followingIds = followRepository.findFollowingIds(currentUser);
+        return postRepository.findFeedBefore(
+                        currentUser, followingIds, before,
+                        org.springframework.data.domain.PageRequest.of(0, size))
+                .stream()
+                .map(p -> toResponse(p, postLikeRepository.existsByPostAndUser(p, currentUser)))
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public Page<PostResponse> getByUsername(String username, User currentUser, Pageable pageable) {
         User author = userRepository.findByUsername(username)
@@ -92,6 +134,7 @@ public class PostService {
     }
 
     @Transactional
+    @CacheEvict(value = "posts", allEntries = true)
     public PostResponse like(Long id, User currentUser) {
         Post post = findPost(id);
         if (postLikeRepository.existsByPostAndUser(post, currentUser))
@@ -109,6 +152,7 @@ public class PostService {
     }
 
     @Transactional
+    @CacheEvict(value = "posts", allEntries = true)
     public PostResponse unlike(Long id, User currentUser) {
         Post post = findPost(id);
         PostLike like = postLikeRepository.findByPostAndUser(post, currentUser)
@@ -126,13 +170,23 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<PostResponse> searchByHashtag(String tag, User currentUser, Pageable pageable) {
-        // Strip leading '#' if provided
         String cleanTag = tag.startsWith("#") ? tag.substring(1) : tag;
         return postRepository.findByHashtag(cleanTag, currentUser, pageable)
                 .map(p -> toResponse(p, postLikeRepository.existsByPostAndUser(p, currentUser)));
     }
 
     // ── Helpers ───────────────────────────────────────────────
+
+    /** Extract unique @mention usernames from post content (3-30 word chars). */
+    private List<String> extractMentions(String content) {
+        if (content == null || content.isBlank()) return List.of();
+        Matcher m = MENTION_PATTERN.matcher(content);
+        return m.results()
+                .map(r -> r.group(1).toLowerCase())
+                .distinct()
+                .limit(10) // cap to avoid abuse
+                .toList();
+    }
 
     private Post findPost(Long id) {
         return postRepository.findById(id)

@@ -5,6 +5,7 @@ import notificationsReducer from './notificationsSlice.js'
 import aiReducer from './aiSlice.js'
 import messagingReducer from './messagingSlice.js'
 import bookmarksReducer from './bookmarksSlice.js'
+import themeReducer from './themeSlice.js'
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     ai: aiReducer,
     messaging: messagingReducer,
     bookmarks: bookmarksReducer,
+    theme: themeReducer,
   },
 })

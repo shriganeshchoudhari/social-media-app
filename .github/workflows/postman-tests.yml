@@ -21,25 +21,91 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Newman
-        run: npm install -g newman
+      - name: Install Newman + HTML reporter
+        run: npm install -g newman newman-reporter-htmlextra
 
-      - name: Run Postman collection (Newman)
+      - name: Run 01 - Authentication
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
-          API_KEY: ${{ secrets.API_KEY }}
         run: |
-          newman run "postman_collections/Social Media API Tests.postman_collection.json" \
+          newman run "postman_collections/01_Auth.postman_collection.json" \
             -e "postman_environments/local.postman_environment.json" \
-            --env-var "baseUrl=${BASE_URL:-http://localhost:3000}" \
-            --env-var "apiKey=${API_KEY}" \
-            --reporters cli,junit \
-            --reporter-junit-export "newman-results.xml"
+            --env-var "BASE_URL=${BASE_URL:-http://localhost:8080/api/v1}" \
+            --reporters cli,junit,htmlextra \
+            --reporter-junit-export "newman-results/01_auth.xml" \
+            --reporter-htmlextra-export "newman-results/01_auth.html" \
+            --delay-request 100 \
+            --timeout-request 10000
+        continue-on-error: false
 
-      - name: Upload test report
+      - name: Run 02 - User Management
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          newman run "postman_collections/02_User_Management.postman_collection.json" \
+            -e "postman_environments/local.postman_environment.json" \
+            --env-var "BASE_URL=${BASE_URL:-http://localhost:8080/api/v1}" \
+            --reporters cli,junit,htmlextra \
+            --reporter-junit-export "newman-results/02_user_management.xml" \
+            --reporter-htmlextra-export "newman-results/02_user_management.html" \
+            --delay-request 100 \
+            --timeout-request 10000
+
+      - name: Run 03 - Posts & Feed
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          newman run "postman_collections/03_Posts_and_Feed.postman_collection.json" \
+            -e "postman_environments/local.postman_environment.json" \
+            --env-var "BASE_URL=${BASE_URL:-http://localhost:8080/api/v1}" \
+            --reporters cli,junit,htmlextra \
+            --reporter-junit-export "newman-results/03_posts_feed.xml" \
+            --reporter-htmlextra-export "newman-results/03_posts_feed.html" \
+            --delay-request 100 \
+            --timeout-request 10000
+
+      - name: Run 04 - Social Features
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          newman run "postman_collections/04_Social_Features.postman_collection.json" \
+            -e "postman_environments/local.postman_environment.json" \
+            --env-var "BASE_URL=${BASE_URL:-http://localhost:8080/api/v1}" \
+            --reporters cli,junit,htmlextra \
+            --reporter-junit-export "newman-results/04_social.xml" \
+            --reporter-htmlextra-export "newman-results/04_social.html" \
+            --delay-request 100 \
+            --timeout-request 10000
+
+      - name: Run 05 - Messaging & Notifications
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          newman run "postman_collections/05_Messaging_and_Notifications.postman_collection.json" \
+            -e "postman_environments/local.postman_environment.json" \
+            --env-var "BASE_URL=${BASE_URL:-http://localhost:8080/api/v1}" \
+            --reporters cli,junit,htmlextra \
+            --reporter-junit-export "newman-results/05_messaging.xml" \
+            --reporter-htmlextra-export "newman-results/05_messaging.html" \
+            --delay-request 100 \
+            --timeout-request 10000
+
+      - name: Run 06 - Search, Media & Admin
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          newman run "postman_collections/06_Search_Media_Admin.postman_collection.json" \
+            -e "postman_environments/local.postman_environment.json" \
+            --env-var "BASE_URL=${BASE_URL:-http://localhost:8080/api/v1}" \
+            --reporters cli,junit,htmlextra \
+            --reporter-junit-export "newman-results/06_search_admin.xml" \
+            --reporter-htmlextra-export "newman-results/06_search_admin.html" \
+            --delay-request 100 \
+            --timeout-request 10000
+
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: newman-results
-          path: |
-            newman-results.xml
+          path: newman-results/

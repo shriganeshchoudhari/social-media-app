@@ -11,6 +11,9 @@ import SearchPage from './pages/SearchPage.jsx'
 import NotificationsPage from './pages/NotificationsPage.jsx'
 import MessagesPage from './pages/MessagesPage.jsx'
 import BookmarksPage from './pages/BookmarksPage.jsx'
+import HashtagFeedPage from './pages/HashtagFeedPage.jsx'
+import SettingsPage from './pages/SettingsPage.jsx'
+import AdminPage from './pages/AdminPage.jsx'
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated)
@@ -39,6 +42,9 @@ export default function App() {
           <Route path="posts/:id" element={<PostDetailPage />} />
           <Route path="messages" element={<MessagesPage />} />
           <Route path="bookmarks" element={<BookmarksPage />} />
+          <Route path="hashtag/:tag" element={<HashtagFeedPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="admin" element={<AdminPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

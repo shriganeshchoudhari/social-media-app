@@ -3,13 +3,24 @@
     "id": "d33f7fbf-26ca-4144-8a7e-028cf9b1e6ef"
   },
   "entities": {
-    "environments": [],
+    "environments": [
+      "..\\postman_environments\\local.postman_environment.json",
+      "..\\postman_environments\\ConnectHub.postman_environment.json"
+    ],
     "flows": [],
     "globals": [],
     "mocks": [],
     "specs": [
       "..\\docs\\openapi.yaml"
     ],
-    "collections": []
+    "collections": [
+      "..\\postman_collections\\01_Auth.postman_collection.json",
+      "..\\postman_collections\\02_User_Management.postman_collection.json",
+      "..\\postman_collections\\03_Posts_and_Feed.postman_collection.json",
+      "..\\postman_collections\\04_Social_Features.postman_collection.json",
+      "..\\postman_collections\\05_Messaging_and_Notifications.postman_collection.json",
+      "..\\postman_collections\\06_Search_Media_Admin.postman_collection.json",
+      "..\\postman_collections\\Social Media API Tests.postman_collection.json"
+    ]
   }
 }

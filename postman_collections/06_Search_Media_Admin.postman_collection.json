@@ -1,0 +1,688 @@
+{
+  "info": {
+    "_postman_id": "ch-search-admin-col-006",
+    "name": "06 - ConnectHub Search, Media & Admin",
+    "description": "Search & Discovery, Media Upload, and Admin Panel endpoints (TC-SEARCH-001 to TC-SEARCH-009, TC-MEDIA-001 to TC-MEDIA-007, TC-ADMIN-001 to TC-ADMIN-010).\n\nPrerequisite: Run collection 01 so ALICE_TOKEN, BOB_TOKEN, ADMIN_TOKEN are set.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "if (!pm.environment.get('ADMIN_TOKEN')) {",
+          "    console.warn('ADMIN_TOKEN not set — run collection 01 first');",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test('Response time < 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Search & Discovery",
+      "item": [
+        {
+          "name": "✅ TC-SEARCH-001 Search users by username",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-001: Alice appears in results for query \"ali\"', () => {",
+                  "    const users = pm.response.json().content || pm.response.json();",
+                  "    pm.expect(users).to.be.an('array');",
+                  "    pm.expect(users.map(u => u.username)).to.include('alice');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/users?q=ali",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "users"],
+              "query": [{ "key": "q", "value": "ali" }]
+            }
+          }
+        },
+        {
+          "name": "❌ TC-SEARCH-002 Search users empty query",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-SEARCH-002: Status 400 or empty results', () => { pm.expect([200, 400]).to.include(pm.response.code); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/users?q=",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "users"],
+              "query": [{ "key": "q", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-SEARCH-003 Search posts by content",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-003: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-003: Results is an array', () => {",
+                  "    pm.expect((pm.response.json().content || pm.response.json())).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/posts?q=testing",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "posts"],
+              "query": [{ "key": "q", "value": "testing" }]
+            }
+          }
+        },
+        {
+          "name": "❌ TC-SEARCH-004 SQL injection in search query",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-004: Status 200 — injection neutralized', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-004: No SQL error exposed in response', () => {",
+                  "    const body = pm.response.text().toLowerCase();",
+                  "    pm.expect(body).to.not.include('sql');",
+                  "    pm.expect(body).to.not.include('syntax error');",
+                  "    pm.expect(body).to.not.include('exception');",
+                  "    pm.expect(body).to.not.include('drop table');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/posts?q=' OR '1'='1'; DROP TABLE posts;--",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "posts"],
+              "query": [{ "key": "q", "value": "' OR '1'='1'; DROP TABLE posts;--" }]
+            }
+          }
+        },
+        {
+          "name": "❌ TC-SEARCH-005 XSS payload in search query",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-005: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-005: Raw script tag not reflected in response', () => {",
+                  "    pm.expect(pm.response.text()).to.not.include('<script>alert(1)</script>');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/users?q=<script>alert(1)</script>",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "users"],
+              "query": [{ "key": "q", "value": "<script>alert(1)</script>" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-SEARCH-006 Get posts by hashtag",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-006: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-006: Returns array of posts', () => {",
+                  "    pm.expect(pm.response.json().content).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/hashtag/testing", "host": ["{{BASE_URL}}"], "path": ["posts", "hashtag", "testing"] }
+          }
+        },
+        {
+          "name": "✅ TC-SEARCH-007 Non-existent hashtag returns empty results",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-007: Status 200 OK (not 404)', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-007: Empty results', () => {",
+                  "    pm.expect(pm.response.json().content).to.be.an('array').and.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/posts/hashtag/xyz_no_such_hashtag_9999", "host": ["{{BASE_URL}}"], "path": ["posts", "hashtag", "xyz_no_such_hashtag_9999"] }
+          }
+        },
+        {
+          "name": "✅ TC-SEARCH-008 Mention autocomplete",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-008: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-008: Results include bob, max 6 results', () => {",
+                  "    const users = pm.response.json().content || pm.response.json();",
+                  "    pm.expect(users).to.be.an('array');",
+                  "    pm.expect(users.length).to.be.at.most(6);",
+                  "    pm.expect(users.map(u => u.username)).to.include('bob');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/users?q=bo&size=6",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "users"],
+              "query": [{ "key": "q", "value": "bo" }, { "key": "size", "value": "6" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-SEARCH-009 Search pagination page 2",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SEARCH-009: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-SEARCH-009: Page 1 returned with size 5', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.number).to.equal(1);",
+                  "    pm.expect(json.size).to.equal(5);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/search/posts?q=the&page=1&size=5",
+              "host": ["{{BASE_URL}}"],
+              "path": ["search", "posts"],
+              "query": [{ "key": "q", "value": "the" }, { "key": "page", "value": "1" }, { "key": "size", "value": "5" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media Upload",
+      "item": [
+        {
+          "name": "❌ TC-MEDIA-003 Upload file exceeding size limit",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": ["// Attach a file > 50MB to the 'file' form-data field to trigger this test"],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MEDIA-003: Status 413 or 400', () => { pm.expect([400, 413]).to.include(pm.response.code); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "/path/to/large-file-over-50mb.bin", "description": "Replace with actual >50MB file" }]
+            },
+            "url": { "raw": "{{BASE_URL}}/media/upload", "host": ["{{BASE_URL}}"], "path": ["media", "upload"] }
+          }
+        },
+        {
+          "name": "❌ TC-MEDIA-004 Upload unsupported file type",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MEDIA-004: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-MEDIA-004: Error mentions unsupported file type', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/unsupported|file type|format/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "/path/to/test.exe", "description": "Replace with an actual .exe file" }]
+            },
+            "url": { "raw": "{{BASE_URL}}/media/upload", "host": ["{{BASE_URL}}"], "path": ["media", "upload"] }
+          }
+        },
+        {
+          "name": "❌ TC-MEDIA-005 Upload with no file",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-MEDIA-005: Status 400 — empty upload rejected', () => { pm.response.to.have.status(400); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "body": { "mode": "formdata", "formdata": [] },
+            "url": { "raw": "{{BASE_URL}}/media/upload", "host": ["{{BASE_URL}}"], "path": ["media", "upload"] }
+          }
+        },
+        {
+          "name": "❌ TC-MEDIA-007 Create post with javascript: URL scheme",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MEDIA-007: Status 400 — javascript: URL rejected', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-MEDIA-007: Error mentions invalid URL', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/url|invalid|scheme/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Photo post\",\n  \"mediaUrl\": \"javascript:alert(1)\",\n  \"mediaType\": \"IMAGE\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "✅ TC-MEDIA-006 Create post with valid media URL",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-MEDIA-006: Status 201 Created', () => { pm.response.to.have.status(201); });",
+                  "pm.test('TC-MEDIA-006: Post has mediaUrl and mediaType', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.mediaUrl).to.include('https://');",
+                  "    pm.expect(json.mediaType).to.equal('IMAGE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Look at this photo!\",\n  \"mediaUrl\": \"https://images.unsplash.com/photo-1506905925346-21bda4d32df4\",\n  \"mediaType\": \"IMAGE\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/posts", "host": ["{{BASE_URL}}"], "path": ["posts"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Panel",
+      "item": [
+        {
+          "name": "✅ TC-ADMIN-001 Get platform stats as admin",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ADMIN-001: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-ADMIN-001: Stats object has required fields', () => {",
+                  "    const json = pm.response.json();",
+                  "    ['totalUsers','adminUsers','regularUsers','totalPosts'].forEach(f => pm.expect(json).to.have.property(f));",
+                  "    pm.expect(json.totalUsers).to.equal(json.adminUsers + json.regularUsers);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/admin/stats", "host": ["{{BASE_URL}}"], "path": ["admin", "stats"] }
+          }
+        },
+        {
+          "name": "❌ TC-ADMIN-002 Get stats as regular user",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-ADMIN-002: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/admin/stats", "host": ["{{BASE_URL}}"], "path": ["admin", "stats"] }
+          }
+        },
+        {
+          "name": "❌ TC-ADMIN-003 Get stats unauthenticated",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-ADMIN-003: Status 401 Unauthorized', () => { pm.response.to.have.status(401); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/admin/stats", "host": ["{{BASE_URL}}"], "path": ["admin", "stats"] }
+          }
+        },
+        {
+          "name": "✅ TC-ADMIN-004 List all users paginated",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ADMIN-004: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-ADMIN-004: Paginated user list max 15', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('content');",
+                  "    pm.expect(json.content.length).to.be.at.most(15);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/users?page=0&size=15",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "users"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "15" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-ADMIN-005 Search users in admin panel",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ADMIN-005: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-ADMIN-005: Alice in results for query \"ali\"', () => {",
+                  "    pm.expect(pm.response.json().content.map(u => u.username)).to.include('alice');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/users?q=ali",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "users"],
+              "query": [{ "key": "q", "value": "ali" }]
+            }
+          }
+        },
+        {
+          "name": "✅ TC-ADMIN-006 Promote Charlie to ADMIN",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["// CHARLIE_ID must be set from collection 01"], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ADMIN-006: Status 200 OK', () => { pm.response.to.have.status(200); });",
+                  "pm.test('TC-ADMIN-006: Role updated to ADMIN', () => {",
+                  "    pm.expect(pm.response.json().role).to.equal('ADMIN');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"ADMIN\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/admin/users/{{CHARLIE_ID}}/role", "host": ["{{BASE_URL}}"], "path": ["admin", "users", "{{CHARLIE_ID}}", "role"] }
+          }
+        },
+        {
+          "name": "✅ TC-ADMIN-006b Restore Charlie to USER",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Restore Charlie: Status 200', () => { pm.response.to.have.status(200); });",
+                  "pm.test('Restore Charlie: Role is USER', () => { pm.expect(pm.response.json().role).to.equal('USER'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"USER\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/admin/users/{{CHARLIE_ID}}/role", "host": ["{{BASE_URL}}"], "path": ["admin", "users", "{{CHARLIE_ID}}", "role"] }
+          }
+        },
+        {
+          "name": "❌ TC-ADMIN-007 Promote with invalid role",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ADMIN-007: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-ADMIN-007: Error mentions invalid role', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/role|invalid|enum/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"SUPERUSER\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/admin/users/{{CHARLIE_ID}}/role", "host": ["{{BASE_URL}}"], "path": ["admin", "users", "{{CHARLIE_ID}}", "role"] }
+          }
+        },
+        {
+          "name": "❌ TC-ADMIN-009 Admin tries to delete themselves",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["// ADMIN_ID set from collection 01 login"], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ADMIN-009: Status 400 Bad Request', () => { pm.response.to.have.status(400); });",
+                  "pm.test('TC-ADMIN-009: Error about self-deletion', () => {",
+                  "    pm.expect(JSON.stringify(pm.response.json())).to.match(/cannot delete|own account|self/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/admin/users/{{ADMIN_ID}}", "host": ["{{BASE_URL}}"], "path": ["admin", "users", "{{ADMIN_ID}}"] }
+          }
+        },
+        {
+          "name": "❌ TC-ADMIN-010a Regular user hits admin users endpoint",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-ADMIN-010a: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/admin/users", "host": ["{{BASE_URL}}"], "path": ["admin", "users"] }
+          }
+        },
+        {
+          "name": "❌ TC-ADMIN-010b Regular user hits admin role endpoint",
+          "event": [
+            { "listen": "prerequest", "script": { "exec": [""], "type": "text/javascript" } },
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('TC-ADMIN-010b: Status 403 Forbidden', () => { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ALICE_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"ADMIN\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/admin/users/{{BOB_ID}}/role", "host": ["{{BASE_URL}}"], "path": ["admin", "users", "{{BOB_ID}}", "role"] }
+          }
+        }
+      ]
+    }
+  ]
+}

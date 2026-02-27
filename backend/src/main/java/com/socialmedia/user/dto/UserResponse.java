@@ -1,5 +1,6 @@
 package com.socialmedia.user.dto;
 
+import com.socialmedia.user.User;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +17,6 @@ public class UserResponse {
     private int followersCount;
     private int followingCount;
     private int postsCount;
+    private User.Role role;
     private LocalDateTime createdAt;
 }

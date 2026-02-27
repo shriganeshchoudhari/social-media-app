@@ -7,7 +7,6 @@ import AiChatPanel from '../ai/AiChatPanel.jsx'
 import useWebSocket from '../../hooks/useWebSocket.js'
 
 function WebSocketProvider() {
-  // Initialize the app-wide WS connection; renders nothing
   useWebSocket()
   return null
 }
@@ -15,9 +14,9 @@ function WebSocketProvider() {
 export default function AppLayout() {
   return (
     <ToastProvider>
-      <div className="min-h-screen flex bg-gray-50">
+      <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
         {/* Left sidebar — hidden on mobile */}
-        <aside className="hidden md:flex flex-col w-60 shrink-0 fixed top-0 left-0 h-full border-r border-gray-200 bg-white z-30">
+        <aside className="hidden md:flex flex-col w-60 shrink-0 fixed top-0 left-0 h-full border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-30">
           <Sidebar />
         </aside>
 

@@ -64,6 +64,13 @@ public class DataSeeder implements ApplicationRunner {
         // ── 1. Users ─────────────────────────────────────────
         String hash = passwordEncoder.encode("Password1!");
 
+        // Admin account (login with admin / Password1! to access /admin)
+        save(User.builder()
+                .username("admin").email("admin@demo.com").password(hash)
+                .displayName("Admin").bio("Platform administrator")
+                .role(User.Role.ADMIN)
+                .build());
+
         User alice = save(User.builder()
                 .username("alice").email("alice@demo.com").password(hash)
                 .displayName("Alice Wonderland")
