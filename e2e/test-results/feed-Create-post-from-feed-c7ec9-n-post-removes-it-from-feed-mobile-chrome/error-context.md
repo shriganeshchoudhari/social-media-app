@@ -1,0 +1,703 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Home" [level=1] [ref=e8]
+      - generic [ref=e10]:
+        - generic [ref=e11]: A
+        - generic [ref=e12]:
+          - textbox "Post content" [ref=e14]:
+            - /placeholder: What's on your mind? Use @username to mention people
+          - generic [ref=e15]:
+            - generic [ref=e16]:
+              - button "Add image" [ref=e17] [cursor=pointer]:
+                - img [ref=e18]
+              - combobox "Post privacy" [ref=e22] [cursor=pointer]:
+                - option "Public" [selected]
+                - option "Followers only"
+                - option "Only me"
+            - generic [ref=e23]:
+              - generic "2000 characters remaining" [ref=e24]: "2000"
+              - button "Publish post" [disabled] [ref=e25]: Post
+      - article [ref=e26]:
+        - generic [ref=e27]:
+          - link "A" [ref=e28] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e29]: A
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - link "Alice Updated 1772356549415" [ref=e32] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e33]: "@alice"
+              - generic [ref=e34]: ·
+              - generic [ref=e35]: just now
+              - img [ref=e36]
+            - link "Delete me 1772357097782" [ref=e39] [cursor=pointer]:
+              - /url: /posts/93
+              - paragraph [ref=e40]: Delete me 1772357097782
+            - generic [ref=e41]:
+              - button "Like" [ref=e42] [cursor=pointer]:
+                - img [ref=e43]
+                - generic [ref=e45]: "0"
+              - link "0" [ref=e46] [cursor=pointer]:
+                - /url: /posts/93
+                - img [ref=e47]
+                - generic [ref=e49]: "0"
+              - button "Bookmark" [ref=e50] [cursor=pointer]:
+                - img [ref=e51]
+              - generic [ref=e53]:
+                - button "Edit post" [ref=e54] [cursor=pointer]:
+                  - img [ref=e55]
+                - button "Delete post" [ref=e58] [cursor=pointer]:
+                  - img [ref=e59]
+      - article [ref=e62]:
+        - generic [ref=e63]:
+          - link "A" [ref=e64] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e65]: A
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - link "Alice Updated 1772356549415" [ref=e68] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e69]: "@alice"
+              - generic [ref=e70]: ·
+              - generic [ref=e71]: just now
+              - img [ref=e72]
+            - link "Private 1772357095652" [ref=e75] [cursor=pointer]:
+              - /url: /posts/92
+              - paragraph [ref=e76]: Private 1772357095652
+            - generic [ref=e77]:
+              - button "Like" [ref=e78] [cursor=pointer]:
+                - img [ref=e79]
+                - generic [ref=e81]: "0"
+              - link "0" [ref=e82] [cursor=pointer]:
+                - /url: /posts/92
+                - img [ref=e83]
+                - generic [ref=e85]: "0"
+              - button "Bookmark" [ref=e86] [cursor=pointer]:
+                - img [ref=e87]
+              - generic [ref=e89]:
+                - button "Edit post" [ref=e90] [cursor=pointer]:
+                  - img [ref=e91]
+                - button "Delete post" [ref=e94] [cursor=pointer]:
+                  - img [ref=e95]
+      - article [ref=e98]:
+        - generic [ref=e99]:
+          - link "A" [ref=e100] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e101]: A
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - link "Alice Updated 1772356549415" [ref=e104] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e105]: "@alice"
+              - generic [ref=e106]: ·
+              - generic [ref=e107]: just now
+              - img [ref=e108]
+            - link "Followers only 1772357092945" [ref=e111] [cursor=pointer]:
+              - /url: /posts/91
+              - paragraph [ref=e112]: Followers only 1772357092945
+            - generic [ref=e113]:
+              - button "Like" [ref=e114] [cursor=pointer]:
+                - img [ref=e115]
+                - generic [ref=e117]: "0"
+              - link "0" [ref=e118] [cursor=pointer]:
+                - /url: /posts/91
+                - img [ref=e119]
+                - generic [ref=e121]: "0"
+              - button "Bookmark" [ref=e122] [cursor=pointer]:
+                - img [ref=e123]
+              - generic [ref=e125]:
+                - button "Edit post" [ref=e126] [cursor=pointer]:
+                  - img [ref=e127]
+                - button "Delete post" [ref=e130] [cursor=pointer]:
+                  - img [ref=e131]
+      - article [ref=e134]:
+        - generic [ref=e135]:
+          - link "A" [ref=e136] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e137]: A
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - link "Alice Updated 1772356549415" [ref=e140] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e141]: "@alice"
+              - generic [ref=e142]: ·
+              - generic [ref=e143]: just now
+              - img [ref=e144]
+            - link "E2E public post 1772357085391" [ref=e147] [cursor=pointer]:
+              - /url: /posts/90
+              - paragraph [ref=e148]: E2E public post 1772357085391
+            - generic [ref=e149]:
+              - button "Like" [ref=e150] [cursor=pointer]:
+                - img [ref=e151]
+                - generic [ref=e153]: "0"
+              - link "0" [ref=e154] [cursor=pointer]:
+                - /url: /posts/90
+                - img [ref=e155]
+                - generic [ref=e157]: "0"
+              - button "Bookmark" [ref=e158] [cursor=pointer]:
+                - img [ref=e159]
+              - generic [ref=e161]:
+                - button "Edit post" [ref=e162] [cursor=pointer]:
+                  - img [ref=e163]
+                - button "Delete post" [ref=e166] [cursor=pointer]:
+                  - img [ref=e167]
+      - article [ref=e170]:
+        - generic [ref=e171]:
+          - link "A" [ref=e172] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e173]: A
+          - generic [ref=e174]:
+            - generic [ref=e175]:
+              - link "Alice Updated 1772356549415" [ref=e176] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e177]: "@alice"
+              - generic [ref=e178]: ·
+              - generic [ref=e179]: just now
+              - generic [ref=e180]: (edited)
+              - img [ref=e181]
+            - link "Pagination test 1772357075475" [ref=e184] [cursor=pointer]:
+              - /url: /posts/89
+              - paragraph [ref=e185]: Pagination test 1772357075475
+            - generic [ref=e186]:
+              - button "Like" [ref=e187] [cursor=pointer]:
+                - img [ref=e188]
+                - generic [ref=e190]: "0"
+              - link "3" [ref=e191] [cursor=pointer]:
+                - /url: /posts/89
+                - img [ref=e192]
+                - generic [ref=e194]: "3"
+              - button "Bookmark" [ref=e195] [cursor=pointer]:
+                - img [ref=e196]
+              - generic [ref=e198]:
+                - button "Edit post" [ref=e199] [cursor=pointer]:
+                  - img [ref=e200]
+                - button "Delete post" [ref=e203] [cursor=pointer]:
+                  - img [ref=e204]
+      - article [ref=e207]:
+        - generic [ref=e208]:
+          - link "A" [ref=e209] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e210]: A
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - link "Alice Updated 1772356549415" [ref=e213] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e214]: "@alice"
+              - generic [ref=e215]: ·
+              - generic [ref=e216]: just now
+              - generic [ref=e217]: (edited)
+              - img [ref=e218]
+            - link "403 comment test 1772357074820" [ref=e221] [cursor=pointer]:
+              - /url: /posts/88
+              - paragraph [ref=e222]: 403 comment test 1772357074820
+            - generic [ref=e223]:
+              - button "Like" [ref=e224] [cursor=pointer]:
+                - img [ref=e225]
+                - generic [ref=e227]: "0"
+              - link "1" [ref=e228] [cursor=pointer]:
+                - /url: /posts/88
+                - img [ref=e229]
+                - generic [ref=e231]: "1"
+              - button "Bookmark" [ref=e232] [cursor=pointer]:
+                - img [ref=e233]
+              - generic [ref=e235]:
+                - button "Edit post" [ref=e236] [cursor=pointer]:
+                  - img [ref=e237]
+                - button "Delete post" [ref=e240] [cursor=pointer]:
+                  - img [ref=e241]
+      - article [ref=e244]:
+        - generic [ref=e245]:
+          - link "A" [ref=e246] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e247]: A
+          - generic [ref=e248]:
+            - generic [ref=e249]:
+              - link "Alice Updated 1772356549415" [ref=e250] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e251]: "@alice"
+              - generic [ref=e252]: ·
+              - generic [ref=e253]: just now
+              - img [ref=e254]
+            - link "Auth test 1772357073454" [ref=e257] [cursor=pointer]:
+              - /url: /posts/87
+              - paragraph [ref=e258]: Auth test 1772357073454
+            - generic [ref=e259]:
+              - button "Like" [ref=e260] [cursor=pointer]:
+                - img [ref=e261]
+                - generic [ref=e263]: "0"
+              - link "0" [ref=e264] [cursor=pointer]:
+                - /url: /posts/87
+                - img [ref=e265]
+                - generic [ref=e267]: "0"
+              - button "Bookmark" [ref=e268] [cursor=pointer]:
+                - img [ref=e269]
+              - generic [ref=e271]:
+                - button "Edit post" [ref=e272] [cursor=pointer]:
+                  - img [ref=e273]
+                - button "Delete post" [ref=e276] [cursor=pointer]:
+                  - img [ref=e277]
+      - article [ref=e280]:
+        - generic [ref=e281]:
+          - link "A" [ref=e282] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e283]: A
+          - generic [ref=e284]:
+            - generic [ref=e285]:
+              - link "Alice Updated 1772356549415" [ref=e286] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e287]: "@alice"
+              - generic [ref=e288]: ·
+              - generic [ref=e289]: just now
+              - img [ref=e290]
+            - link "Comment test post 1772357069251" [ref=e293] [cursor=pointer]:
+              - /url: /posts/86
+              - paragraph [ref=e294]: Comment test post 1772357069251
+            - generic [ref=e295]:
+              - button "Like" [ref=e296] [cursor=pointer]:
+                - img [ref=e297]
+                - generic [ref=e299]: "0"
+              - link "0" [ref=e300] [cursor=pointer]:
+                - /url: /posts/86
+                - img [ref=e301]
+                - generic [ref=e303]: "0"
+              - button "Bookmark" [ref=e304] [cursor=pointer]:
+                - img [ref=e305]
+              - generic [ref=e307]:
+                - button "Edit post" [ref=e308] [cursor=pointer]:
+                  - img [ref=e309]
+                - button "Delete post" [ref=e312] [cursor=pointer]:
+                  - img [ref=e313]
+      - article [ref=e316]:
+        - generic [ref=e317]:
+          - link "A" [ref=e318] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e319]: A
+          - generic [ref=e320]:
+            - generic [ref=e321]:
+              - link "Alice Updated 1772356549415" [ref=e322] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e323]: "@alice"
+              - generic [ref=e324]: ·
+              - generic [ref=e325]: just now
+              - img [ref=e326]
+            - link "Comment test post 1772357056296" [ref=e329] [cursor=pointer]:
+              - /url: /posts/85
+              - paragraph [ref=e330]: Comment test post 1772357056296
+            - generic [ref=e331]:
+              - button "Like" [ref=e332] [cursor=pointer]:
+                - img [ref=e333]
+                - generic [ref=e335]: "0"
+              - link "0" [ref=e336] [cursor=pointer]:
+                - /url: /posts/85
+                - img [ref=e337]
+                - generic [ref=e339]: "0"
+              - button "Bookmark" [ref=e340] [cursor=pointer]:
+                - img [ref=e341]
+              - generic [ref=e343]:
+                - button "Edit post" [ref=e344] [cursor=pointer]:
+                  - img [ref=e345]
+                - button "Delete post" [ref=e348] [cursor=pointer]:
+                  - img [ref=e349]
+      - article [ref=e352]:
+        - generic [ref=e353]:
+          - link "A" [ref=e354] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e355]: A
+          - generic [ref=e356]:
+            - generic [ref=e357]:
+              - link "Alice Updated 1772356549415" [ref=e358] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e359]: "@alice"
+              - generic [ref=e360]: ·
+              - generic [ref=e361]: just now
+              - img [ref=e362]
+            - link "Comment test post 1772357043363" [ref=e365] [cursor=pointer]:
+              - /url: /posts/84
+              - paragraph [ref=e366]: Comment test post 1772357043363
+            - generic [ref=e367]:
+              - button "Like" [ref=e368] [cursor=pointer]:
+                - img [ref=e369]
+                - generic [ref=e371]: "0"
+              - link "0" [ref=e372] [cursor=pointer]:
+                - /url: /posts/84
+                - img [ref=e373]
+                - generic [ref=e375]: "0"
+              - button "Bookmark" [ref=e376] [cursor=pointer]:
+                - img [ref=e377]
+              - generic [ref=e379]:
+                - button "Edit post" [ref=e380] [cursor=pointer]:
+                  - img [ref=e381]
+                - button "Delete post" [ref=e384] [cursor=pointer]:
+                  - img [ref=e385]
+      - article [ref=e388]:
+        - generic [ref=e389]:
+          - link "A" [ref=e390] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e391]: A
+          - generic [ref=e392]:
+            - generic [ref=e393]:
+              - link "Alice Updated 1772356549415" [ref=e394] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e395]: "@alice"
+              - generic [ref=e396]: ·
+              - generic [ref=e397]: just now
+              - generic [ref=e398]: (edited)
+              - img [ref=e399]
+            - link "Ownership test 1772357041772" [ref=e402] [cursor=pointer]:
+              - /url: /posts/83
+              - paragraph [ref=e403]: Ownership test 1772357041772
+            - generic [ref=e404]:
+              - button "Like" [ref=e405] [cursor=pointer]:
+                - img [ref=e406]
+                - generic [ref=e408]: "0"
+              - link "1" [ref=e409] [cursor=pointer]:
+                - /url: /posts/83
+                - img [ref=e410]
+                - generic [ref=e412]: "1"
+              - button "Bookmark" [ref=e413] [cursor=pointer]:
+                - img [ref=e414]
+              - generic [ref=e416]:
+                - button "Edit post" [ref=e417] [cursor=pointer]:
+                  - img [ref=e418]
+                - button "Delete post" [ref=e421] [cursor=pointer]:
+                  - img [ref=e422]
+      - article [ref=e425]:
+        - generic [ref=e426]:
+          - link "A" [ref=e427] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e428]: A
+          - generic [ref=e429]:
+            - generic [ref=e430]:
+              - link "Alice Updated 1772356549415" [ref=e431] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e432]: "@alice"
+              - generic [ref=e433]: ·
+              - generic [ref=e434]: 1m
+              - img [ref=e435]
+            - link "Comment test post 1772357028711" [ref=e438] [cursor=pointer]:
+              - /url: /posts/82
+              - paragraph [ref=e439]: Comment test post 1772357028711
+            - generic [ref=e440]:
+              - button "Like" [ref=e441] [cursor=pointer]:
+                - img [ref=e442]
+                - generic [ref=e444]: "0"
+              - link "0" [ref=e445] [cursor=pointer]:
+                - /url: /posts/82
+                - img [ref=e446]
+                - generic [ref=e448]: "0"
+              - button "Bookmark" [ref=e449] [cursor=pointer]:
+                - img [ref=e450]
+              - generic [ref=e452]:
+                - button "Edit post" [ref=e453] [cursor=pointer]:
+                  - img [ref=e454]
+                - button "Delete post" [ref=e457] [cursor=pointer]:
+                  - img [ref=e458]
+      - article [ref=e461]:
+        - generic [ref=e462]:
+          - link "A" [ref=e463] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e464]: A
+          - generic [ref=e465]:
+            - generic [ref=e466]:
+              - link "Alice Updated 1772356549415" [ref=e467] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e468]: "@alice"
+              - generic [ref=e469]: ·
+              - generic [ref=e470]: 1m
+              - img [ref=e471]
+            - link "Comment test post 1772357015531" [ref=e474] [cursor=pointer]:
+              - /url: /posts/81
+              - paragraph [ref=e475]: Comment test post 1772357015531
+            - generic [ref=e476]:
+              - button "Like" [ref=e477] [cursor=pointer]:
+                - img [ref=e478]
+                - generic [ref=e480]: "0"
+              - link "0" [ref=e481] [cursor=pointer]:
+                - /url: /posts/81
+                - img [ref=e482]
+                - generic [ref=e484]: "0"
+              - button "Bookmark" [ref=e485] [cursor=pointer]:
+                - img [ref=e486]
+              - generic [ref=e488]:
+                - button "Edit post" [ref=e489] [cursor=pointer]:
+                  - img [ref=e490]
+                - button "Delete post" [ref=e493] [cursor=pointer]:
+                  - img [ref=e494]
+      - article [ref=e497]:
+        - generic [ref=e498]:
+          - link "A" [ref=e499] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e500]: A
+          - generic [ref=e501]:
+            - generic [ref=e502]:
+              - link "Alice Updated 1772356549415" [ref=e503] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e504]: "@alice"
+              - generic [ref=e505]: ·
+              - generic [ref=e506]: 1m
+              - img [ref=e507]
+            - link "Comment test post 1772356991055" [ref=e510] [cursor=pointer]:
+              - /url: /posts/80
+              - paragraph [ref=e511]: Comment test post 1772356991055
+            - generic [ref=e512]:
+              - button "Like" [ref=e513] [cursor=pointer]:
+                - img [ref=e514]
+                - generic [ref=e516]: "0"
+              - link "0" [ref=e517] [cursor=pointer]:
+                - /url: /posts/80
+                - img [ref=e518]
+                - generic [ref=e520]: "0"
+              - button "Bookmark" [ref=e521] [cursor=pointer]:
+                - img [ref=e522]
+              - generic [ref=e524]:
+                - button "Edit post" [ref=e525] [cursor=pointer]:
+                  - img [ref=e526]
+                - button "Delete post" [ref=e529] [cursor=pointer]:
+                  - img [ref=e530]
+      - article [ref=e533]:
+        - generic [ref=e534]:
+          - link "A" [ref=e535] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e536]: A
+          - generic [ref=e537]:
+            - generic [ref=e538]:
+              - link "Alice Updated 1772356549415" [ref=e539] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e540]: "@alice"
+              - generic [ref=e541]: ·
+              - generic [ref=e542]: 2m
+              - img [ref=e543]
+            - link "Comment test post 1772356978073" [ref=e546] [cursor=pointer]:
+              - /url: /posts/79
+              - paragraph [ref=e547]: Comment test post 1772356978073
+            - generic [ref=e548]:
+              - button "Like" [ref=e549] [cursor=pointer]:
+                - img [ref=e550]
+                - generic [ref=e552]: "0"
+              - link "0" [ref=e553] [cursor=pointer]:
+                - /url: /posts/79
+                - img [ref=e554]
+                - generic [ref=e556]: "0"
+              - button "Bookmark" [ref=e557] [cursor=pointer]:
+                - img [ref=e558]
+              - generic [ref=e560]:
+                - button "Edit post" [ref=e561] [cursor=pointer]:
+                  - img [ref=e562]
+                - button "Delete post" [ref=e565] [cursor=pointer]:
+                  - img [ref=e566]
+      - article [ref=e569]:
+        - generic [ref=e570]:
+          - link "A" [ref=e571] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e572]: A
+          - generic [ref=e573]:
+            - generic [ref=e574]:
+              - link "Alice Updated 1772356549415" [ref=e575] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e576]: "@alice"
+              - generic [ref=e577]: ·
+              - generic [ref=e578]: 2m
+              - img [ref=e579]
+            - link "Comment test post 1772356965184" [ref=e582] [cursor=pointer]:
+              - /url: /posts/78
+              - paragraph [ref=e583]: Comment test post 1772356965184
+            - generic [ref=e584]:
+              - button "Like" [ref=e585] [cursor=pointer]:
+                - img [ref=e586]
+                - generic [ref=e588]: "0"
+              - link "0" [ref=e589] [cursor=pointer]:
+                - /url: /posts/78
+                - img [ref=e590]
+                - generic [ref=e592]: "0"
+              - button "Bookmark" [ref=e593] [cursor=pointer]:
+                - img [ref=e594]
+              - generic [ref=e596]:
+                - button "Edit post" [ref=e597] [cursor=pointer]:
+                  - img [ref=e598]
+                - button "Delete post" [ref=e601] [cursor=pointer]:
+                  - img [ref=e602]
+      - article [ref=e605]:
+        - generic [ref=e606]:
+          - link "A" [ref=e607] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e608]: A
+          - generic [ref=e609]:
+            - generic [ref=e610]:
+              - link "Alice Updated 1772356549415" [ref=e611] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e612]: "@alice"
+              - generic [ref=e613]: ·
+              - generic [ref=e614]: 2m
+              - img [ref=e615]
+            - link "Comment test post 1772356952248" [ref=e618] [cursor=pointer]:
+              - /url: /posts/77
+              - paragraph [ref=e619]: Comment test post 1772356952248
+            - generic [ref=e620]:
+              - button "Like" [ref=e621] [cursor=pointer]:
+                - img [ref=e622]
+                - generic [ref=e624]: "0"
+              - link "0" [ref=e625] [cursor=pointer]:
+                - /url: /posts/77
+                - img [ref=e626]
+                - generic [ref=e628]: "0"
+              - button "Bookmark" [ref=e629] [cursor=pointer]:
+                - img [ref=e630]
+              - generic [ref=e632]:
+                - button "Edit post" [ref=e633] [cursor=pointer]:
+                  - img [ref=e634]
+                - button "Delete post" [ref=e637] [cursor=pointer]:
+                  - img [ref=e638]
+      - article [ref=e641]:
+        - generic [ref=e642]:
+          - link "A" [ref=e643] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e644]: A
+          - generic [ref=e645]:
+            - generic [ref=e646]:
+              - link "Alice Updated 1772356549415" [ref=e647] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e648]: "@alice"
+              - generic [ref=e649]: ·
+              - generic [ref=e650]: 2m
+              - img [ref=e651]
+            - link "Comment test post 1772356928980" [ref=e654] [cursor=pointer]:
+              - /url: /posts/76
+              - paragraph [ref=e655]: Comment test post 1772356928980
+            - generic [ref=e656]:
+              - button "Like" [ref=e657] [cursor=pointer]:
+                - img [ref=e658]
+                - generic [ref=e660]: "0"
+              - link "0" [ref=e661] [cursor=pointer]:
+                - /url: /posts/76
+                - img [ref=e662]
+                - generic [ref=e664]: "0"
+              - button "Bookmark" [ref=e665] [cursor=pointer]:
+                - img [ref=e666]
+              - generic [ref=e668]:
+                - button "Edit post" [ref=e669] [cursor=pointer]:
+                  - img [ref=e670]
+                - button "Delete post" [ref=e673] [cursor=pointer]:
+                  - img [ref=e674]
+      - article [ref=e677]:
+        - generic [ref=e678]:
+          - link "A" [ref=e679] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e680]: A
+          - generic [ref=e681]:
+            - generic [ref=e682]:
+              - link "Alice Updated 1772356549415" [ref=e683] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e684]: "@alice"
+              - generic [ref=e685]: ·
+              - generic [ref=e686]: 3m
+              - img [ref=e687]
+            - link "Comment test post 1772356915976" [ref=e690] [cursor=pointer]:
+              - /url: /posts/75
+              - paragraph [ref=e691]: Comment test post 1772356915976
+            - generic [ref=e692]:
+              - button "Like" [ref=e693] [cursor=pointer]:
+                - img [ref=e694]
+                - generic [ref=e696]: "0"
+              - link "0" [ref=e697] [cursor=pointer]:
+                - /url: /posts/75
+                - img [ref=e698]
+                - generic [ref=e700]: "0"
+              - button "Bookmark" [ref=e701] [cursor=pointer]:
+                - img [ref=e702]
+              - generic [ref=e704]:
+                - button "Edit post" [ref=e705] [cursor=pointer]:
+                  - img [ref=e706]
+                - button "Delete post" [ref=e709] [cursor=pointer]:
+                  - img [ref=e710]
+      - article [ref=e713]:
+        - generic [ref=e714]:
+          - link "A" [ref=e715] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e716]: A
+          - generic [ref=e717]:
+            - generic [ref=e718]:
+              - link "Alice Updated 1772356549415" [ref=e719] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e720]: "@alice"
+              - generic [ref=e721]: ·
+              - generic [ref=e722]: 7m
+              - generic [ref=e723]: (edited)
+              - img [ref=e724]
+            - link "Duplicate like test 1772356674107" [ref=e727] [cursor=pointer]:
+              - /url: /posts/74
+              - paragraph [ref=e728]: Duplicate like test 1772356674107
+            - generic [ref=e729]:
+              - button "Unlike" [ref=e730] [cursor=pointer]:
+                - img [ref=e731]
+                - generic [ref=e733]: "1"
+              - link "0" [ref=e734] [cursor=pointer]:
+                - /url: /posts/74
+                - img [ref=e735]
+                - generic [ref=e737]: "0"
+              - button "Bookmark" [ref=e738] [cursor=pointer]:
+                - img [ref=e739]
+              - generic [ref=e741]:
+                - button "Edit post" [ref=e742] [cursor=pointer]:
+                  - img [ref=e743]
+                - button "Delete post" [ref=e746] [cursor=pointer]:
+                  - img [ref=e747]
+      - article [ref=e750]:
+        - generic [ref=e751]:
+          - link "A" [ref=e752] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e753]: A
+          - generic [ref=e754]:
+            - generic [ref=e755]:
+              - link "Alice Updated 1772356549415" [ref=e756] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e757]: "@alice"
+              - generic [ref=e758]: ·
+              - generic [ref=e759]: 7m
+              - img [ref=e760]
+            - link "<script>window.__XSS_TEST__ = true</script>" [ref=e763] [cursor=pointer]:
+              - /url: /posts/73
+              - paragraph [ref=e764]: <script>window.__XSS_TEST__ = true</script>
+            - generic [ref=e765]:
+              - button "Like" [ref=e766] [cursor=pointer]:
+                - img [ref=e767]
+                - generic [ref=e769]: "0"
+              - link "0" [ref=e770] [cursor=pointer]:
+                - /url: /posts/73
+                - img [ref=e771]
+                - generic [ref=e773]: "0"
+              - button "Bookmark" [ref=e774] [cursor=pointer]:
+                - img [ref=e775]
+              - generic [ref=e777]:
+                - button "Edit post" [ref=e778] [cursor=pointer]:
+                  - img [ref=e779]
+                - button "Delete post" [ref=e782] [cursor=pointer]:
+                  - img [ref=e783]
+  - navigation "Main navigation" [ref=e786]:
+    - link "Home" [ref=e787] [cursor=pointer]:
+      - /url: /
+      - img [ref=e789]
+      - text: Home
+    - link "Search" [ref=e792] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e794]
+      - text: Search
+    - link "DMs" [ref=e797] [cursor=pointer]:
+      - /url: /messages
+      - img [ref=e799]
+      - text: DMs
+    - link "Alerts" [ref=e801] [cursor=pointer]:
+      - /url: /notifications
+      - img [ref=e803]
+      - text: Alerts
+    - link "Profile" [ref=e806] [cursor=pointer]:
+      - /url: /profile/alice
+      - img [ref=e808]
+      - text: Profile
+  - button "Open Spark AI assistant" [ref=e811] [cursor=pointer]:
+    - generic [ref=e812]: ⚡
+    - generic [ref=e813]: Ask Spark
+```

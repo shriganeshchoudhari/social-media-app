@@ -1,0 +1,71 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: ConnectHub
+      - navigation "Sidebar navigation" [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+          - text: Home
+        - link "Search" [ref=e13] [cursor=pointer]:
+          - /url: /search
+          - img [ref=e15]
+          - text: Search
+        - link "Messages" [ref=e18] [cursor=pointer]:
+          - /url: /messages
+          - img [ref=e20]
+          - text: Messages
+        - link "Notifications" [ref=e22] [cursor=pointer]:
+          - /url: /notifications
+          - img [ref=e24]
+          - text: Notifications
+        - link "Saved" [ref=e27] [cursor=pointer]:
+          - /url: /bookmarks
+          - img [ref=e29]
+          - text: Saved
+        - link "Settings" [ref=e31] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e33]
+          - text: Settings
+        - link "Profile" [ref=e36] [cursor=pointer]:
+          - /url: /profile/alice
+          - img [ref=e37]
+          - text: Profile
+      - button "Toggle dark mode" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - text: Dark mode
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: A
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: Alice Updated 1772355577697
+            - paragraph [ref=e48]: "@alice"
+        - button "Log out" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - text: Log out
+  - main [ref=e53]:
+    - generic [ref=e55]:
+      - generic [ref=e57]:
+        - img [ref=e58]
+        - textbox "Search posts, users, hashtags…" [active] [ref=e61]: ali
+      - generic [ref=e62]:
+        - button "Posts" [ref=e63] [cursor=pointer]
+        - button "Users" [ref=e64] [cursor=pointer]
+        - button "Hashtags" [ref=e65] [cursor=pointer]
+      - generic [ref=e67]:
+        - link "A" [ref=e68] [cursor=pointer]:
+          - /url: /profile/alice
+          - generic [ref=e69]: A
+        - generic [ref=e70]:
+          - link "Alice Updated 1772355577697 @alice" [ref=e71] [cursor=pointer]:
+            - /url: /profile/alice
+            - paragraph [ref=e72]: Alice Updated 1772355577697
+            - paragraph [ref=e73]: "@alice"
+          - paragraph [ref=e74]: Curiouser and curiouser 🐇
+  - button "Open Spark AI assistant" [ref=e75] [cursor=pointer]:
+    - generic [ref=e76]: ⚡
+    - generic [ref=e77]: Ask Spark
+```

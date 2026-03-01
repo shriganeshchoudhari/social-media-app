@@ -1,0 +1,49 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e8]:
+        - img [ref=e9]
+        - textbox "Search posts, users, hashtags…" [active] [ref=e12]: Builder
+      - generic [ref=e13]:
+        - button "Posts" [ref=e14] [cursor=pointer]
+        - button "Users" [ref=e15] [cursor=pointer]
+        - button "Hashtags" [ref=e16] [cursor=pointer]
+      - generic [ref=e18]:
+        - link "B" [ref=e19] [cursor=pointer]:
+          - /url: /profile/bob
+          - generic [ref=e20]: B
+        - generic [ref=e21]:
+          - link "Bob Builder @bob" [ref=e22] [cursor=pointer]:
+            - /url: /profile/bob
+            - paragraph [ref=e23]: Bob Builder
+            - paragraph [ref=e24]: "@bob"
+          - paragraph [ref=e25]: Can we fix it? Yes we can! 🔨
+        - button "Follow" [ref=e26] [cursor=pointer]
+  - navigation "Main navigation" [ref=e27]:
+    - link "Home" [ref=e28] [cursor=pointer]:
+      - /url: /
+      - img [ref=e30]
+      - text: Home
+    - link "Search" [ref=e33] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e35]
+      - text: Search
+    - link "DMs" [ref=e38] [cursor=pointer]:
+      - /url: /messages
+      - img [ref=e40]
+      - text: DMs
+    - link "Alerts" [ref=e42] [cursor=pointer]:
+      - /url: /notifications
+      - img [ref=e44]
+      - text: Alerts
+    - link "Profile" [ref=e47] [cursor=pointer]:
+      - /url: /profile/alice
+      - img [ref=e49]
+      - text: Profile
+  - button "Open Spark AI assistant" [ref=e52] [cursor=pointer]:
+    - generic [ref=e53]: ⚡
+    - generic [ref=e54]: Ask Spark
+```

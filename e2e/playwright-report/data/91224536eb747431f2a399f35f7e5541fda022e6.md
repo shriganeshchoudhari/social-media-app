@@ -1,0 +1,108 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: ConnectHub
+      - navigation "Sidebar navigation" [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+          - text: Home
+        - link "Search" [ref=e13] [cursor=pointer]:
+          - /url: /search
+          - img [ref=e15]
+          - text: Search
+        - link "Messages" [ref=e18] [cursor=pointer]:
+          - /url: /messages
+          - img [ref=e20]
+          - text: Messages
+        - link "Notifications" [ref=e22] [cursor=pointer]:
+          - /url: /notifications
+          - img [ref=e24]
+          - text: Notifications
+        - link "Saved" [ref=e27] [cursor=pointer]:
+          - /url: /bookmarks
+          - img [ref=e29]
+          - text: Saved
+        - link "Settings" [ref=e31] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e33]
+          - text: Settings
+        - link "Profile" [ref=e36] [cursor=pointer]:
+          - /url: /profile/alice
+          - img [ref=e37]
+          - text: Profile
+      - button "Toggle dark mode" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - text: Dark mode
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: A
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: Alice Updated 1772355577697
+            - paragraph [ref=e48]: "@alice"
+        - button "Log out" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - text: Log out
+  - main [ref=e54]:
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - button "Go back" [ref=e58] [cursor=pointer]:
+          - img [ref=e59]
+        - heading "Post" [level=1] [ref=e62]
+      - article [ref=e63]:
+        - generic [ref=e64]:
+          - link "A" [ref=e65] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e66]: A
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - link "Alice Updated 1772355577697" [ref=e69] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e70]: "@alice"
+              - generic [ref=e71]: ·
+              - generic [ref=e72]: just now
+              - img [ref=e73]
+            - link "Comment test post 1772356126665" [ref=e77] [cursor=pointer]:
+              - /url: /posts/46
+              - paragraph [ref=e78]: Comment test post 1772356126665
+            - generic [ref=e79]:
+              - button "Like" [ref=e80] [cursor=pointer]:
+                - img [ref=e81]
+                - generic [ref=e83]: "0"
+              - link "0" [ref=e84] [cursor=pointer]:
+                - /url: /posts/46
+                - img [ref=e85]
+                - generic [ref=e87]: "0"
+              - button "Bookmark" [ref=e88] [cursor=pointer]:
+                - img [ref=e89]
+              - generic [ref=e91]:
+                - button "Edit post" [ref=e92] [cursor=pointer]:
+                  - img [ref=e93]
+                - button "Delete post" [ref=e96] [cursor=pointer]:
+                  - img [ref=e97]
+      - generic [ref=e103]:
+        - heading "0 Comments" [level=2] [ref=e105]
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]: A
+            - generic [ref=e109]:
+              - textbox "Write a comment" [active] [ref=e110]:
+                - /placeholder: Add a comment…
+              - button "Reply" [disabled] [ref=e111]
+          - generic [ref=e113]:
+            - generic [ref=e114]: A
+            - generic [ref=e115]:
+              - generic [ref=e116]:
+                - link "Alice Updated 1772355577697" [ref=e117] [cursor=pointer]:
+                  - /url: /profile/alice
+                - generic [ref=e118]: just now
+              - paragraph [ref=e119]: Delete me 1772356127129
+            - button "Delete comment" [ref=e120] [cursor=pointer]:
+              - img [ref=e121]
+  - button "Open Spark AI assistant" [ref=e127] [cursor=pointer]:
+    - generic [ref=e128]: ⚡
+    - generic [ref=e129]: Ask Spark
+```

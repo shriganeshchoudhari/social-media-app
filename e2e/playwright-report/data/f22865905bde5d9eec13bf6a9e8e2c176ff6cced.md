@@ -1,0 +1,364 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: ConnectHub
+      - navigation "Sidebar navigation" [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+          - text: Home
+        - link "Search" [ref=e13] [cursor=pointer]:
+          - /url: /search
+          - img [ref=e15]
+          - text: Search
+        - link "Messages" [ref=e18] [cursor=pointer]:
+          - /url: /messages
+          - img [ref=e20]
+          - text: Messages
+        - link "Notifications" [ref=e22] [cursor=pointer]:
+          - /url: /notifications
+          - img [ref=e24]
+          - text: Notifications
+        - link "Saved" [ref=e27] [cursor=pointer]:
+          - /url: /bookmarks
+          - img [ref=e29]
+          - text: Saved
+        - link "Settings" [ref=e31] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e33]
+          - text: Settings
+        - link "Profile" [ref=e36] [cursor=pointer]:
+          - /url: /profile/alice
+          - img [ref=e37]
+          - text: Profile
+      - button "Toggle dark mode" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - text: Dark mode
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: A
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: Alice Wonderland
+            - paragraph [ref=e48]: "@alice"
+        - button "Log out" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - text: Log out
+  - main [ref=e53]:
+    - generic [ref=e55]:
+      - heading "Home" [level=1] [ref=e57]
+      - generic [ref=e59]:
+        - generic [ref=e60]: A
+        - generic [ref=e61]:
+          - textbox "Post content" [ref=e63]:
+            - /placeholder: What's on your mind? Use @username to mention people
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - button "Add image" [ref=e66] [cursor=pointer]:
+                - img [ref=e67]
+              - combobox "Post privacy" [ref=e71] [cursor=pointer]:
+                - option "Public" [selected]
+                - option "Followers only"
+                - option "Only me"
+            - generic [ref=e72]:
+              - generic "2000 characters remaining" [ref=e73]: "2000"
+              - button "Publish post" [disabled] [ref=e74]: Post
+      - article [ref=e75]:
+        - generic [ref=e76]:
+          - link "B" [ref=e77] [cursor=pointer]:
+            - /url: /profile/bob
+            - generic [ref=e78]: B
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - link "Bob Builder" [ref=e81] [cursor=pointer]:
+                - /url: /profile/bob
+              - generic [ref=e82]: "@bob"
+              - generic [ref=e83]: ·
+              - generic [ref=e84]: 8m
+              - generic [ref=e85]: (edited)
+              - img [ref=e86]
+            - 'link "Weekend project done! Built a bird feeder from scratch 🐦 #diy #nature" [ref=e89] [cursor=pointer]':
+              - /url: /posts/10
+              - paragraph [ref=e90]:
+                - text: Weekend project done! Built a bird feeder from scratch 🐦
+                - link "#diy" [ref=e91]:
+                  - /url: /hashtag/diy
+                - link "#nature" [ref=e92]:
+                  - /url: /hashtag/nature
+            - generic [ref=e93]:
+              - button "Unlike" [ref=e94] [cursor=pointer]:
+                - img [ref=e95]
+                - generic [ref=e97]: "2"
+              - link "1" [ref=e98] [cursor=pointer]:
+                - /url: /posts/10
+                - img [ref=e99]
+                - generic [ref=e101]: "1"
+              - button "Bookmark" [ref=e102] [cursor=pointer]:
+                - img [ref=e103]
+      - article [ref=e105]:
+        - generic [ref=e106]:
+          - link "A" [ref=e107] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e108]: A
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - link "Alice Wonderland" [ref=e111] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e112]: "@alice"
+              - generic [ref=e113]: ·
+              - generic [ref=e114]: 8m
+              - generic [ref=e115]: (edited)
+              - img [ref=e116]
+            - 'link "Pro tip: name your variables properly. Future you will thank you 💡 #coding #tips" [ref=e119] [cursor=pointer]':
+              - /url: /posts/9
+              - paragraph [ref=e120]:
+                - text: "Pro tip: name your variables properly. Future you will thank you 💡"
+                - link "#coding" [ref=e121]:
+                  - /url: /hashtag/coding
+                - link "#tips" [ref=e122]:
+                  - /url: /hashtag/tips
+            - generic [ref=e123]:
+              - button "Like" [ref=e124] [cursor=pointer]:
+                - img [ref=e125]
+                - generic [ref=e127]: "3"
+              - link "1" [ref=e128] [cursor=pointer]:
+                - /url: /posts/9
+                - img [ref=e129]
+                - generic [ref=e131]: "1"
+              - button "Bookmark" [ref=e132] [cursor=pointer]:
+                - img [ref=e133]
+              - generic [ref=e135]:
+                - button "Edit post" [ref=e136] [cursor=pointer]:
+                  - img [ref=e137]
+                - button "Delete post" [ref=e140] [cursor=pointer]:
+                  - img [ref=e141]
+      - article [ref=e144]:
+        - generic [ref=e145]:
+          - link "C" [ref=e146] [cursor=pointer]:
+            - /url: /profile/carol
+            - generic [ref=e147]: C
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - link "Carol Danvers" [ref=e150] [cursor=pointer]:
+                - /url: /profile/carol
+              - generic [ref=e151]: "@carol"
+              - generic [ref=e152]: ·
+              - generic [ref=e153]: 8m
+              - img [ref=e154]
+            - 'link "Training update: 10km run in 48 minutes! New personal best 🏃‍♀️ #fitness #running" [ref=e159] [cursor=pointer]':
+              - /url: /posts/6
+              - paragraph [ref=e160]:
+                - text: "Training update: 10km run in 48 minutes! New personal best 🏃‍♀️"
+                - link "#fitness" [ref=e161]:
+                  - /url: /hashtag/fitness
+                - link "#running" [ref=e162]:
+                  - /url: /hashtag/running
+            - generic [ref=e163]:
+              - button "Like" [ref=e164] [cursor=pointer]:
+                - img [ref=e165]
+                - generic [ref=e167]: "0"
+              - link "0" [ref=e168] [cursor=pointer]:
+                - /url: /posts/6
+                - img [ref=e169]
+                - generic [ref=e171]: "0"
+              - button "Bookmark" [ref=e172] [cursor=pointer]:
+                - img [ref=e173]
+      - article [ref=e175]:
+        - generic [ref=e176]:
+          - link "C" [ref=e177] [cursor=pointer]:
+            - /url: /profile/carol
+            - generic [ref=e178]: C
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - link "Carol Danvers" [ref=e181] [cursor=pointer]:
+                - /url: /profile/carol
+              - generic [ref=e182]: "@carol"
+              - generic [ref=e183]: ·
+              - generic [ref=e184]: 8m
+              - generic [ref=e185]: (edited)
+              - img [ref=e186]
+            - 'link "Just watched the most amazing meteor shower last night 🌠 #space #stargazing" [ref=e189] [cursor=pointer]':
+              - /url: /posts/5
+              - paragraph [ref=e190]:
+                - text: Just watched the most amazing meteor shower last night 🌠
+                - link "#space" [ref=e191]:
+                  - /url: /hashtag/space
+                - link "#stargazing" [ref=e192]:
+                  - /url: /hashtag/stargazing
+            - generic [ref=e193]:
+              - button "Unlike" [ref=e194] [cursor=pointer]:
+                - img [ref=e195]
+                - generic [ref=e197]: "3"
+              - link "1" [ref=e198] [cursor=pointer]:
+                - /url: /posts/5
+                - img [ref=e199]
+                - generic [ref=e201]: "1"
+              - button "Bookmark" [ref=e202] [cursor=pointer]:
+                - img [ref=e203]
+      - article [ref=e205]:
+        - generic [ref=e206]:
+          - link "B" [ref=e207] [cursor=pointer]:
+            - /url: /profile/bob
+            - generic [ref=e208]: B
+          - generic [ref=e209]:
+            - generic [ref=e210]:
+              - link "Bob Builder" [ref=e211] [cursor=pointer]:
+                - /url: /profile/bob
+              - generic [ref=e212]: "@bob"
+              - generic [ref=e213]: ·
+              - generic [ref=e214]: 8m
+              - generic [ref=e215]: (edited)
+              - img [ref=e216]
+            - 'link "Coffee ☕ + code = perfect morning. What''s your morning routine? #coding #coffee" [ref=e219] [cursor=pointer]':
+              - /url: /posts/4
+              - paragraph [ref=e220]:
+                - text: Coffee ☕ + code = perfect morning. What's your morning routine?
+                - link "#coding" [ref=e221]:
+                  - /url: /hashtag/coding
+                - link "#coffee" [ref=e222]:
+                  - /url: /hashtag/coffee
+            - generic [ref=e223]:
+              - button "Unlike" [ref=e224] [cursor=pointer]:
+                - img [ref=e225]
+                - generic [ref=e227]: "3"
+              - link "1" [ref=e228] [cursor=pointer]:
+                - /url: /posts/4
+                - img [ref=e229]
+                - generic [ref=e231]: "1"
+              - button "Bookmark" [ref=e232] [cursor=pointer]:
+                - img [ref=e233]
+      - article [ref=e235]:
+        - generic [ref=e236]:
+          - link "B" [ref=e237] [cursor=pointer]:
+            - /url: /profile/bob
+            - generic [ref=e238]: B
+          - generic [ref=e239]:
+            - generic [ref=e240]:
+              - link "Bob Builder" [ref=e241] [cursor=pointer]:
+                - /url: /profile/bob
+              - generic [ref=e242]: "@bob"
+              - generic [ref=e243]: ·
+              - generic [ref=e244]: 8m
+              - generic [ref=e245]: (edited)
+              - img [ref=e246]
+            - 'link "Built my first standing desk today! Productivity through the roof 🔨 #diy #productivity" [ref=e249] [cursor=pointer]':
+              - /url: /posts/3
+              - paragraph [ref=e250]:
+                - text: Built my first standing desk today! Productivity through the roof 🔨
+                - link "#diy" [ref=e251]:
+                  - /url: /hashtag/diy
+                - link "#productivity" [ref=e252]:
+                  - /url: /hashtag/productivity
+            - generic [ref=e253]:
+              - button "Unlike" [ref=e254] [cursor=pointer]:
+                - img [ref=e255]
+                - generic [ref=e257]: "3"
+              - link "2" [ref=e258] [cursor=pointer]:
+                - /url: /posts/3
+                - img [ref=e259]
+                - generic [ref=e261]: "2"
+              - button "Bookmark" [ref=e262] [cursor=pointer]:
+                - img [ref=e263]
+      - article [ref=e265]:
+        - generic [ref=e266]:
+          - link "A" [ref=e267] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e268]: A
+          - generic [ref=e269]:
+            - generic [ref=e270]:
+              - link "Alice Wonderland" [ref=e271] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e272]: "@alice"
+              - generic [ref=e273]: ·
+              - generic [ref=e274]: 8m
+              - generic [ref=e275]: (edited)
+              - img [ref=e276]
+            - 'link "Just finished reading ''Alice in Wonderland'' again. Some things never get old 📚 #books #reading" [ref=e279] [cursor=pointer]':
+              - /url: /posts/2
+              - paragraph [ref=e280]:
+                - text: Just finished reading 'Alice in Wonderland' again. Some things never get old 📚
+                - link "#books" [ref=e281]:
+                  - /url: /hashtag/books
+                - link "#reading" [ref=e282]:
+                  - /url: /hashtag/reading
+            - generic [ref=e283]:
+              - button "Like" [ref=e284] [cursor=pointer]:
+                - img [ref=e285]
+                - generic [ref=e287]: "2"
+              - link "0" [ref=e288] [cursor=pointer]:
+                - /url: /posts/2
+                - img [ref=e289]
+                - generic [ref=e291]: "0"
+              - button "Bookmark" [ref=e292] [cursor=pointer]:
+                - img [ref=e293]
+              - generic [ref=e295]:
+                - button "Edit post" [ref=e296] [cursor=pointer]:
+                  - img [ref=e297]
+                - button "Delete post" [ref=e300] [cursor=pointer]:
+                  - img [ref=e301]
+      - article [ref=e304]:
+        - generic [ref=e305]:
+          - link "A" [ref=e306] [cursor=pointer]:
+            - /url: /profile/alice
+            - generic [ref=e307]: A
+          - generic [ref=e308]:
+            - generic [ref=e309]:
+              - link "Alice Wonderland" [ref=e310] [cursor=pointer]:
+                - /url: /profile/alice
+              - generic [ref=e311]: "@alice"
+              - generic [ref=e312]: ·
+              - generic [ref=e313]: 8m
+              - generic [ref=e314]: (edited)
+              - img [ref=e315]
+            - 'link "Hello ConnectHub! 👋 Excited to join this platform. #intro #hello" [ref=e318] [cursor=pointer]':
+              - /url: /posts/1
+              - paragraph [ref=e319]:
+                - text: Hello ConnectHub! 👋 Excited to join this platform.
+                - link "#intro" [ref=e320]:
+                  - /url: /hashtag/intro
+                - link "#hello" [ref=e321]:
+                  - /url: /hashtag/hello
+            - generic [ref=e322]:
+              - button "Like" [ref=e323] [cursor=pointer]:
+                - img [ref=e324]
+                - generic [ref=e326]: "3"
+              - link "2" [ref=e327] [cursor=pointer]:
+                - /url: /posts/1
+                - img [ref=e328]
+                - generic [ref=e330]: "2"
+              - button "Bookmark" [ref=e331] [cursor=pointer]:
+                - img [ref=e332]
+              - generic [ref=e334]:
+                - button "Edit post" [ref=e335] [cursor=pointer]:
+                  - img [ref=e336]
+                - button "Delete post" [ref=e339] [cursor=pointer]:
+                  - img [ref=e340]
+      - paragraph [ref=e343]: You're all caught up!
+  - button "Close Spark AI assistant" [ref=e344] [cursor=pointer]:
+    - generic [ref=e345]: ⚡
+    - generic [ref=e346]: Ask Spark
+  - dialog "Spark AI assistant" [ref=e347]:
+    - generic [ref=e348]:
+      - generic [ref=e349]:
+        - generic [ref=e350]: ⚡
+        - generic [ref=e351]:
+          - paragraph [ref=e352]: Spark
+          - paragraph [ref=e353]: ConnectHub AI · powered by Ollama
+      - generic [ref=e354]:
+        - button "↺" [ref=e355] [cursor=pointer]
+        - button "Close AI panel" [ref=e356] [cursor=pointer]: ✕
+    - generic [ref=e357]:
+      - generic [ref=e359]: Hello
+      - generic [ref=e360]:
+        - generic [ref=e361]: ⚡
+        - generic [ref=e364]: Done!
+    - generic [ref=e365]:
+      - generic [ref=e366]:
+        - textbox "Message to Spark" [ref=e367]:
+          - /placeholder: Ask Spark anything…
+        - button "Send message" [disabled] [ref=e368]:
+          - img [ref=e369]
+      - paragraph [ref=e371]: Enter to send · Shift+Enter for new line
+```

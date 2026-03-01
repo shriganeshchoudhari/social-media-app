@@ -1,0 +1,59 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: ConnectHub
+      - navigation "Sidebar navigation" [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+          - text: Home
+        - link "Search" [ref=e13] [cursor=pointer]:
+          - /url: /search
+          - img [ref=e15]
+          - text: Search
+        - link "Messages" [ref=e18] [cursor=pointer]:
+          - /url: /messages
+          - img [ref=e20]
+          - text: Messages
+        - link "Notifications" [ref=e22] [cursor=pointer]:
+          - /url: /notifications
+          - img [ref=e24]
+          - text: Notifications
+        - link "Saved" [ref=e27] [cursor=pointer]:
+          - /url: /bookmarks
+          - img [ref=e29]
+          - text: Saved
+        - link "Settings" [ref=e31] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e33]
+          - text: Settings
+        - link "Profile" [ref=e36] [cursor=pointer]:
+          - /url: /profile/alice
+          - img [ref=e37]
+          - text: Profile
+      - button "Toggle dark mode" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - text: Dark mode
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: A
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: Alice Updated 1772355577697
+            - paragraph [ref=e48]: "@alice"
+        - button "Log out" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - text: Log out
+  - main [ref=e54]:
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - button "Go back" [ref=e58] [cursor=pointer]:
+          - img [ref=e59]
+        - heading "Post" [level=1] [ref=e62]
+      - paragraph [ref=e63]: Post not found
+  - button "Open Spark AI assistant" [ref=e64] [cursor=pointer]:
+    - generic [ref=e65]: ⚡
+    - generic [ref=e66]: Ask Spark
+```

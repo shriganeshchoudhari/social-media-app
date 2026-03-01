@@ -20,7 +20,7 @@ async function checkService(name: string, url: string): Promise<void> {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
             const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-            if (res.ok || res.status < 500) {
+            if (res.ok || res.status <= 503) {
                 console.log(`  ✅  ${name} is reachable at ${url}`);
                 return;
             }

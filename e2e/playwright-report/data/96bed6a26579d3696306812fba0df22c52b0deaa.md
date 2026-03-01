@@ -1,0 +1,88 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - button [ref=e8] [cursor=pointer]:
+          - img [ref=e9]
+        - generic [ref=e11]:
+          - heading "Dave Grohl" [level=1] [ref=e12]
+          - paragraph [ref=e13]: 1 posts
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e18]: D
+          - generic [ref=e20]:
+            - button "Send message" [ref=e21] [cursor=pointer]:
+              - img [ref=e22]
+            - button "Follow" [ref=e24] [cursor=pointer]
+        - heading "Dave Grohl" [level=2] [ref=e25]
+        - paragraph [ref=e26]: "@dave"
+        - paragraph [ref=e27]: Drummer turned frontman 🥁
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - strong [ref=e30]: "1"
+            - text: Following
+          - generic [ref=e31]:
+            - strong [ref=e32]: "0"
+            - text: Followers
+      - generic [ref=e33]:
+        - heading "Posts" [level=3] [ref=e35]
+        - article [ref=e36]:
+          - generic [ref=e37]:
+            - link "D" [ref=e38] [cursor=pointer]:
+              - /url: /profile/dave
+              - generic [ref=e39]: D
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - link "Dave Grohl" [ref=e42] [cursor=pointer]:
+                  - /url: /profile/dave
+                - generic [ref=e43]: "@dave"
+                - generic [ref=e44]: ·
+                - generic [ref=e45]: 43m
+                - generic [ref=e46]: (edited)
+                - img [ref=e47]
+              - 'link "New drum cover dropping this weekend 🥁 Stay tuned! #music #drums" [ref=e50] [cursor=pointer]':
+                - /url: /posts/7
+                - paragraph [ref=e51]:
+                  - text: New drum cover dropping this weekend 🥁 Stay tuned!
+                  - link "#music" [ref=e52]:
+                    - /url: /hashtag/music
+                  - link "#drums" [ref=e53]:
+                    - /url: /hashtag/drums
+              - generic [ref=e54]:
+                - button "Like" [ref=e55] [cursor=pointer]:
+                  - img [ref=e56]
+                  - generic [ref=e58]: "2"
+                - link "1" [ref=e59] [cursor=pointer]:
+                  - /url: /posts/7
+                  - img [ref=e60]
+                  - generic [ref=e62]: "1"
+                - button "Bookmark" [ref=e63] [cursor=pointer]:
+                  - img [ref=e64]
+  - navigation "Main navigation" [ref=e66]:
+    - link "Home" [ref=e67] [cursor=pointer]:
+      - /url: /
+      - img [ref=e69]
+      - text: Home
+    - link "Search" [ref=e72] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e74]
+      - text: Search
+    - link "DMs" [ref=e77] [cursor=pointer]:
+      - /url: /messages
+      - img [ref=e79]
+      - text: DMs
+    - link "Alerts" [ref=e81] [cursor=pointer]:
+      - /url: /notifications
+      - img [ref=e83]
+      - text: Alerts
+    - link "Profile" [ref=e86] [cursor=pointer]:
+      - /url: /profile/eve
+      - img [ref=e88]
+      - text: Profile
+  - button "Open Spark AI assistant" [ref=e91] [cursor=pointer]:
+    - generic [ref=e92]: ⚡
+    - generic [ref=e93]: Ask Spark
+```

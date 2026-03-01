@@ -1,0 +1,48 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e8]:
+        - img [ref=e9]
+        - textbox "Search posts, users, hashtags…" [active] [ref=e12]: ali
+      - generic [ref=e13]:
+        - button "Posts" [ref=e14] [cursor=pointer]
+        - button "Users" [ref=e15] [cursor=pointer]
+        - button "Hashtags" [ref=e16] [cursor=pointer]
+      - generic [ref=e18]:
+        - link "A" [ref=e19] [cursor=pointer]:
+          - /url: /profile/alice
+          - generic [ref=e20]: A
+        - generic [ref=e21]:
+          - link "Alice Updated 1772356549415 @alice" [ref=e22] [cursor=pointer]:
+            - /url: /profile/alice
+            - paragraph [ref=e23]: Alice Updated 1772356549415
+            - paragraph [ref=e24]: "@alice"
+          - paragraph [ref=e25]: <img src=x onerror=alert(1)>
+  - navigation "Main navigation" [ref=e26]:
+    - link "Home" [ref=e27] [cursor=pointer]:
+      - /url: /
+      - img [ref=e29]
+      - text: Home
+    - link "Search" [ref=e32] [cursor=pointer]:
+      - /url: /search
+      - img [ref=e34]
+      - text: Search
+    - link "DMs" [ref=e37] [cursor=pointer]:
+      - /url: /messages
+      - img [ref=e39]
+      - text: DMs
+    - link "Alerts" [ref=e41] [cursor=pointer]:
+      - /url: /notifications
+      - img [ref=e43]
+      - text: Alerts
+    - link "Profile" [ref=e46] [cursor=pointer]:
+      - /url: /profile/alice
+      - img [ref=e48]
+      - text: Profile
+  - button "Open Spark AI assistant" [ref=e51] [cursor=pointer]:
+    - generic [ref=e52]: ⚡
+    - generic [ref=e53]: Ask Spark
+```
