@@ -48,7 +48,7 @@ export async function* streamChatMessage(message, conversationHistory = [], cont
     try {
       const err = await response.json()
       msg = err.message || err.error || msg
-    } catch (_) {}
+    } catch (_) { /* ignore — use the default HTTP status message */ }
     throw new AiError(response.status, msg)
   }
 

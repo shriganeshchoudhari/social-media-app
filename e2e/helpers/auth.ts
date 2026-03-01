@@ -31,7 +31,7 @@ export async function loginViaAPI(context: BrowserContext, page: Page, username:
   await page.evaluate(([t, u]) => {
     localStorage.setItem('token', t);
     localStorage.setItem('user', JSON.stringify(u));
-  }, [token, JSON.stringify(user)] as [string, string]);
+  }, [token, user] as [string, unknown]);
 
   await page.goto('/');
   await page.waitForURL('/');
@@ -53,7 +53,7 @@ export async function registerAndLogin(
   await page.evaluate(([t, u]) => {
     localStorage.setItem('token', t);
     localStorage.setItem('user', JSON.stringify(u));
-  }, [token, JSON.stringify(user)] as [string, string]);
+  }, [token, user] as [string, unknown]);
 
   await page.goto('/');
   await page.waitForURL('/');

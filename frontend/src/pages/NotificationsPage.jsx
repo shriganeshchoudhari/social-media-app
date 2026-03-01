@@ -3,18 +3,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Heart, MessageCircle, UserPlus } from 'lucide-react'
 import {
-  fetchNotifications, markAllReadThunk,
+  fetchNotifications, markAllReadThunk, fetchUnreadCount,
   selectNotifications, selectNotifLoading,
 } from '../store/notificationsSlice.js'
-import { fetchUnreadCount } from '../store/notificationsSlice.js'
 import Avatar from '../components/ui/Avatar.jsx'
 import Button from '../components/ui/Button.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 
 const TYPE_CONFIG = {
-  LIKE:    { Icon: Heart,       color: 'text-pink-500',    bg: 'bg-pink-50' },
+  LIKE: { Icon: Heart, color: 'text-pink-500', bg: 'bg-pink-50' },
   COMMENT: { Icon: MessageCircle, color: 'text-primary-500', bg: 'bg-primary-50' },
-  FOLLOW:  { Icon: UserPlus,    color: 'text-green-500',   bg: 'bg-green-50' },
+  FOLLOW: { Icon: UserPlus, color: 'text-green-500', bg: 'bg-green-50' },
 }
 
 const relativeTime = (iso) => {
@@ -27,8 +26,8 @@ const relativeTime = (iso) => {
 
 export default function NotificationsPage() {
   const dispatch = useDispatch()
-  const items    = useSelector(selectNotifications)
-  const loading  = useSelector(selectNotifLoading)
+  const items = useSelector(selectNotifications)
+  const loading = useSelector(selectNotifLoading)
 
   useEffect(() => {
     dispatch(fetchNotifications(0))
@@ -57,7 +56,7 @@ export default function NotificationsPage() {
         <div className="flex flex-col items-center py-16 gap-3 text-center px-4">
           <span className="text-5xl">🔔</span>
           <p className="text-lg font-semibold text-gray-800">No notifications yet</p>
-          <p className="text-sm text-gray-500">When someone likes, comments, or follows you, it'll show up here.</p>
+          <p className="text-sm text-gray-500">When someone likes, comments, or follows you, it&apos;ll show up here.</p>
         </div>
       ) : (
         <div>

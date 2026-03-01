@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Search, Plus, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -6,7 +6,6 @@ import ConversationList from '../components/messaging/ConversationList.jsx'
 import ChatWindow from '../components/messaging/ChatWindow.jsx'
 import useWebSocket from '../hooks/useWebSocket.js'
 import { sendMessageThunk, selectActiveConversationId, selectConversations, setActiveConversation } from '../store/messagingSlice.js'
-import { useEffect, useRef } from 'react'
 import * as searchApi from '../api/search.js'
 
 export default function MessagesPage() {

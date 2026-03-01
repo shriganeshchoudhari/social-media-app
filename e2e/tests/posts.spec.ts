@@ -52,7 +52,7 @@ test.describe('Post detail page', () => {
     await page.goto('/posts/99999999');
     // Either a 404 message or redirect to home
     const has404 = await page.locator(':has-text("not found"), :has-text("404"), :has-text("does not exist")').first().isVisible({ timeout: 4000 }).catch(() => false);
-    const redirected = page.url() === 'http://localhost:3000/';
+    const redirected = page.url() === 'http://localhost:3001/';
     expect(has404 || redirected).toBeTruthy();
   });
 });

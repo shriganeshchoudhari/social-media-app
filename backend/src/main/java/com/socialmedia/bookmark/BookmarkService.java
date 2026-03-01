@@ -1,6 +1,5 @@
 package com.socialmedia.bookmark;
 
-import com.socialmedia.exception.ConflictException;
 import com.socialmedia.exception.ResourceNotFoundException;
 import com.socialmedia.post.Post;
 import com.socialmedia.post.PostLikeRepository;
@@ -23,11 +22,12 @@ import java.util.Map;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
-    private final PostRepository     postRepository;
+    private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
     /**
      * Toggle bookmark on a post.
+     * 
      * @return Map with keys "bookmarked" (boolean) indicating the new state.
      */
     @Transactional

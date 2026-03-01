@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
 
@@ -31,11 +30,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AiController – integration tests")
 class AiControllerIntTest extends BaseIntegrationTest {
 
-    @MockitoBean OllamaClient  ollamaClient;
-    @MockitoBean AiRateLimiter rateLimiter;
+    @MockitoBean
+    OllamaClient ollamaClient;
+    @MockitoBean
+    AiRateLimiter rateLimiter;
 
-    @Autowired TestDataFactory factory;
-    @Autowired JwtService      jwtService;
+    @Autowired
+    TestDataFactory factory;
+    @Autowired
+    JwtService jwtService;
 
     private User alice;
     private String aliceToken;
@@ -66,9 +69,9 @@ class AiControllerIntTest extends BaseIntegrationTest {
         }).when(ollamaClient).streamChat(any(), any(), any(), any());
 
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("Hello Spark", "general"))))
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("Hello Spark", "general"))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(NDJSON));
     }
@@ -85,9 +88,9 @@ class AiControllerIntTest extends BaseIntegrationTest {
         }).when(ollamaClient).streamChat(any(), any(), any(), any());
 
         String body = mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("Hey", "general"))))
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("Hey", "general"))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -107,9 +110,9 @@ class AiControllerIntTest extends BaseIntegrationTest {
         }).when(ollamaClient).streamChat(any(), any(), any(), any());
 
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("What's in my feed?", "feed_summary"))))
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("What's in my feed?", "feed_summary"))))
                 .andExpect(status().isOk());
     }
 
@@ -123,9 +126,9 @@ class AiControllerIntTest extends BaseIntegrationTest {
         }).when(ollamaClient).streamChat(any(), any(), any(), any());
 
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("Improve: went running today", "post_improve"))))
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("Improve: went running today", "post_improve"))))
                 .andExpect(status().isOk());
     }
 
@@ -139,9 +142,9 @@ class AiControllerIntTest extends BaseIntegrationTest {
         }).when(ollamaClient).streamChat(any(), any(), any(), any());
 
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"message\":\"Hello\"}"))
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"message\":\"Hello\"}"))
                 .andExpect(status().isOk());
     }
 
@@ -155,7 +158,7 @@ class AiControllerIntTest extends BaseIntegrationTest {
         when(ollamaClient.getBaseUrl()).thenReturn("http://localhost:11434");
 
         mockMvc.perform(get(API + "/health")
-                        .header("Authorization", "Bearer " + aliceToken))
+                .header("Authorization", "Bearer " + aliceToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ok"))
                 .andExpect(jsonPath("$.ollamaReachable").value(true))
@@ -170,7 +173,7 @@ class AiControllerIntTest extends BaseIntegrationTest {
         when(ollamaClient.getBaseUrl()).thenReturn("http://localhost:11434");
 
         mockMvc.perform(get(API + "/health")
-                        .header("Authorization", "Bearer " + aliceToken))
+                .header("Authorization", "Bearer " + aliceToken))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.status").value("degraded"))
                 .andExpect(jsonPath("$.ollamaReachable").value(false))
@@ -183,8 +186,8 @@ class AiControllerIntTest extends BaseIntegrationTest {
     @DisplayName("❌ chat returns 401 when no Authorization header")
     void chat_returns401_withNoAuth() throws Exception {
         mockMvc.perform(post(API + "/chat")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("Hello", "general"))))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("Hello", "general"))))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -192,20 +195,20 @@ class AiControllerIntTest extends BaseIntegrationTest {
     @DisplayName("❌ chat returns 422 when message is blank")
     void chat_returns422_whenMessageBlank() throws Exception {
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"message\":\"\"}"))
-                .andExpect(status().isUnprocessableEntity());
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"message\":\"\"}"))
+                .andExpect(status().is(422));
     }
 
     @Test
     @DisplayName("❌ chat returns 422 when message is missing")
     void chat_returns422_whenMessageMissing() throws Exception {
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"context\":\"general\"}"))
-                .andExpect(status().isUnprocessableEntity());
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"context\":\"general\"}"))
+                .andExpect(status().is(422));
     }
 
     @Test
@@ -213,20 +216,20 @@ class AiControllerIntTest extends BaseIntegrationTest {
     void chat_returns422_whenMessageTooLong() throws Exception {
         String longMsg = "a".repeat(1001);
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"message\":\"" + longMsg + "\"}"))
-                .andExpect(status().isUnprocessableEntity());
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"message\":\"" + longMsg + "\"}"))
+                .andExpect(status().is(422));
     }
 
     @Test
     @DisplayName("❌ chat returns 422 for invalid context value")
     void chat_returns422_forInvalidContext() throws Exception {
         mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"message\":\"Hi\",\"context\":\"invalid_mode\"}"))
-                .andExpect(status().isUnprocessableEntity());
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"message\":\"Hi\",\"context\":\"invalid_mode\"}"))
+                .andExpect(status().is(422));
     }
 
     @Test
@@ -236,10 +239,10 @@ class AiControllerIntTest extends BaseIntegrationTest {
                 .thenReturn(new RateLimitStatus(false, 0, Instant.now().plusSeconds(3600)));
 
         String body = mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("Hello", "general"))))
-                .andExpect(status().isOk())   // streaming starts before rate-limit check result
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("Hello", "general"))))
+                .andExpect(status().isOk()) // streaming starts before rate-limit check result
                 .andReturn().getResponse().getContentAsString();
 
         org.assertj.core.api.Assertions.assertThat(body).contains("rate_limit");
@@ -252,9 +255,9 @@ class AiControllerIntTest extends BaseIntegrationTest {
                 .when(ollamaClient).streamChat(any(), any(), any(), any());
 
         String body = mockMvc.perform(post(API + "/chat")
-                        .header("Authorization", "Bearer " + aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(chatBody("Hello", "general"))))
+                .header("Authorization", "Bearer " + aliceToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(chatBody("Hello", "general"))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -270,7 +273,8 @@ class AiControllerIntTest extends BaseIntegrationTest {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private record ChatBody(String message, String context) {}
+    private record ChatBody(String message, String context) {
+    }
 
     private ChatBody chatBody(String message, String context) {
         return new ChatBody(message, context);

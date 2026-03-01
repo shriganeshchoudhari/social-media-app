@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
@@ -20,10 +20,10 @@ import java.util.Map;
  * Redis-backed Spring Cache configuration.
  *
  * Cache names and TTLs:
- *   users         -- User profiles by username         10 minutes
- *   posts         -- Individual post by ID              5 minutes
- *   notif-count   -- Unread notification count/user    60 seconds
- *   trending-tags -- Top hashtags from search           5 minutes
+ * users -- User profiles by username 10 minutes
+ * posts -- Individual post by ID 5 minutes
+ * notif-count -- Unread notification count/user 60 seconds
+ * trending-tags -- Top hashtags from search 5 minutes
  */
 @Configuration
 @EnableCaching
@@ -34,20 +34,23 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {
+        // RedisSerializer.json() is the non-deprecated factory method (Spring Data
+        // Redis 3.2+)
+        // that replaces the deprecated GenericJackson2JsonRedisSerializer
         RedisCacheConfiguration defaults = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMillis(defaultTtlMs))
                 .serializeKeysWith(
-                    RedisSerializationContext.SerializationPair.fromSerializer(
-                        new StringRedisSerializer()))
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new StringRedisSerializer()))
                 .serializeValuesWith(
-                    RedisSerializationContext.SerializationPair.fromSerializer(
-                        new GenericJackson2JsonRedisSerializer()))
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                RedisSerializer.json()))
                 .disableCachingNullValues();
 
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
-        cacheConfigs.put("users",         defaults.entryTtl(Duration.ofMinutes(10)));
-        cacheConfigs.put("posts",         defaults.entryTtl(Duration.ofMinutes(5)));
-        cacheConfigs.put("notif-count",   defaults.entryTtl(Duration.ofSeconds(60)));
+        cacheConfigs.put("users", defaults.entryTtl(Duration.ofMinutes(10)));
+        cacheConfigs.put("posts", defaults.entryTtl(Duration.ofMinutes(5)));
+        cacheConfigs.put("notif-count", defaults.entryTtl(Duration.ofSeconds(60)));
         cacheConfigs.put("trending-tags", defaults.entryTtl(Duration.ofMinutes(5)));
 
         return RedisCacheManager.builder(factory)

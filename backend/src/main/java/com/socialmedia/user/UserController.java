@@ -49,13 +49,21 @@ public class UserController {
             @RequestBody Map<String, String> body) {
 
         String current = body.getOrDefault("currentPassword", "");
-        String next    = body.getOrDefault("newPassword", "");
+        String next = body.getOrDefault("newPassword", "");
 
         if (!passwordEncoder.matches(current, currentUser.getPassword()))
             throw new ForbiddenException("Current password is incorrect");
 
-        if (next.length() < 8)
-            throw new IllegalArgumentException("New password must be at least 8 characters");
+        // Enforce the same strength rules as registration:
+        // min 8 chars, at least one digit, one uppercase, one special character.
+        if (next.length() < 8
+                || !next.matches(".*\\d.*")
+                || !next.matches(".*[A-Z].*")
+                || !next.matches(".*[^a-zA-Z0-9].*")) {
+            throw new IllegalArgumentException(
+                    "New password must be at least 8 characters and contain "
+                            + "at least one digit, one uppercase letter, and one special character.");
+        }
 
         currentUser.setPassword(passwordEncoder.encode(next));
         userRepository.save(currentUser);

@@ -12,12 +12,20 @@ client.interceptors.request.use((config) => {
   return config
 })
 
-// Redirect to login on 401
+// Redirect to login on 401 — also dispatch the Redux logout action so the
+// Redux store stays in sync with localStorage (avoids a stale isAuthenticated flash).
 client.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      // Lazy-import store to avoid a circular-dependency at module load time.
+      import('../store/index.js').then(({ default: store }) => {
+        import('../store/authSlice.js').then(({ logout }) => {
+          store.dispatch(logout())
+        })
+      })
       window.location.href = '/login'
     }
     return Promise.reject(err)

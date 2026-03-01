@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../store/authSlice.js'
 import { getPost } from '../api/posts.js'
 import PostCard from '../components/post/PostCard.jsx'
 import CommentList from '../components/post/CommentList.jsx'
@@ -9,11 +7,11 @@ import Spinner from '../components/ui/Spinner.jsx'
 import { ArrowLeft } from 'lucide-react'
 
 export default function PostDetailPage() {
-  const { id }    = useParams()
-  const navigate  = useNavigate()
-  const [post, setPost]       = useState(null)
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     setLoading(true)

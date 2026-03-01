@@ -3,8 +3,9 @@ package com.socialmedia.auth.dto;
 import com.socialmedia.user.dto.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data @AllArgsConstructor
+@Data @AllArgsConstructor @NoArgsConstructor
 public class AuthResponse {
     private String token;
     private UserResponse user;

@@ -32,16 +32,16 @@ import AiSuggestionBar from './AiSuggestionBar.jsx'
 const MAX_CHARS = 1000
 
 export default function AiChatPanel() {
-  const dispatch     = useDispatch()
-  const isOpen       = useSelector(selectAiOpen)
-  const messages     = useSelector(selectAiMessages)
-  const isStreaming  = useSelector(selectAiStreaming)
-  const error        = useSelector(selectAiError)
+  const dispatch = useDispatch()
+  const isOpen = useSelector(selectAiOpen)
+  const messages = useSelector(selectAiMessages)
+  const isStreaming = useSelector(selectAiStreaming)
+  const error = useSelector(selectAiError)
   const ollamaStatus = useSelector(selectOllamaStatus)
 
   const [input, setInput] = useState('')
-  const messagesEndRef    = useRef(null)
-  const inputRef          = useRef(null)
+  const messagesEndRef = useRef(null)
+  const inputRef = useRef(null)
 
   // ── Esc key closes panel ────────────────────────────────────────────────────
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function AiChatPanel() {
   }
 
   const remaining = MAX_CHARS - input.length
-  const canSend   = input.trim().length > 0 && !isStreaming
+  const canSend = input.trim().length > 0 && !isStreaming
 
   // ── Nothing to render when closed ──────────────────────────────────────────
   if (!isOpen) return null
@@ -209,7 +209,7 @@ export default function AiChatPanel() {
                 ⚡
               </div>
               <div>
-                <p className="font-semibold text-gray-800 text-sm">Hi! I'm Spark</p>
+                <p className="font-semibold text-gray-800 text-sm">Hi! I&apos;m Spark</p>
                 <p className="text-xs text-gray-400 mt-1">Your ConnectHub AI assistant</p>
               </div>
               <AiSuggestionBar />

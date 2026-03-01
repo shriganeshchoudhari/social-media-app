@@ -1,0 +1,151 @@
+{
+    "groups": [
+        {
+            "name": "jwt",
+            "description": "JWT authentication settings."
+        },
+        {
+            "name": "app.ratelimit",
+            "description": "HTTP rate-limiting settings."
+        },
+        {
+            "name": "app.cors",
+            "description": "CORS allowed origins configuration."
+        },
+        {
+            "name": "app.media",
+            "description": "Media file upload and serving settings."
+        },
+        {
+            "name": "ollama",
+            "description": "Ollama LLM instance connection settings."
+        },
+        {
+            "name": "ai",
+            "description": "AI assistant (Spark) model and rate-limiting settings."
+        },
+        {
+            "name": "ai.ratelimit",
+            "description": "AI assistant per-user rate-limiting."
+        }
+    ],
+    "properties": [
+        {
+            "name": "jwt.secret",
+            "type": "java.lang.String",
+            "description": "Base64URL-encoded secret key for JWT signing. In production, set via JWT_SECRET environment variable."
+        },
+        {
+            "name": "jwt.expiration-ms",
+            "type": "java.lang.Long",
+            "description": "JWT token validity in milliseconds.",
+            "defaultValue": 86400000
+        },
+        {
+            "name": "app.ratelimit.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Whether the in-memory HTTP rate limiter is active.",
+            "defaultValue": true
+        },
+        {
+            "name": "app.ratelimit.requests-per-minute",
+            "type": "java.lang.Integer",
+            "description": "Max requests per client IP per minute.",
+            "defaultValue": 120
+        },
+        {
+            "name": "app.cors.allowed-origins",
+            "type": "java.lang.String",
+            "description": "Comma-separated list of allowed CORS origins. Override with APP_CORS_ORIGINS env var in production.",
+            "defaultValue": "http://localhost:3001"
+        },
+        {
+            "name": "app.media.upload-dir",
+            "type": "java.lang.String",
+            "description": "Filesystem directory where uploaded media files are stored.",
+            "defaultValue": "uploads"
+        },
+        {
+            "name": "app.media.base-url",
+            "type": "java.lang.String",
+            "description": "Base URL prefix for serving stored media files.",
+            "defaultValue": "/api/v1/media/files"
+        },
+        {
+            "name": "ollama.base-url",
+            "type": "java.lang.String",
+            "description": "Base URL of the Ollama REST API.",
+            "defaultValue": "http://localhost:11434"
+        },
+        {
+            "name": "ai.model",
+            "type": "java.lang.String",
+            "description": "Ollama model name to use for the Spark AI assistant.",
+            "defaultValue": "llama3.2:3b"
+        },
+        {
+            "name": "ai.max-tokens",
+            "type": "java.lang.Integer",
+            "description": "Maximum tokens the model may generate per response.",
+            "defaultValue": 1024
+        },
+        {
+            "name": "ai.ratelimit.requests-per-hour",
+            "type": "java.lang.Integer",
+            "description": "Max AI chat requests allowed per user per hour.",
+            "defaultValue": 60
+        },
+        {
+            "name": "ai.ratelimit.max-concurrent",
+            "type": "java.lang.Integer",
+            "description": "Max concurrent AI streaming responses across all users.",
+            "defaultValue": 5
+        },
+        {
+            "name": "ai.system-prompt",
+            "type": "java.lang.String",
+            "description": "Override the default Spark AI system prompt. Useful for testing or staging environments."
+        },
+        {
+            "name": "spring.flyway.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Whether to enable Flyway database migrations.",
+            "defaultValue": true
+        },
+        {
+            "name": "spring.flyway.locations",
+            "type": "java.lang.String[]",
+            "description": "Locations of migration scripts (e.g. classpath:db/migration)."
+        },
+        {
+            "name": "spring.flyway.baseline-on-migrate",
+            "type": "java.lang.Boolean",
+            "description": "Whether to baseline an existing schema on first Flyway run.",
+            "defaultValue": false
+        },
+        {
+            "name": "spring.flyway.validate-on-migrate",
+            "type": "java.lang.Boolean",
+            "description": "Whether to validate applied migrations against available scripts during migration.",
+            "defaultValue": true
+        },
+        {
+            "name": "spring.flyway.out-of-order",
+            "type": "java.lang.Boolean",
+            "description": "Whether out-of-order migrations are allowed (useful for branching workflows).",
+            "defaultValue": false
+        },
+        {
+            "name": "spring.flyway.repair-on-migrate",
+            "type": "java.lang.Boolean",
+            "description": "Whether to automatically repair the Flyway schema history table before each migration run.",
+            "defaultValue": false
+        },
+        {
+            "name": "spring.h2.console.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Whether to enable the H2 web console (dev-only — never enable in production).",
+            "defaultValue": false
+        }
+    ]
+}

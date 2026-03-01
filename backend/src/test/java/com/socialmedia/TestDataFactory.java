@@ -13,12 +13,12 @@ import com.socialmedia.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Factory that creates and persists entities for integration tests.
  *
  * Usage in a test (class must extend BaseIntegrationTest):
+ * 
  * <pre>
  *   {@literal @}Autowired TestDataFactory factory;
  *
@@ -38,12 +38,12 @@ public class TestDataFactory {
     /** Default password used for all users created by this factory. */
     public static final String DEFAULT_PASSWORD = "Password1!";
 
-    private final UserRepository     userRepo;
-    private final PostRepository     postRepo;
-    private final CommentRepository  commentRepo;
+    private final UserRepository userRepo;
+    private final PostRepository postRepo;
+    private final CommentRepository commentRepo;
     private final PostLikeRepository likeRepo;
-    private final FollowRepository   followRepo;
-    private final PasswordEncoder    passwordEncoder;
+    private final FollowRepository followRepo;
+    private final PasswordEncoder passwordEncoder;
 
     // ── Users ─────────────────────────────────────────────────
 
@@ -52,7 +52,9 @@ public class TestDataFactory {
         return user(username, username + "@test.com");
     }
 
-    /** Creates a persisted user with a custom email and {@code DEFAULT_PASSWORD}. */
+    /**
+     * Creates a persisted user with a custom email and {@code DEFAULT_PASSWORD}.
+     */
     public User user(String username, String email) {
         return userRepo.save(User.builder()
                 .username(username)
@@ -124,7 +126,8 @@ public class TestDataFactory {
     // ── Helpers ───────────────────────────────────────────────
 
     private String capitalize(String s) {
-        if (s == null || s.isEmpty()) return s;
+        if (s == null || s.isEmpty())
+            return s;
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 }

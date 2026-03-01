@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -27,9 +26,11 @@ import static org.mockito.Mockito.*;
 @DisplayName("ContextBuilder – unit tests")
 class ContextBuilderTest {
 
-    @Mock PostRepository postRepository;
+    @Mock
+    PostRepository postRepository;
 
-    @InjectMocks ContextBuilder contextBuilder;
+    @InjectMocks
+    ContextBuilder contextBuilder;
 
     private User alice;
 
@@ -59,8 +60,8 @@ class ContextBuilderTest {
         assertThat(prompt).contains("Alice Wonderland");
         assertThat(prompt).contains("@alice");
         assertThat(prompt).contains("Tech enthusiast");
-        assertThat(prompt).contains("10");   // followers
-        assertThat(prompt).contains("5");    // following
+        assertThat(prompt).contains("10"); // followers
+        assertThat(prompt).contains("5"); // following
     }
 
     @Test

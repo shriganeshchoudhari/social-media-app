@@ -8,8 +8,8 @@ import Spinner from '../components/ui/Spinner.jsx'
 const TABS = ['Posts', 'Users', 'Hashtags']
 
 export default function SearchPage() {
-  const [query, setQuery]     = useState('')
-  const [tab, setTab]         = useState('Posts')
+  const [query, setQuery] = useState('')
+  const [tab, setTab] = useState('Posts')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const debounceRef = useRef(null)
@@ -27,9 +27,9 @@ export default function SearchPage() {
     setLoading(true)
     try {
       let data
-      if (t === 'Posts')    ({ data } = await searchPosts(q, page))
-      else if (t === 'Users')    ({ data } = await searchUsers(q, page))
-      else                       ({ data } = await searchHashtags(q, page))
+      if (t === 'Posts') ({ data } = await searchPosts(q, page))
+      else if (t === 'Users') ({ data } = await searchUsers(q, page))
+      else ({ data } = await searchHashtags(q, page))
       setResults(page === 0 ? data.content : prev => [...prev, ...data.content])
     } finally {
       setLoading(false)
@@ -58,11 +58,10 @@ export default function SearchPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
-              tab === t
+            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${tab === t
                 ? 'border-primary-500 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             {t}
           </button>
@@ -79,7 +78,7 @@ export default function SearchPage() {
         ) : loading && results.length === 0 ? (
           <div className="flex justify-center py-16"><Spinner size="lg" /></div>
         ) : results.length === 0 ? (
-          <p className="text-center text-sm text-gray-400 py-16">No results for "{query}"</p>
+          <p className="text-center text-sm text-gray-400 py-16">No results for &quot;{query}&quot;</p>
         ) : tab === 'Posts' || tab === 'Hashtags' ? (
           results.map(post => <PostCard key={post.id} post={post} />)
         ) : (

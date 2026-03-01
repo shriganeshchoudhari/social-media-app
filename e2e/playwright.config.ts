@@ -14,6 +14,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  globalSetup: './global-setup',
   fullyParallel: false,      // tests share seed data; run sequentially to avoid races
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -26,10 +27,10 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL:       'http://localhost:3001',
-    screenshot:    'only-on-failure',
-    video:         'retain-on-failure',
-    trace:         'retain-on-failure',
+    baseURL: 'http://localhost:3001',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
     actionTimeout: 10_000,
   },
 

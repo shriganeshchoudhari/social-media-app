@@ -119,6 +119,13 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Jackson JSR-310 module: enables LocalDateTime serialization/deserialization in tests -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- OkHttp MockWebServer: lightweight fake HTTP server for OllamaClient tests -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

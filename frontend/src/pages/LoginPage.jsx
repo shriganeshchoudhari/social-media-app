@@ -6,10 +6,10 @@ import Input from '../components/ui/Input.jsx'
 import Button from '../components/ui/Button.jsx'
 
 export default function LoginPage() {
-  const dispatch  = useDispatch()
-  const navigate  = useNavigate()
-  const loading   = useSelector(selectAuthLoading)
-  const error     = useSelector(selectAuthError)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const loading = useSelector(selectAuthLoading)
+  const error = useSelector(selectAuthError)
   const [form, setForm] = useState({ usernameOrEmail: '', password: '' })
 
   const onChange = e => {
@@ -68,7 +68,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link to="/register" className="text-primary-600 font-semibold hover:underline">
               Sign up
             </Link>

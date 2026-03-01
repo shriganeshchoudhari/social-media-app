@@ -10,12 +10,12 @@ import Spinner from '../components/ui/Spinner.jsx'
 import { FeedSkeleton } from '../components/ui/PostSkeleton.jsx'
 
 export default function FeedPage() {
-  const dispatch     = useDispatch()
-  const posts        = useSelector(selectFeed)
-  const loading      = useSelector(selectFeedLoading)
-  const loadingMore  = useSelector(selectLoadingMore)
-  const totalPages   = useSelector(selectTotalPages)
-  const currentPage  = useSelector(selectCurrentPage)
+  const dispatch = useDispatch()
+  const posts = useSelector(selectFeed)
+  const loading = useSelector(selectFeedLoading)
+  const loadingMore = useSelector(selectLoadingMore)
+  const totalPages = useSelector(selectTotalPages)
+  const currentPage = useSelector(selectCurrentPage)
 
   useEffect(() => { dispatch(fetchFeed(0)) }, [dispatch])
 
@@ -60,7 +60,7 @@ export default function FeedPage() {
             <div className="flex justify-center py-6"><Spinner /></div>
           )}
           {!loadingMore && currentPage + 1 >= totalPages && posts.length > 0 && (
-            <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-6">You're all caught up!</p>
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-6">You&apos;re all caught up!</p>
           )}
         </>
       )}

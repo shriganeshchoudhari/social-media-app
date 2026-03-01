@@ -74,11 +74,12 @@ public class WebSocketMessageController {
         Long conversationId = Long.valueOf(payload.get("conversationId").toString());
         boolean isTyping    = Boolean.parseBoolean(payload.get("isTyping").toString());
 
+        java.util.Map<String, Object> typingPayload = java.util.Map.of(
+                "username", sender.getUsername(),
+                "isTyping",  isTyping
+        );
         messagingTemplate.convertAndSend(
                 "/topic/typing/" + conversationId,
-                java.util.Map.of(
-                        "username",  sender.getUsername(),
-                        "isTyping",  isTyping
-                ));
+                (Object) typingPayload);
     }
 }

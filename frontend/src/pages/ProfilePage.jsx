@@ -10,7 +10,6 @@ import Modal from '../components/ui/Modal.jsx'
 import Input from '../components/ui/Input.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 import { ArrowLeft, Edit2, MessageCircle } from 'lucide-react'
-import { useDispatch } from 'react-redux'
 import { sendMessageThunk, setActiveConversation } from '../store/messagingSlice.js'
 
 export default function ProfilePage() {
@@ -31,14 +30,13 @@ export default function ProfilePage() {
   const [editForm, setEditForm]       = useState({})
   const [saving, setSaving]           = useState(false)
 
-  const isMe     = me?.username === username
-  const dispatch2 = useDispatch()
+  const isMe = me?.username === username
 
   const handleMessageUser = () => {
-    dispatch2(sendMessageThunk({ recipientId: profile?.id, content: '👋' }))
+    dispatch(sendMessageThunk({ recipientId: profile?.id, content: '👋' }))
       .unwrap()
       .then((msg) => {
-        dispatch2(setActiveConversation(msg.conversationId))
+        dispatch(setActiveConversation(msg.conversationId))
         navigate('/messages')
       })
       .catch(() => {})

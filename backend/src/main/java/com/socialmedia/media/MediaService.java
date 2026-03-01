@@ -1,6 +1,5 @@
 package com.socialmedia.media;
 
-import com.socialmedia.exception.ApiError;
 import com.socialmedia.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,13 +25,11 @@ public class MediaService {
 
     /** Allowed MIME types */
     private static final Set<String> ALLOWED_TYPES = Set.of(
-            "image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4"
-    );
+            "image/jpeg", "image/png", "image/gif", "image/webp", "video/mp4");
 
     /** Allowed extensions (extra guard) */
     private static final Set<String> ALLOWED_EXT = Set.of(
-            "jpg", "jpeg", "png", "gif", "webp", "mp4"
-    );
+            "jpg", "jpeg", "png", "gif", "webp", "mp4");
 
     @Value("${app.media.upload-dir:uploads}")
     private String uploadDir;
@@ -79,7 +76,8 @@ public class MediaService {
         try {
             byte[] data = Files.readAllBytes(path);
             String contentType = Files.probeContentType(path);
-            if (contentType == null) contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            if (contentType == null)
+                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, contentType)
@@ -98,7 +96,7 @@ public class MediaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File must not be empty");
         }
         if (file.getSize() > MAX_BYTES) {
-            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE,
+            throw new ResponseStatusException(HttpStatus.valueOf(413),
                     "File exceeds the 10 MB limit");
         }
 
@@ -116,7 +114,8 @@ public class MediaService {
     }
 
     private String extension(String filename) {
-        if (filename == null || !filename.contains(".")) return "";
+        if (filename == null || !filename.contains("."))
+            return "";
         return filename.substring(filename.lastIndexOf('.') + 1);
     }
 }

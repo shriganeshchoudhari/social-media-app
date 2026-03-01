@@ -3,6 +3,9 @@
 -- Matches all JPA entities exactly (column names, types, constraints)
 -- ============================================================
 
+-- ── pg_trgm extension (required for trigram/ILIKE search indexes) ──
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- ── users ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
     id               BIGSERIAL PRIMARY KEY,

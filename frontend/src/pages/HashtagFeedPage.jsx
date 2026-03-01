@@ -7,13 +7,13 @@ import { FeedSkeleton } from '../components/ui/PostSkeleton.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 
 export default function HashtagFeedPage() {
-  const { tag }    = useParams()
-  const navigate   = useNavigate()
+  const { tag } = useParams()
+  const navigate = useNavigate()
 
-  const [posts, setPosts]         = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [loadingMore, setLM]      = useState(false)
-  const [page, setPage]           = useState(0)
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLM] = useState(false)
+  const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
 
   const load = useCallback(async (p = 0) => {
@@ -90,7 +90,7 @@ export default function HashtagFeedPage() {
             <div className="flex justify-center py-6"><Spinner /></div>
           )}
           {!loadingMore && page + 1 >= totalPages && posts.length > 0 && (
-            <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-6">That's all posts for #{tag}</p>
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-6">That&apos;s all posts for #{tag}</p>
           )}
         </>
       )}

@@ -19,8 +19,10 @@ import static org.mockito.Mockito.*;
 @DisplayName("UserService – unit tests")
 class UserServiceTest {
 
-    @Mock UserRepository userRepository;
-    @InjectMocks UserService userService;
+    @Mock
+    UserRepository userRepository;
+    @InjectMocks
+    UserService userService;
 
     private User alice;
 
@@ -60,10 +62,10 @@ class UserServiceTest {
 
         when(userRepository.save(alice)).thenReturn(alice);
 
-        UserResponse resp = userService.updateProfile(alice, req);
+        userService.updateProfile(alice, req);
 
         assertThat(alice.getBio()).isEqualTo("Updated bio");
-        assertThat(alice.getDisplayName()).isEqualTo("Alice");   // unchanged
+        assertThat(alice.getDisplayName()).isEqualTo("Alice"); // unchanged
         verify(userRepository).save(alice);
     }
 
