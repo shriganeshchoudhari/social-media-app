@@ -35,7 +35,7 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Welcome back</h2>
 
-          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
             <Input
               label="Username or Email"
               name="usernameOrEmail"
@@ -57,7 +57,7 @@ export default function LoginPage() {
             />
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+              <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 error-banner">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}

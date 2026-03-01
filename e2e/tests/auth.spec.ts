@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage }    from '../pages/LoginPage';
+import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { SEED, INVALID, newUser } from '../fixtures/test-data';
 import { loginViaUI, logout } from '../helpers/auth';
@@ -11,7 +11,7 @@ test.describe('Register', () => {
 
   test('✅ new user can register successfully and is redirected to feed', async ({ page }) => {
     const registerPage = new RegisterPage(page);
-    const user = newUser('reg1');
+    const user = newUser();
 
     await registerPage.goto();
     await registerPage.register(user);
@@ -31,9 +31,9 @@ test.describe('Register', () => {
     // alice is a seed user — always exists
     await registerPage.goto();
     await registerPage.register({
-      username:    SEED.alice.username,
-      email:       'newalice@playwright.test',
-      password:    SEED.alice.password,
+      username: SEED.alice.username,
+      email: 'newalice@playwright.test',
+      password: SEED.alice.password,
       displayName: 'Alice Dup',
     });
 
@@ -47,9 +47,9 @@ test.describe('Register', () => {
 
     await registerPage.goto();
     await registerPage.register({
-      username:    'uniqueuser999',
-      email:       SEED.alice.email,   // alice@demo.com already taken
-      password:    'Password1!',
+      username: 'uniqueuser999',
+      email: SEED.alice.email,   // alice@demo.com already taken
+      password: 'Password1!',
       displayName: 'Unique User',
     });
 
@@ -61,9 +61,9 @@ test.describe('Register', () => {
 
     await registerPage.goto();
     await registerPage.register({
-      username:    'shortpwuser',
-      email:       'shortpw@playwright.test',
-      password:    INVALID.shortPassword,
+      username: 'shortpwuser',
+      email: 'shortpw@playwright.test',
+      password: INVALID.shortPassword,
       displayName: 'Short PW',
     });
 
@@ -75,9 +75,9 @@ test.describe('Register', () => {
 
     await registerPage.goto();
     await registerPage.register({
-      username:    'bademailuser',
-      email:       INVALID.badEmail,
-      password:    'Password1!',
+      username: 'bademailuser',
+      email: INVALID.badEmail,
+      password: 'Password1!',
       displayName: 'Bad Email',
     });
 
@@ -89,9 +89,9 @@ test.describe('Register', () => {
 
     await registerPage.goto();
     await registerPage.register({
-      username:    INVALID.emptyString,
-      email:       'blank@playwright.test',
-      password:    'Password1!',
+      username: INVALID.emptyString,
+      email: 'blank@playwright.test',
+      password: 'Password1!',
       displayName: 'Blank User',
     });
 

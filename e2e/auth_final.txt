@@ -1,0 +1,241 @@
+  ✅  Backend API is reachable at http://localhost:9090/api/v1/health
+  ✅  Frontend (Vite dev server) is reachable at http://localhost:3001
+
+Running 51 tests using 1 worker
+
+  ✘   1 [chromium] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed (9.4s)
+  ✓   2 [chromium] › tests\auth.spec.ts:23:7 › Register › ✅ register page link is visible on login page (892ms)
+  ✓   3 [chromium] › tests\auth.spec.ts:28:7 › Register › ❌ register with duplicate username shows error (831ms)
+  ✓   4 [chromium] › tests\auth.spec.ts:45:7 › Register › ❌ register with duplicate email shows error (882ms)
+  ✓   5 [chromium] › tests\auth.spec.ts:59:7 › Register › ❌ register with short password shows validation error (796ms)
+  ✓   6 [chromium] › tests\auth.spec.ts:73:7 › Register › ❌ register with invalid email shows validation error (772ms)
+  ✓   7 [chromium] › tests\auth.spec.ts:87:7 › Register › ❌ register with blank username shows validation error (812ms)
+  ✓   8 [chromium] › tests\auth.spec.ts:107:7 › Login › ✅ login with username redirects to feed (903ms)
+  ✓   9 [chromium] › tests\auth.spec.ts:115:7 › Login › ✅ login with email redirects to feed (901ms)
+  ✓  10 [chromium] › tests\auth.spec.ts:123:7 › Login › ✅ after login, user name is visible in sidebar/header (887ms)
+  ✓  11 [chromium] › tests\auth.spec.ts:131:7 › Login › ❌ login with wrong password shows error (902ms)
+  ✓  12 [chromium] › tests\auth.spec.ts:140:7 › Login › ❌ login with non-existent user shows error (897ms)
+  ✓  13 [chromium] › tests\auth.spec.ts:148:7 › Login › ❌ login with blank credentials shows error (1.0s)
+  ✓  14 [chromium] › tests\auth.spec.ts:156:7 › Login › ✅ unauthenticated user visiting / is redirected to /login (946ms)
+  ✓  15 [chromium] › tests\auth.spec.ts:162:7 › Login › ✅ logout clears session and redirects to login (1.2s)
+  ✓  16 [chromium] › tests\auth.spec.ts:174:7 › Login › ✅ after logout, navigating to / redirects back to login (1.4s)
+  ✓  17 [chromium] › tests\auth.spec.ts:181:7 › Login › ✅ login page link to register is visible (876ms)
+  ✘  18 [firefox] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed (13.2s)
+  ✓  19 [firefox] › tests\auth.spec.ts:23:7 › Register › ✅ register page link is visible on login page (4.2s)
+  ✓  20 [firefox] › tests\auth.spec.ts:28:7 › Register › ❌ register with duplicate username shows error (3.4s)
+  ✓  21 [firefox] › tests\auth.spec.ts:45:7 › Register › ❌ register with duplicate email shows error (3.4s)
+  ✓  22 [firefox] › tests\auth.spec.ts:59:7 › Register › ❌ register with short password shows validation error (3.5s)
+  ✓  23 [firefox] › tests\auth.spec.ts:73:7 › Register › ❌ register with invalid email shows validation error (3.6s)
+  ✓  24 [firefox] › tests\auth.spec.ts:87:7 › Register › ❌ register with blank username shows validation error (3.6s)
+  ✓  25 [firefox] › tests\auth.spec.ts:107:7 › Login › ✅ login with username redirects to feed (4.1s)
+  ✓  26 [firefox] › tests\auth.spec.ts:115:7 › Login › ✅ login with email redirects to feed (4.0s)
+  ✓  27 [firefox] › tests\auth.spec.ts:123:7 › Login › ✅ after login, user name is visible in sidebar/header (3.7s)
+  ✓  28 [firefox] › tests\auth.spec.ts:131:7 › Login › ❌ login with wrong password shows error (3.8s)
+  ✓  29 [firefox] › tests\auth.spec.ts:140:7 › Login › ❌ login with non-existent user shows error (3.5s)
+  ✓  30 [firefox] › tests\auth.spec.ts:148:7 › Login › ❌ login with blank credentials shows error (3.4s)
+  ✓  31 [firefox] › tests\auth.spec.ts:156:7 › Login › ✅ unauthenticated user visiting / is redirected to /login (3.1s)
+  ✓  32 [firefox] › tests\auth.spec.ts:162:7 › Login › ✅ logout clears session and redirects to login (3.8s)
+  ✓  33 [firefox] › tests\auth.spec.ts:174:7 › Login › ✅ after logout, navigating to / redirects back to login (4.3s)
+  ✓  34 [firefox] › tests\auth.spec.ts:181:7 › Login › ✅ login page link to register is visible (3.3s)
+  ✘  35 [mobile-chrome] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed (9.3s)
+  ✓  36 [mobile-chrome] › tests\auth.spec.ts:23:7 › Register › ✅ register page link is visible on login page (1.0s)
+  ✓  37 [mobile-chrome] › tests\auth.spec.ts:28:7 › Register › ❌ register with duplicate username shows error (947ms)
+  ✓  38 [mobile-chrome] › tests\auth.spec.ts:45:7 › Register › ❌ register with duplicate email shows error (837ms)
+  ✓  39 [mobile-chrome] › tests\auth.spec.ts:59:7 › Register › ❌ register with short password shows validation error (974ms)
+  ✓  40 [mobile-chrome] › tests\auth.spec.ts:73:7 › Register › ❌ register with invalid email shows validation error (1.1s)
+  ✓  41 [mobile-chrome] › tests\auth.spec.ts:87:7 › Register › ❌ register with blank username shows validation error (989ms)
+  ✓  42 [mobile-chrome] › tests\auth.spec.ts:107:7 › Login › ✅ login with username redirects to feed (1.2s)
+  ✓  43 [mobile-chrome] › tests\auth.spec.ts:115:7 › Login › ✅ login with email redirects to feed (1.3s)
+  ✓  44 [mobile-chrome] › tests\auth.spec.ts:123:7 › Login › ✅ after login, user name is visible in sidebar/header (1.1s)
+  ✓  45 [mobile-chrome] › tests\auth.spec.ts:131:7 › Login › ❌ login with wrong password shows error (1.1s)
+  ✓  46 [mobile-chrome] › tests\auth.spec.ts:140:7 › Login › ❌ login with non-existent user shows error (978ms)
+  ✓  47 [mobile-chrome] › tests\auth.spec.ts:148:7 › Login › ❌ login with blank credentials shows error (1.0s)
+  ✓  48 [mobile-chrome] › tests\auth.spec.ts:156:7 › Login › ✅ unauthenticated user visiting / is redirected to /login (886ms)
+  ✘  49 [mobile-chrome] › tests\auth.spec.ts:162:7 › Login › ✅ logout clears session and redirects to login (11.5s)
+  ✓  50 [mobile-chrome] › tests\auth.spec.ts:174:7 › Login › ✅ after logout, navigating to / redirects back to login (1.4s)
+  ✓  51 [mobile-chrome] › tests\auth.spec.ts:181:7 › Login › ✅ login page link to register is visible (722ms)
+
+
+  1) [chromium] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3001/"[39m
+    Received: [31m"http://localhost:3001/[7mregister[27m"[39m
+    Timeout:  8000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 8000ms[22m
+    [2m    12 × unexpected value "http://localhost:3001/register"[22m
+
+
+       at ..\pages\RegisterPage.ts:30
+
+      28 |
+      29 |   async expectRedirectedToFeed() {
+    > 30 |     await expect(this.page).toHaveURL('/', { timeout: 8000 });
+         |                             ^
+      31 |   }
+      32 | }
+      33 |
+        at RegisterPage.expectRedirectedToFeed (F:\social-media-app\e2e\pages\RegisterPage.ts:30:29)
+        at F:\social-media-app\e2e\tests\auth.spec.ts:18:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [firefox] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3001/"[39m
+    Received: [31m"http://localhost:3001/[7mregister[27m"[39m
+    Timeout:  8000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 8000ms[22m
+    [2m    12 × unexpected value "http://localhost:3001/register"[22m
+
+
+       at ..\pages\RegisterPage.ts:30
+
+      28 |
+      29 |   async expectRedirectedToFeed() {
+    > 30 |     await expect(this.page).toHaveURL('/', { timeout: 8000 });
+         |                             ^
+      31 |   }
+      32 | }
+      33 |
+        at RegisterPage.expectRedirectedToFeed (F:\social-media-app\e2e\pages\RegisterPage.ts:30:29)
+        at F:\social-media-app\e2e\tests\auth.spec.ts:18:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-firefox\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-firefox\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-firefox\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [mobile-chrome] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3001/"[39m
+    Received: [31m"http://localhost:3001/[7mregister[27m"[39m
+    Timeout:  8000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 8000ms[22m
+    [2m    12 × unexpected value "http://localhost:3001/register"[22m
+
+
+       at ..\pages\RegisterPage.ts:30
+
+      28 |
+      29 |   async expectRedirectedToFeed() {
+    > 30 |     await expect(this.page).toHaveURL('/', { timeout: 8000 });
+         |                             ^
+      31 |   }
+      32 | }
+      33 |
+        at RegisterPage.expectRedirectedToFeed (F:\social-media-app\e2e\pages\RegisterPage.ts:30:29)
+        at F:\social-media-app\e2e\tests\auth.spec.ts:18:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-mobile-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-mobile-chrome\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-mobile-chrome\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-mobile-chrome\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\auth-Register-✅-new-user-c-b285c-y-and-is-redirected-to-feed-mobile-chrome\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [mobile-chrome] › tests\auth.spec.ts:162:7 › Login › ✅ logout clears session and redirects to login 
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Logout"), button:has-text("Log out"), button:has-text("Sign out")').first()[22m
+    [2m    - locator resolved to <button class="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-950 dark:hover:text-red-400 transition-colors">…</button>[22m
+    [2m  - attempting click action[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not visible[22m
+    [2m    - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is not visible[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    19 × waiting for element to be visible, enabled and stable[22m
+    [2m       - element is not visible[22m
+    [2m     - retrying click action[22m
+    [2m       - waiting 500ms[22m
+
+
+      164 |
+      165 |     // Click logout — look for logout button in sidebar
+    > 166 |     await page.locator('button:has-text("Logout"), button:has-text("Log out"), button:has-text("Sign out")').first().click();
+          |                                                                                                                      ^
+      167 |     await expect(page).toHaveURL('/login', { timeout: 6000 });
+      168 |
+      169 |     // Verify storage cleared
+        at F:\social-media-app\e2e\tests\auth.spec.ts:166:118
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-Login-✅-logout-clears-session-and-redirects-to-login-mobile-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\auth-Login-✅-logout-clears-session-and-redirects-to-login-mobile-chrome\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-Login-✅-logout-clears-session-and-redirects-to-login-mobile-chrome\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\auth-Login-✅-logout-clears-session-and-redirects-to-login-mobile-chrome\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\auth-Login-✅-logout-clears-session-and-redirects-to-login-mobile-chrome\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed 
+    [firefox] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed 
+    [mobile-chrome] › tests\auth.spec.ts:12:7 › Register › ✅ new user can register successfully and is redirected to feed 
+    [mobile-chrome] › tests\auth.spec.ts:162:7 › Login › ✅ logout clears session and redirects to login 
+  47 passed (2.4m)

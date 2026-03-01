@@ -1,20 +1,27 @@
-import { NavLink } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { Home, Search, Bell, User, MessageCircle } from 'lucide-react'
-import { selectUser } from '../../store/authSlice.js'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Home, Search, Bell, User, MessageCircle, LogOut } from 'lucide-react'
+import { logout, selectUser } from '../../store/authSlice.js'
 import { selectUnreadCount } from '../../store/notificationsSlice.js'
 import { selectTotalUnread as selectMsgUnread } from '../../store/messagingSlice.js'
 
 export default function BottomNav() {
-  const user     = useSelector(selectUser)
-  const unread   = useSelector(selectUnreadCount)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const user = useSelector(selectUser)
+  const unread = useSelector(selectUnreadCount)
   const msgUnread = useSelector(selectMsgUnread)
 
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate('/login')
+  }
+
   const links = [
-    { to: '/',              Icon: Home,          label: 'Home' },
-    { to: '/search',        Icon: Search,        label: 'Search' },
-    { to: '/messages',      Icon: MessageCircle, label: 'DMs',   badge: msgUnread },
-    { to: '/notifications', Icon: Bell,          label: 'Alerts', badge: unread },
+    { to: '/', Icon: Home, label: 'Home' },
+    { to: '/search', Icon: Search, label: 'Search' },
+    { to: '/messages', Icon: MessageCircle, label: 'DMs', badge: msgUnread },
+    { to: '/notifications', Icon: Bell, label: 'Alerts', badge: unread },
     { to: user ? `/profile/${user.username}` : '/login', Icon: User, label: 'Profile' },
   ]
 
@@ -47,6 +54,15 @@ export default function BottomNav() {
           {label}
         </NavLink>
       ))}
+      {user && (
+        <button
+          onClick={handleLogout}
+          className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 text-xs font-medium text-gray-500 transition-colors"
+        >
+          <LogOut size={22} />
+          Log out
+        </button>
+      )}
     </nav>
   )
 }

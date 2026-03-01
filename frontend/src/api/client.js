@@ -26,7 +26,9 @@ client.interceptors.response.use(
           store.dispatch(logout())
         })
       })
-      window.location.href = '/login'
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(err)
   }

@@ -6,10 +6,10 @@ import Input from '../components/ui/Input.jsx'
 import Button from '../components/ui/Button.jsx'
 
 export default function RegisterPage() {
-  const dispatch  = useDispatch()
-  const navigate  = useNavigate()
-  const loading   = useSelector(selectAuthLoading)
-  const error     = useSelector(selectAuthError)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const loading = useSelector(selectAuthLoading)
+  const error = useSelector(selectAuthError)
   const [form, setForm] = useState({ username: '', email: '', password: '', displayName: '' })
 
   const onChange = e => {
@@ -34,7 +34,7 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Create account</h2>
 
-          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
             <Input
               label="Display name"
               name="displayName"
@@ -74,7 +74,7 @@ export default function RegisterPage() {
             />
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+              <div role="alert" className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 error-banner">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}

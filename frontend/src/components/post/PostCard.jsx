@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Heart, MessageCircle, Trash2, Globe, Lock, Users, Pencil, Check, X, Bookmark } from 'lucide-react'
 import { selectUser } from '../../store/authSlice.js'
 import {
@@ -14,8 +14,8 @@ const privacyIcon = { PUBLIC: Globe, FOLLOWERS_ONLY: Users, PRIVATE: Lock }
 
 const relativeTime = (iso) => {
   const diff = (Date.now() - new Date(iso)) / 1000
-  if (diff < 60)    return 'just now'
-  if (diff < 3600)  return `${Math.floor(diff / 60)}m`
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`
   return `${Math.floor(diff / 86400)}d`
 }
@@ -46,16 +46,17 @@ function PostContent({ content }) {
 }
 
 export default function PostCard({ post, onDeleted }) {
-  const dispatch  = useDispatch()
-  const me        = useSelector(selectUser)
-  const [liking, setLiking]     = useState(false)
-  const [editing, setEditing]   = useState(false)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const me = useSelector(selectUser)
+  const [liking, setLiking] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(post.content)
-  const [saving, setSaving]     = useState(false)
-  const textareaRef             = useRef(null)
+  const [saving, setSaving] = useState(false)
+  const textareaRef = useRef(null)
 
-  const Privacy     = privacyIcon[post.privacy] || Globe
-  const isOwner     = me?.id === post.author?.id || me?.username === post.author?.username
+  const Privacy = privacyIcon[post.privacy] || Globe
+  const isOwner = me?.id === post.author?.id || me?.username === post.author?.username
   const isBookmarked = useSelector(selectIsBookmarked(post.id))
 
   useEffect(() => {
@@ -85,7 +86,7 @@ export default function PostCard({ post, onDeleted }) {
     onDeleted?.()
   }
 
-  const handleEditStart  = () => { setEditText(post.content); setEditing(true) }
+  const handleEditStart = () => { setEditText(post.content); setEditing(true) }
   const handleEditCancel = () => { setEditText(post.content); setEditing(false) }
 
   const handleEditSave = async () => {
@@ -102,8 +103,15 @@ export default function PostCard({ post, onDeleted }) {
     if (e.key === 'Escape') handleEditCancel()
   }
 
+  const handleArticleClick = (e) => {
+    if (e.target.closest('button, a, textarea')) return
+    if (!editing) navigate(`/posts/${post.id}`)
+  }
+
   return (
-    <article className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors">
+    <article
+      onClick={handleArticleClick}
+      className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors cursor-pointer">
       {/* Author row */}
       <div className="flex items-start gap-3">
         <Link to={`/profile/${post.author.username}`}>
@@ -184,9 +192,8 @@ export default function PostCard({ post, onDeleted }) {
               {/* Like */}
               <button
                 onClick={handleLike}
-                className={`flex items-center gap-1.5 text-sm transition-colors group ${
-                  post.likedByCurrentUser ? 'text-pink-500' : 'text-gray-500 dark:text-gray-400 hover:text-pink-500'
-                }`}
+                className={`flex items-center gap-1.5 text-sm transition-colors group ${post.likedByCurrentUser ? 'text-pink-500' : 'text-gray-500 dark:text-gray-400 hover:text-pink-500'
+                  }`}
                 aria-label={post.likedByCurrentUser ? 'Unlike' : 'Like'}
               >
                 <Heart
@@ -208,9 +215,8 @@ export default function PostCard({ post, onDeleted }) {
               {/* Bookmark */}
               <button
                 onClick={() => dispatch(toggleBookmarkThunk(post.id))}
-                className={`flex items-center gap-1.5 text-sm transition-colors ${
-                  isBookmarked ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400 hover:text-primary-500'
-                }`}
+                className={`flex items-center gap-1.5 text-sm transition-colors ${isBookmarked ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400 hover:text-primary-500'
+                  }`}
                 aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
                 title={isBookmarked ? 'Saved' : 'Save'}
               >
