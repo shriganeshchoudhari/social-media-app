@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Send, ArrowLeft } from 'lucide-react'
 import {
   fetchMessages,
-  sendMessageThunk,
   markReadThunk,
   selectMessagesForConv,
   selectTyping,
@@ -42,14 +41,11 @@ export default function ChatWindow({ conversation, sendWsMessage, sendTyping }) 
     if (!content) return
     setText('')
 
-    // Send via WebSocket for real-time delivery
     sendWsMessage(conversation.id, content)
-    // Also persist via REST (ensures delivery even if WS drops)
-    dispatch(sendMessageThunk({ recipientId: conversation.otherUserId, content }))
 
     // Stop typing indicator
     sendTyping(conversation.id, false)
-  }, [text, conversation.id, conversation.otherUserId, dispatch, sendWsMessage, sendTyping])
+  }, [text, conversation.id, sendWsMessage, sendTyping])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

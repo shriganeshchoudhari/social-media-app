@@ -30,7 +30,7 @@ function ProfileSettings({ user }) {
     setSaving(true)
     setError(null)
     try {
-      const { data } = await client.put('/api/v1/users/me', form)
+      const { data } = await client.put('/users/me', form)
       dispatch(updateUserProfile(data))
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
@@ -121,7 +121,7 @@ function PasswordSettings() {
     setSaving(true)
     setError(null)
     try {
-      await client.put('/api/v1/users/me/password', {
+      await client.put('/users/me/password', {
         currentPassword: form.currentPassword,
         newPassword:     form.newPassword,
       })

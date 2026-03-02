@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import ConversationList from '../components/messaging/ConversationList.jsx'
 import ChatWindow from '../components/messaging/ChatWindow.jsx'
 import useWebSocket from '../hooks/useWebSocket.js'
-import { sendMessageThunk, selectActiveConversationId, selectConversations, setActiveConversation } from '../store/messagingSlice.js'
+import { sendMessageThunk, selectActiveConversationId, selectConversations, setActiveConversation, fetchConversations } from '../store/messagingSlice.js'
 import * as searchApi from '../api/search.js'
 
 export default function MessagesPage() {
@@ -53,7 +53,11 @@ export default function MessagesPage() {
     setResults([])
     dispatch(sendMessageThunk({ recipientId: user.id, content: '👋' }))
       .unwrap()
-      .then((msg) => dispatch(setActiveConversation(msg.conversationId)))
+      .then((msg) => {
+        // Refresh list so the new conversation card appears immediately
+        dispatch(fetchConversations())
+        dispatch(setActiveConversation(msg.conversationId))
+      })
       .catch(() => {})
   }
 

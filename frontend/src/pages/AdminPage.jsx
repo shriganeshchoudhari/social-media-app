@@ -8,10 +8,10 @@ import Avatar from '../components/ui/Avatar.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 
 // ── API helpers ─────────────────────────────────────────────
-const getStats   = ()              => client.get('/api/v1/admin/stats')
-const listUsers  = (q, page, size) => client.get('/api/v1/admin/users', { params: { q, page, size } })
-const updateRole = (id, role)      => client.put(`/api/v1/admin/users/${id}/role`, { role })
-const deleteUser = (id)            => client.delete(`/api/v1/admin/users/${id}`)
+const getStats   = ()              => client.get('/admin/stats')
+const listUsers  = (q, page, size) => client.get('/admin/users', { params: { q, page, size } })
+const updateRole = (id, role)      => client.put(`/admin/users/${id}/role`, { role })
+const deleteUser = (id)            => client.delete(`/admin/users/${id}`)
 
 // ── Stat Card ───────────────────────────────────────────────
 function StatCard({ icon: Icon, label, value, color }) {
