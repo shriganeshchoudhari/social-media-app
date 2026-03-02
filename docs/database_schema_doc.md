@@ -1828,9 +1828,38 @@ $ LANGUAGE plpgsql;
 
 ### A. Database Schema Version
 
-**Current Version**: 1.0  
-**Last Migration**: V6__Add_triggers.sql  
-**Next Planned**: V7__Add_stories_table.sql
+**Current Version**: 1.3  
+**Last Migration**: V9__notification_preferences.sql  
+**Next Planned**: V10__add_stories_table.sql
+
+### A.1 V9 Changes — Notification Enhancement (March 2026)
+
+**`notifications.type` column** — widened to `VARCHAR(30)` to support new type names.
+
+**New types added to `Notification.Type` enum:**
+
+| Type | Description |
+|------|-------------|
+| `REPLY` | Someone replied to your comment |
+| `SHARE` | Someone shared your post |
+| `FOLLOW_REQUEST` | Someone requested to follow you |
+| `FOLLOW_ACCEPTED` | Your follow request was accepted |
+
+**New table: `notification_preferences`**
+
+```sql
+CREATE TABLE notification_preferences (
+    id      BIGSERIAL   PRIMARY KEY,
+    user_id BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type    VARCHAR(30) NOT NULL,
+    in_app  BOOLEAN     NOT NULL DEFAULT TRUE,
+    CONSTRAINT uq_notif_pref_user_type UNIQUE (user_id, type)
+);
+```
+
+- Missing rows default to `in_app = true` (all types enabled by default).
+- Setting `in_app = false` suppresses both DB persistence and WebSocket push for that type.
+- Indexed on `user_id` for fast preference lookup before each notification write.
 
 ### B. Performance Benchmarks
 

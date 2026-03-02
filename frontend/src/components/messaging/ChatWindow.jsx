@@ -40,6 +40,7 @@ export default function ChatWindow({ conversation, sendWsMessage, sendTyping }) 
     const content = text.trim()
     if (!content) return
     setText('')
+3.
 
     sendWsMessage(conversation.id, content)
 

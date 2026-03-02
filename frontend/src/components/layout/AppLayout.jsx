@@ -1,14 +1,42 @@
+import { useState, useCallback } from 'react'
 import { Outlet } from 'react-router-dom'
 import { ToastProvider } from '../ui/Toast.jsx'
+import NotificationToastContainer from '../ui/NotificationToast.jsx'
 import Sidebar from './Sidebar.jsx'
 import BottomNav from './BottomNav.jsx'
 import AiChatButton from '../ai/AiChatButton.jsx'
 import AiChatPanel from '../ai/AiChatPanel.jsx'
 import useWebSocket from '../../hooks/useWebSocket.js'
 
+const TOAST_TTL_MS  = 4500   // auto-dismiss after 4.5 s
+const MAX_TOASTS    = 3      // maximum visible at once
+
 function WebSocketProvider() {
-  useWebSocket()
-  return null
+  const [toasts, setToasts] = useState([])
+
+  const handleNewNotification = useCallback((notification) => {
+    setToasts(prev => {
+      const next = [notification, ...prev].slice(0, MAX_TOASTS)
+      return next
+    })
+    // Auto-dismiss after TTL
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== notification.id))
+    }, TOAST_TTL_MS)
+  }, [])
+
+  const handleDismiss = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  useWebSocket({ onNewNotification: handleNewNotification })
+
+  return (
+    <NotificationToastContainer
+      notifications={toasts}
+      onDismiss={handleDismiss}
+    />
+  )
 }
 
 export default function AppLayout() {
@@ -30,11 +58,11 @@ export default function AppLayout() {
         {/* Bottom nav — mobile only */}
         <BottomNav />
 
-        {/* ── Spark AI — floating button + slide-over panel ──────────────── */}
+        {/* ── Spark AI — floating button + slide-over panel ──────────── */}
         <AiChatButton />
         <AiChatPanel />
 
-        {/* ── App-wide WebSocket connection ─────────────────────────────── */}
+        {/* ── App-wide WebSocket + real-time notification toasts ────── */}
         <WebSocketProvider />
       </div>
     </ToastProvider>

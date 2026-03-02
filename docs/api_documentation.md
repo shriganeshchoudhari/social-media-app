@@ -1,13 +1,14 @@
 # API Documentation
 ## ConnectHub Social Media Platform - Complete API Reference
 
-**Version:** 1.2.0  
+**Version:** 1.3.0  
 **Base URL (local dev):** `http://localhost:9090/api/v1` | **Frontend:** `http://localhost:3001`  
-**Last Updated:** February 24, 2026  
+**Last Updated:** March 02, 2026  
 **Status:** Production Ready
 
-> **v1.1 additions:** AI Assistant endpoint (`/ai/chat`) — powered by **Ollama** (free local LLM, no API key). See Section 17A and `docs/ai_assistant.md` for streaming protocol details.
-> **v1.2 additions:** Post editing (`PUT /posts/{id}`), Bookmarks toggle (`POST /posts/{id}/bookmark`), Saved posts list (`GET /users/me/bookmarks`), Real-time messaging via WebSocket (STOMP over SockJS at `/ws`).
+> **v1.1 additions:** AI Assistant endpoint (`/ai/chat`) — powered by **Ollama** (free local LLM, no API key). See Section 17A and `docs/ai_assistant.md` for streaming protocol details.  
+> **v1.2 additions:** Post editing (`PUT /posts/{id}`), Bookmarks toggle (`POST /posts/{id}/bookmark`), Saved posts list (`GET /users/me/bookmarks`), Real-time messaging via WebSocket (STOMP over SockJS at `/ws`).  
+> **v1.3 additions (Notification Enhancement):** New notification types (REPLY, SHARE, FOLLOW_REQUEST, FOLLOW_ACCEPTED), reply threading on comments (`parentCommentId`), filter params on `GET /notifications` (`unreadOnly`, `type`), delete endpoints (`DELETE /notifications/{id}`, `DELETE /notifications`), per-user notification preferences (`GET/PUT /notifications/preferences/{type}`).
 
 ---
 
@@ -1292,84 +1293,162 @@ Marks all unread messages in the conversation as read for the current user.
 
 ## 13. Notification Endpoints
 
+> **v1.3 enhanced:** New notification types, filter params, delete endpoints, per-user preferences, and real-time WebSocket push.
+
+### Notification Types Reference
+
+| Type | Trigger | `referenceId` points to |
+|------|---------|-------------------------|
+| `LIKE` | Someone liked your post | `postId` |
+| `COMMENT` | Someone commented on your post | `postId` |
+| `REPLY` | Someone replied to your comment | `postId` of the thread |
+| `MENTION` | You were `@mentioned` in a post | `postId` |
+| `SHARE` | Someone shared your post | `postId` |
+| `FOLLOW` | Someone started following you | `null` |
+| `FOLLOW_REQUEST` | Someone requested to follow you (private account) | `null` |
+| `FOLLOW_ACCEPTED` | Your follow request was accepted | `null` |
+
+**Self-notification guard:** Notifications are never generated when the actor and recipient are the same user.
+
+**Preference gate:** Each type is independently toggleable per user via the Preferences endpoints below. Disabled types are neither saved nor pushed.
+
+---
+
 ### 13.1 Get Notifications
 
-**Endpoint:** `GET /notifications?page=0&size=20&unreadOnly=false`
+**Endpoint:** `GET /notifications`  
+**Auth:** Required  
+Returns the current user's notifications, newest-first, with optional filters.
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | int | `0` | Page index (0-based) |
+| `size` | int | `20` | Items per page |
+| `unreadOnly` | boolean | `false` | If `true`, return only unread notifications |
+| `type` | string | _(none)_ | Filter by notification type (e.g. `LIKE`, `COMMENT`) |
+
+**Examples:**
+```http
+GET /api/v1/notifications
+GET /api/v1/notifications?unreadOnly=true
+GET /api/v1/notifications?type=LIKE&page=1
+```
 
 **Response (200):**
 ```json
 {
-  "status": "success",
-  "data": {
-    "content": [
-      {
-        "id": 123,
-        "type": "like",
-        "title": "New Like",
-        "content": "janedoe liked your post",
-        "actor": {...},
-        "referenceType": "post",
-        "referenceId": 456,
-        "isRead": false,
-        "createdAt": "2026-02-07T10:20:00Z"
-      }
-    ],
-    "unreadCount": 5,
-    "page": {...}
-  }
+  "content": [
+    {
+      "id": 123,
+      "actorUsername": "janedoe",
+      "actorAvatarUrl": "https://cdn.connecthub.com/avatars/janedoe.jpg",
+      "type": "LIKE",
+      "referenceId": 456,
+      "message": "janedoe liked your post",
+      "read": false,
+      "createdAt": "2026-03-02T10:20:00"
+    }
+  ],
+  "totalElements": 47,
+  "totalPages": 3,
+  "number": 0,
+  "size": 20,
+  "last": false
 }
 ```
 
-### 13.2 Mark as Read
+---
 
-**Endpoint:** `PUT /notifications/{id}/read`
+### 13.2 Get Unread Count
+
+**Endpoint:** `GET /notifications/unread-count`  
+**Auth:** Required  
+Cached for 60 seconds per user (Redis). Evicted on any write to that user's notifications.
 
 **Response (200):**
 ```json
-{
-  "status": "success",
-  "message": "Marked as read"
-}
+{ "count": 5 }
 ```
 
-### 13.3 Mark All as Read
+---
 
-**Endpoint:** `PUT /notifications/read-all`
+### 13.3 Mark Single Notification as Read
+
+**Endpoint:** `PATCH /notifications/{id}/read`  
+**Auth:** Required (own notifications only — silently ignored if not owner)
+
+**Response (204):** No content.
+
+---
+
+### 13.4 Mark All as Read
+
+**Endpoint:** `PATCH /notifications/read-all`  
+**Auth:** Required
+
+**Response (204):** No content.
+
+---
+
+### 13.5 Delete Single Notification
+
+**Endpoint:** `DELETE /notifications/{id}`  
+**Auth:** Required (own notifications only — no-op if not owner or not found)
+
+**Response (204):** No content.
+
+---
+
+### 13.6 Clear All Notifications
+
+**Endpoint:** `DELETE /notifications`  
+**Auth:** Required  
+Permanently removes all notifications for the current user.
+
+**Response (204):** No content.
+
+---
+
+### 13.7 Get Notification Preferences
+
+**Endpoint:** `GET /notifications/preferences`  
+**Auth:** Required  
+Returns the full list of per-type preferences. Types with no saved preference row are returned with `inApp: true` (default enabled).
 
 **Response (200):**
 ```json
-{
-  "status": "success",
-  "data": {
-    "markedCount": 5
-  }
-}
+[
+  { "type": "LIKE",            "inApp": true  },
+  { "type": "COMMENT",         "inApp": true  },
+  { "type": "REPLY",           "inApp": true  },
+  { "type": "MENTION",         "inApp": true  },
+  { "type": "SHARE",           "inApp": false },
+  { "type": "FOLLOW",          "inApp": true  },
+  { "type": "FOLLOW_REQUEST",  "inApp": true  },
+  { "type": "FOLLOW_ACCEPTED", "inApp": true  }
+]
 ```
 
-### 13.4 Delete Notification
+---
 
-**Endpoint:** `DELETE /notifications/{id}`
+### 13.8 Update Notification Preference
 
-**Response (200):**
+**Endpoint:** `PUT /notifications/preferences/{type}`  
+**Auth:** Required  
+Upserts a single preference. Setting `inApp: false` suppresses both DB persistence and WebSocket push for that notification type.
+
+**Path param:** `type` — one of the Notification Types listed above (case-sensitive, e.g. `LIKE`).
+
+**Request:**
 ```json
-{
-  "status": "success",
-  "message": "Deleted"
-}
+{ "inApp": false }
 ```
 
-### 13.5 Get Unread Count
-
-**Endpoint:** `GET /notifications/unread-count`
-
 **Response (200):**
 ```json
-{
-  "status": "success",
-  "data": {
-    "count": 5
-  }
-}
+{ "type": "LIKE", "inApp": false }
 ```
 
 ---
@@ -2534,6 +2613,18 @@ GET  /messages/conversations
 POST /messages                       # Send (creates conversation if needed)
 GET  /messages/conversations/{id}/messages
 PUT  /messages/conversations/{id}/read
+```
+
+### Notifications
+```bash
+GET    /notifications                          # list; optional: ?unreadOnly=true&type=LIKE
+GET    /notifications/unread-count
+PATCH  /notifications/{id}/read
+PATCH  /notifications/read-all
+DELETE /notifications/{id}                    # delete one
+DELETE /notifications                         # clear all
+GET    /notifications/preferences
+PUT    /notifications/preferences/{type}      # body: { inApp: bool }
 ```
 
 ### WebSocket (STOMP)

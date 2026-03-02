@@ -90,6 +90,21 @@ public class PostController {
         return ResponseEntity.ok(postService.like(id, currentUser));
     }
 
+    /**
+     * POST /api/v1/posts/{id}/share
+     * Body (optional): { "content": "My take on this..." }
+     * Creates a new share post and notifies the original author.
+     */
+    @PostMapping("/{id}/share")
+    public ResponseEntity<PostResponse> share(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody(required = false) java.util.Map<String, String> body) {
+        String quote = body != null ? body.get("content") : null;
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
+                .body(postService.share(id, currentUser, quote));
+    }
+
     @DeleteMapping("/{id}/like")
     public ResponseEntity<PostResponse> unlike(
             @PathVariable Long id,

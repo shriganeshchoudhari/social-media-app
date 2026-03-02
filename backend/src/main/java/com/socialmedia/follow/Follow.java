@@ -24,9 +24,19 @@ public class Follow {
     @JoinColumn(name = "following_id")
     private User following;     // the user being followed
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private Status status = Status.ACCEPTED;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     void prePersist() { createdAt = LocalDateTime.now(); }
+
+    public enum Status {
+        PENDING,   // awaiting approval (private accounts)
+        ACCEPTED   // active follow relationship
+    }
 }

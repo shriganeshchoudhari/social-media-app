@@ -56,4 +56,17 @@ public class FollowController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(Map.of("following", followService.isFollowing(currentUser, username)));
     }
+
+    /**
+     * POST /api/v1/users/{username}/follow/accept
+     * The authenticated user (the target of the follow request) accepts
+     * the pending request from {username}.
+     */
+    @PostMapping("/follow/accept")
+    public ResponseEntity<Map<String, String>> acceptFollowRequest(
+            @PathVariable String username,
+            @AuthenticationPrincipal User currentUser) {
+        followService.acceptFollowRequest(currentUser, username);
+        return ResponseEntity.ok(Map.of("message", "Follow request accepted from " + username));
+    }
 }

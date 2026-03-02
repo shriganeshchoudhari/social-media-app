@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @Builder.Default
     private int postsCount = 0;
 
+    @Builder.Default
+    private boolean privateAccount = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

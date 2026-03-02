@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "notifications", indexes = {
         @Index(name = "idx_notif_recipient", columnList = "recipient_id"),
-        @Index(name = "idx_notif_read",      columnList = "read_flag")
+        @Index(name = "idx_notif_read",      columnList = "read_flag"),
+        @Index(name = "idx_notif_type",      columnList = "type"),
+        @Index(name = "idx_notif_created",   columnList = "created_at")
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Notification {
@@ -29,7 +31,7 @@ public class Notification {
     private User actor;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     private Type type;
 
     /** Optional reference ID (postId, commentId …) */
@@ -50,9 +52,16 @@ public class Notification {
     void prePersist() { createdAt = LocalDateTime.now(); }
 
     public enum Type {
-        LIKE,       // someone liked your post
-        COMMENT,    // someone commented on your post
-        FOLLOW,     // someone followed you
-        MENTION     // you were mentioned in a post/comment
+        // ── Post interactions ──────────────────────────────────
+        LIKE,             // someone liked your post
+        COMMENT,          // someone commented on your post
+        REPLY,            // someone replied to your comment
+        MENTION,          // you were mentioned in a post or comment
+        SHARE,            // someone shared / reposted your post
+
+        // ── Follow interactions ────────────────────────────────
+        FOLLOW,           // someone started following you (public account)
+        FOLLOW_REQUEST,   // someone requested to follow you (private account)
+        FOLLOW_ACCEPTED   // your follow request was accepted
     }
 }

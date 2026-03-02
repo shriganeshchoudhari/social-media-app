@@ -27,6 +27,14 @@ public class Comment {
     @JoinColumn(name = "author_id")
     private User author;
 
+    /**
+     * Non-null when this comment is a reply to another comment.
+     * Allows one level of threading: top-level comment → replies.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

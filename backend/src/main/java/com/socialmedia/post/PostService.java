@@ -151,6 +151,44 @@ public class PostService {
         return response;
     }
 
+    /**
+     * Shares (reposts) a post to the sharer's feed and notifies the original author.
+     * Creates a new post referencing the original via imageUrl convention, or simply
+     * a quote-post with attribution. The originalPostId is stored as referenceId in
+     * the SHARE notification so the author can navigate directly to it.
+     */
+    @Transactional
+    @CacheEvict(value = "posts", allEntries = true)
+    public PostResponse share(Long originalPostId, User sharer, String quoteContent) {
+        Post original = findPost(originalPostId);
+
+        if (original.getAuthor().getId().equals(sharer.getId()))
+            throw new ForbiddenException("You cannot share your own post");
+
+        String content = quoteContent != null && !quoteContent.isBlank()
+                ? quoteContent + " [shared @" + original.getAuthor().getUsername() + "]"
+                : "[shared @" + original.getAuthor().getUsername() + "]: " + original.getContent();
+
+        Post sharePost = Post.builder()
+                .content(content)
+                .privacy(Post.Privacy.PUBLIC)
+                .author(sharer)
+                .build();
+        sharePost = postRepository.save(sharePost);
+
+        sharer.setPostsCount(sharer.getPostsCount() + 1);
+        userRepository.save(sharer);
+
+        // Notify the original post author
+        final Long sharedPostId = original.getId();
+        eventPublisher.publishEvent(new NotificationEvent(
+                this, sharer, original.getAuthor(),
+                Notification.Type.SHARE, sharedPostId,
+                sharer.getUsername() + " shared your post"));
+
+        return toResponse(sharePost, false);
+    }
+
     @Transactional
     @CacheEvict(value = "posts", allEntries = true)
     public PostResponse unlike(Long id, User currentUser) {

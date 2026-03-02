@@ -1,10 +1,30 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class NotificationsPage {
   readonly page: Page;
 
+  // ── Locators ───────────────────────────────────────────────
+  readonly header:           Locator;
+  readonly items:            Locator;
+  readonly markAllReadBtn:   Locator;
+  readonly clearAllBtn:      Locator;
+  readonly loadMoreBtn:      Locator;
+  readonly filterTabAll:     Locator;
+  readonly filterTabUnread:  Locator;
+  readonly unreadDots:       Locator;
+  readonly toastContainer:   Locator;
+
   constructor(page: Page) {
-    this.page = page;
+    this.page             = page;
+    this.header           = page.locator('h1:has-text("Notification"), [data-testid="notifications-header"]').first();
+    this.items            = page.locator('[data-testid="notification-item"]');
+    this.markAllReadBtn   = page.locator('button:has-text("Mark all"), button:has-text("Mark All")').first();
+    this.clearAllBtn      = page.locator('[data-testid="clear-all-btn"]');
+    this.loadMoreBtn      = page.locator('[data-testid="load-more-btn"]');
+    this.filterTabAll     = page.locator('[data-testid="filter-tab-all"]');
+    this.filterTabUnread  = page.locator('[data-testid="filter-tab-unread"]');
+    this.unreadDots       = page.locator('[data-testid="unread-dot"]');
+    this.toastContainer   = page.locator('[data-testid="notification-toast-container"]');
   }
 
   async goto() {
@@ -12,27 +32,63 @@ export class NotificationsPage {
   }
 
   async isLoaded() {
-    await expect(this.page.locator('h1:has-text("Notification"), [data-testid="notifications-header"]').first()).toBeVisible({ timeout: 8000 });
+    await expect(this.header).toBeVisible({ timeout: 8000 });
   }
 
   async getNotificationCount(): Promise<number> {
-    const items = await this.page.locator('[data-testid="notification-item"], .notification-item, li').all();
-    return items.length;
+    return this.items.count();
   }
 
-  async getUnreadBadgeCount(): Promise<number> {
-    const badge = this.page.locator('[data-testid="unread-badge"], .badge, .unread-count').first();
-    if (!await badge.isVisible()) return 0;
-    return parseInt(await badge.innerText()) || 0;
-  }
-
-  async clickMarkAllRead() {
-    const btn = this.page.locator('button:has-text("Mark all"), button:has-text("Mark All")').first();
-    await btn.click();
-    await this.page.waitForTimeout(500);
+  async getUnreadCount(): Promise<number> {
+    return this.unreadDots.count();
   }
 
   async hasUnreadItems(): Promise<boolean> {
-    return this.page.locator('[class*="unread"], [data-unread="true"], .bg-blue').first().isVisible();
+    return (await this.unreadDots.count()) > 0;
+  }
+
+  async clickMarkAllRead() {
+    await this.markAllReadBtn.click();
+    await this.page.waitForTimeout(500);
+  }
+
+  async clickClearAll(confirm = true) {
+    await this.clearAllBtn.click();
+    if (confirm) {
+      // Second click confirms
+      await this.clearAllBtn.click();
+      await this.page.waitForTimeout(500);
+    }
+  }
+
+  async clickLoadMore() {
+    await this.loadMoreBtn.click();
+  }
+
+  async switchToUnreadFilter() {
+    await this.filterTabUnread.click();
+    await this.page.waitForTimeout(400);
+  }
+
+  async switchToAllFilter() {
+    await this.filterTabAll.click();
+    await this.page.waitForTimeout(400);
+  }
+
+  async deleteFirstNotification() {
+    const first = this.items.first();
+    await first.hover();
+    const deleteBtn = first.locator('[data-testid="delete-notification-btn"]');
+    await deleteBtn.click();
+    await this.page.waitForTimeout(400);
+  }
+
+  async clickFirstNotification(): Promise<void> {
+    await this.items.first().click();
+  }
+
+  async waitForToast() {
+    await expect(this.page.locator('[data-testid="notification-toast"]').first())
+      .toBeVisible({ timeout: 6000 });
   }
 }

@@ -3335,8 +3335,129 @@ Week 20:
 **END OF DOCUMENT**
 
 **Status:** ✅ COMPLETE  
-**Total Test Cases:** 300+  
+**Total Test Cases:** 350+  
 **Coverage:** Unit, Integration, API, UI, Performance, Security, Accessibility  
 **Test Strategy:** Comprehensive and production-ready  
 **Ready for:** Test execution and quality assurance
+
+---
+
+## 22. Notification Enhancement — v1.3 Test Cases (March 2026)
+
+### 22.1 Unit Tests — `NotificationServiceTest.java`
+
+| TC | Description | Expected |
+|----|-------------|----------|
+| NT-001 | `handleNotificationEvent` skips when actor == recipient | No DB row saved |
+| NT-002 | `handleNotificationEvent` skips when preference `inApp=false` | No DB row, no WS push |
+| NT-003 | `handleNotificationEvent` saves and pushes when preference enabled | Row saved, WS called |
+| NT-004 | `getNotifications` with `unreadOnly=true` delegates to unread repo | Only unread items returned |
+| NT-005 | `getNotifications` with `type=LIKE` delegates to type-filtered repo | Only LIKE items returned |
+| NT-006 | `deleteOne` removes owned notification | Row deleted, cache evicted |
+| NT-007 | `deleteOne` silently ignores non-owned notification | No deletion, no error |
+| NT-008 | `deleteAll` removes all for user | Zero rows remain for user |
+| NT-009 | `countUnread` is cached | Second call hits cache, not DB |
+| NT-010 | Cache evicted after `markAllRead` | Next `countUnread` hits DB |
+
+### 22.2 Unit Tests — `NotificationPreferenceServiceTest.java`
+
+| TC | Description | Expected |
+|----|-------------|----------|
+| NP-001 | `getPreferences` returns all 8 types with defaults for missing rows | 8 items, all `inApp=true` |
+| NP-002 | `getPreferences` reflects persisted overrides correctly | Saved `false` row returned |
+| NP-003 | `updatePreference` creates new row when none exists | Row inserted |
+| NP-004 | `updatePreference` updates existing row | Row updated, not duplicated |
+| NP-005 | `isInAppEnabled` returns `true` when no preference row exists | Default true |
+| NP-006 | `isInAppEnabled` returns `false` when row has `inApp=false` | Returns false |
+
+### 22.3 Integration / API Tests (Playwright)
+
+All tests live in `e2e/tests/notifications.spec.ts`.
+
+**Page tests:**
+
+| TC | Description |
+|----|-------------|
+| NPG-001 | Page loads with header visible |
+| NPG-002 | Shows seeded notification items |
+| NPG-003 | Sidebar badge visible when unread count > 0 |
+| NPG-004 | Mark all read clears unread dots |
+| NPG-005 | Mark all read button visible when unread items exist |
+| NPG-006 | Navigable via sidebar link |
+| NPG-007 | Redirects to login when unauthenticated |
+
+**Filter tabs:**
+
+| TC | Description |
+|----|-------------|
+| NFT-001 | Unread tab shows only unread items or empty-state |
+| NFT-002 | All tab shows broader set than unread filter |
+
+**Mark read on click:**
+
+| TC | Description |
+|----|-------------|
+| NMR-001 | Clicking unread notification removes its unread dot |
+
+**Delete:**
+
+| TC | Description |
+|----|-------------|
+| NDL-001 | Hovering a row reveals delete (✕) button |
+| NDL-002 | Clicking delete removes item from list |
+| NDL-003 | Clear all (confirm) removes all items, shows empty state |
+
+**Load more:**
+
+| TC | Description |
+|----|-------------|
+| NLM-001 | Load more button appends additional items when `totalPages > 1` |
+
+**Notification trigger tests:**
+
+| TC | Description |
+|----|-------------|
+| NTR-001 | Liking another user's post generates LIKE notification |
+| NTR-002 | Commenting on a post generates COMMENT notification |
+| NTR-003 | Replying to a comment generates REPLY notification for comment author |
+| NTR-004 | Following a user generates FOLLOW notification |
+| NTR-005 | No self-notification when liking own post |
+
+**REST API tests:**
+
+| TC | Description |
+|----|-------------|
+| NRA-001 | `DELETE /notifications/{id}` removes single notification |
+| NRA-002 | `DELETE /notifications` clears all notifications |
+| NRA-003 | `GET /notifications?unreadOnly=true` returns only unread items |
+| NRA-004 | `GET /notifications?type=LIKE` returns only LIKE notifications |
+
+**Preference API tests:**
+
+| TC | Description |
+|----|-------------|
+| NPR-001 | `GET /notifications/preferences` returns all 8 types |
+| NPR-002 | `PUT /notifications/preferences/LIKE` with `inApp: false` disables |
+| NPR-003 | Re-enabling LIKE preference restores delivery |
+| NPR-004 | Disabled LIKE preference suppresses notification on like action |
+
+**Settings UI tests:**
+
+| TC | Description |
+|----|-------------|
+| NSU-001 | Notifications tab visible in settings |
+| NSU-002 | Clicking tab shows preference toggle rows |
+| NSU-003 | Toggling a preference updates its `aria-checked` state |
+
+### 22.4 Regression Checklist
+
+Run after any change to the notification stack:
+
+- [ ] All existing notifications render correctly (LIKE, COMMENT, FOLLOW, MENTION)
+- [ ] WebSocket badge updates in real-time
+- [ ] Unread count cache invalidates correctly
+- [ ] `markAllRead` clears badge to 0
+- [ ] Settings page loads without errors
+- [ ] No console errors on NotificationsPage mount
+- [ ] BottomNav and Sidebar badge both reflect `unreadCount`
 

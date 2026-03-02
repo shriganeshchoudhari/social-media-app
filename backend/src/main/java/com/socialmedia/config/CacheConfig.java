@@ -48,9 +48,10 @@ public class CacheConfig {
                 .disableCachingNullValues();
 
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
-        cacheConfigs.put("users", defaults.entryTtl(Duration.ofMinutes(10)));
-        cacheConfigs.put("posts", defaults.entryTtl(Duration.ofMinutes(5)));
-        cacheConfigs.put("notif-count", defaults.entryTtl(Duration.ofSeconds(60)));
+        cacheConfigs.put("users",        defaults.entryTtl(Duration.ofMinutes(10)));
+        cacheConfigs.put("posts",         defaults.entryTtl(Duration.ofMinutes(5)));
+        cacheConfigs.put("notif-count",   defaults.entryTtl(Duration.ofSeconds(60)));
+        cacheConfigs.put("notif-pref",    defaults.entryTtl(Duration.ofMinutes(10)));
         cacheConfigs.put("trending-tags", defaults.entryTtl(Duration.ofMinutes(5)));
 
         return RedisCacheManager.builder(factory)

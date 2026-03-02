@@ -28,21 +28,52 @@ public class CommentService {
     @Transactional
     public CommentResponse create(Long postId, User author, CreateCommentRequest req) {
         Post post = findPost(postId);
-        Comment comment = Comment.builder()
+
+        Comment.CommentBuilder builder = Comment.builder()
                 .content(req.getContent())
                 .post(post)
-                .author(author)
-                .build();
-        comment = commentRepository.save(comment);
+                .author(author);
 
-        // increment post comment counter
+        // ── Reply threading ───────────────────────────────────
+        Comment parentComment = null;
+        if (req.getParentCommentId() != null) {
+            parentComment = commentRepository.findById(req.getParentCommentId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Parent comment not found: " + req.getParentCommentId()));
+            // Ensure the parent comment belongs to the same post
+            if (!parentComment.getPost().getId().equals(postId)) {
+                throw new ForbiddenException("Parent comment does not belong to this post");
+            }
+            builder.parentComment(parentComment);
+        }
+
+        Comment comment = commentRepository.save(builder.build());
+
+        // Increment post comment counter
         post.setCommentsCount(post.getCommentsCount() + 1);
         postRepository.save(post);
 
+        // ── Notifications ──────────────────────────────────────
+        // Always notify the post author about new comments on their post
         eventPublisher.publishEvent(new NotificationEvent(
                 this, author, post.getAuthor(),
                 Notification.Type.COMMENT, post.getId(),
                 author.getUsername() + " commented on your post"));
+
+        // Additionally notify the parent comment's author about the reply
+        // (only if different from the post author, to avoid duplicate notifications)
+        if (parentComment != null) {
+            User parentAuthor = parentComment.getAuthor();
+            boolean alreadyNotifiedAsPostAuthor =
+                    parentAuthor.getId().equals(post.getAuthor().getId());
+
+            if (!alreadyNotifiedAsPostAuthor) {
+                eventPublisher.publishEvent(new NotificationEvent(
+                        this, author, parentAuthor,
+                        Notification.Type.REPLY, post.getId(),
+                        author.getUsername() + " replied to your comment"));
+            }
+        }
 
         return toResponse(comment);
     }
@@ -76,11 +107,14 @@ public class CommentService {
     }
 
     private CommentResponse toResponse(Comment c) {
+        Comment parent = c.getParentComment();
         return CommentResponse.builder()
                 .id(c.getId())
                 .content(c.getContent())
                 .author(UserService.toResponse(c.getAuthor()))
                 .postId(c.getPost().getId())
+                .parentCommentId(parent != null ? parent.getId() : null)
+                .parentAuthorUsername(parent != null ? parent.getAuthor().getUsername() : null)
                 .createdAt(c.getCreatedAt())
                 .build();
     }
