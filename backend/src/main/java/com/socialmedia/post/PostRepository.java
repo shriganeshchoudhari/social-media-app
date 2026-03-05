@@ -78,4 +78,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
        Page<Post> findByHashtag(@Param("tag") String tag,
                      @Param("user") User user,
                      Pageable pageable);
+
+       /** All posts belonging to a given group, newest first. */
+       @QueryHints(@QueryHint(name = HibernateHints.HINT_READ_ONLY, value = "true"))
+       Page<Post> findByGroupIdOrderByCreatedAtDesc(@Param("groupId") Long groupId, Pageable pageable);
 }

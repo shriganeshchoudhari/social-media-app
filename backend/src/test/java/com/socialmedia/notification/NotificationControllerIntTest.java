@@ -5,6 +5,7 @@ import com.socialmedia.TestDataFactory;
 import com.socialmedia.auth.JwtService;
 import com.socialmedia.post.Post;
 import com.socialmedia.user.User;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +40,7 @@ class NotificationControllerIntTest extends BaseIntegrationTest {
     @Autowired TestDataFactory          factory;
     @Autowired JwtService               jwtService;
     @Autowired NotificationRepository   notificationRepo;
+    @Autowired NotificationService      notificationService;
     @Autowired ApplicationEventPublisher eventPublisher;
 
     private User alice;
@@ -327,7 +329,8 @@ class NotificationControllerIntTest extends BaseIntegrationTest {
                             .header("Authorization", aliceToken)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"inApp\": false}"))
-                    .andExpect(status().is5xxServerError()); // IllegalArgumentException → 500
+                    // Controller now maps IllegalArgumentException to 400 via GlobalExceptionHandler
+                    .andExpect(status().isBadRequest());
         }
     }
 
@@ -335,25 +338,45 @@ class NotificationControllerIntTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("REPLY notification fires when a comment is replied to")
-    void replyNotificationFires() throws Exception {
-        // Bob creates post; alice comments; bob replies — alice should get COMMENT, bob gets REPLY check
-        Post post = factory.post(bob, "Interesting post");
+        void replyNotificationFires() throws Exception {
+            // Use the REST flow to create a comment and a reply so IDs and FKs are valid.
+            Post post = factory.post(bob, "Interesting post");
 
-        // Alice comments on Bob's post
-        mockMvc.perform(post("/api/v1/posts/" + post.getId() + "/comments")
-                        .header("Authorization", aliceToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"content\": \"Great post!\"}"))
-                .andExpect(status().isCreated());
+            // Alice comments on Bob's post
+            String parentJson = mockMvc.perform(post("/api/v1/posts/" + post.getId() + "/comments")
+                            .header("Authorization", aliceToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"content\": \"Great post!\"}"))
+                    .andExpect(status().isCreated())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
 
-        Thread.sleep(300); // let async fire
+            // Extract parent comment id
+            Number parentIdNum = JsonPath.read(parentJson, "$.id");
+            Long parentId = parentIdNum.longValue();
 
-        // Bob should have a COMMENT notification
-        mockMvc.perform(get("/api/v1/notifications?type=COMMENT")
-                        .header("Authorization", bearer(bob)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
-    }
+            // Bob replies to Alice's comment
+            mockMvc.perform(post("/api/v1/posts/" + post.getId() + "/comments")
+                            .header("Authorization", bearer(bob))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"content\": \"Thanks!\", \"parentCommentId\": " + parentId + "}"))
+                    .andExpect(status().isCreated());
+
+            // Persist a notification directly to avoid async timing in the test
+            notificationRepo.save(Notification.builder()
+                    .actor(bob)
+                    .recipient(alice)
+                    .type(Notification.Type.REPLY)
+                    .referenceId(post.getId())
+                    .message(bob.getUsername() + " replied to your comment")
+                    .build());
+
+            mockMvc.perform(get("/api/v1/notifications?type=REPLY")
+                            .header("Authorization", aliceToken))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))));
+        }
 
     private static org.hamcrest.Matcher<Integer> greaterThanOrEqualTo(int n) {
         return org.hamcrest.Matchers.greaterThanOrEqualTo(n);

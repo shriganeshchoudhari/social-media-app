@@ -62,6 +62,14 @@ public class Notification {
         // ── Follow interactions ────────────────────────────────
         FOLLOW,           // someone started following you (public account)
         FOLLOW_REQUEST,   // someone requested to follow you (private account)
-        FOLLOW_ACCEPTED   // your follow request was accepted
+        FOLLOW_ACCEPTED,  // your follow request was accepted
+
+        // ── Group interactions ─────────────────────────────────
+        GROUP_INVITE,         // you were invited to join a group
+        GROUP_JOIN_REQUEST,   // someone requested to join your group (admin)
+        GROUP_JOIN_APPROVED,  // your join request was approved
+        GROUP_JOIN_REJECTED,  // your join request was rejected
+        GROUP_NEW_POST,       // new post in a group you belong to
+        GROUP_MEMBER_JOINED   // someone joined your group (admin)
     }
 }

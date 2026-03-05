@@ -14,4 +14,7 @@ public class CreatePostRequest {
     private String imageUrl;
 
     private Post.Privacy privacy = Post.Privacy.PUBLIC;
+
+    /** Optional: if set the post is scoped to this group. Caller must be a member. */
+    private Long groupId;
 }

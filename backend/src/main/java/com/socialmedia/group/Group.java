@@ -1,6 +1,5 @@
-package com.socialmedia.post;
+package com.socialmedia.group;
 
-import com.socialmedia.group.Group;
 import com.socialmedia.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,37 +7,34 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "social_groups")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Post {
+public class Group {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 2000)
-    private String content;
+    @Column(nullable = false, length = 100)
+    private String name;
 
-    private String imageUrl;
+    @Column(length = 500)
+    private String description;
+
+    @Column(length = 1000)
+    private String rules;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     @Builder.Default
     private Privacy privacy = Privacy.PUBLIC;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id")
-    private User author;
+    @JoinColumn(name = "creator_id")
+    private User creator;
 
-    @Builder.Default
-    private int likesCount = 0;
-
-    @Builder.Default
-    private int commentsCount = 0;
-
-    /** Optional group scope — null means a regular personal/feed post. */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @Column(length = 500)
+    private String coverImageUrl;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -51,5 +47,5 @@ public class Post {
     @PreUpdate
     void preUpdate() { updatedAt = LocalDateTime.now(); }
 
-    public enum Privacy { PUBLIC, FOLLOWERS_ONLY, PRIVATE }
+    public enum Privacy { PUBLIC, PRIVATE }
 }
